@@ -29,7 +29,7 @@ public class PerformanceAspect {
   private static final double MILLI_TO_SECOND_UNIT = 0.001;
   private static final double MAX_PERFORMANCE_TIME = 3;
 
-  @Around("execution(* com.prgrms.coretime..controller.*Controller.*(..))")
+  @Around("execution(* com.prgrms.artzip..controller.*Controller.*(..))")
   public Object printLog(ProceedingJoinPoint joinPoint) throws Throwable {
     HttpServletRequest request = (
         (ServletRequestAttributes) Objects.requireNonNull(
