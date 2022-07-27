@@ -9,6 +9,7 @@ plugins {
 	id 'io.spring.dependency-management' version '1.0.12.RELEASE'
 	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 	id 'java'
+	id 'jacoco'
 }
 
 group = 'com.prgrms'
@@ -23,6 +24,10 @@ configurations {
 
 repositories {
 	mavenCentral()
+}
+
+jacoco {
+	toolVersion = '0.8.7'
 }
 
 dependencies {
@@ -45,6 +50,73 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+	finalizedBy 'jacocoTestReport'
+}
+
+jacocoTestReport {
+	reports {
+		html.destination file("${buildDir}/jacocoHtml")
+		xml.enabled false
+		csv.enabled false
+	}
+
+	def Qdomains = []
+
+	for (qPattern in '**/QA'..'**/QZ') {
+		Qdomains.add(qPattern + '*')
+	}
+
+	afterEvaluate {
+		classDirectories.setFrom(
+				files(classDirectories.files.collect {
+					fileTree(dir: it, excludes: [
+							"com/prgrms/artzip/common/*",
+							"**/dto/*",
+							"**/domain/*",
+							"**/controller/*",
+							"**/util/*",
+							"com/prgrms/artzip/ArtzipApplication.class"
+					] + Qdomains)
+				})
+		)
+	}
+
+	finalizedBy 'jacocoTestCoverageVerification'
+}
+
+jacocoTestCoverageVerification {
+	def Qdomains = []
+
+	for (qPattern in '*.QA'..'*.QZ') {
+		Qdomains.add(qPattern + '*')
+	}
+
+	violationRules {
+		rule {
+			element = 'CLASS'
+
+			limit {
+				counter = 'LINE'
+				value = 'COVEREDRATIO'
+				minimum = 0.00
+			}
+
+			limit {
+				counter = 'BRANCH'
+				value = 'COVEREDRATIO'
+				minimum = 0.00
+			}
+
+			excludes = [
+					"com.prgrms.artzip.common.*",
+					"*.dto.*",
+					"*.controller.*",
+					"*.domain.*",
+					"*.util.*",
+					"com.prgrms.artzip.ArtzipApplication"
+			] + Qdomains
+		}
+	}
 }
 
 def querydslDir = "$buildDir/generated/querydsl" as Object
