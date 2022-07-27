@@ -46,10 +46,10 @@ public class SwaggerConfig {
   }
 
   private ApiKey accessToken() {
-    return new ApiKey("AccessJWT", "accessToken", "header");
+    return new ApiKey("accessJWT", "accessToken", "header");
   }
   private ApiKey refreshToken() {
-    return new ApiKey("RefreshJWT", "refreshToken", "header");
+    return new ApiKey("refreshJWT", "refreshToken", "header");
   }
 
   private SecurityContext securityContext() {
