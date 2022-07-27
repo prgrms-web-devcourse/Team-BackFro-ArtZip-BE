@@ -1,0 +1,14 @@
+spring:
+  profiles:
+    include:
+      - aws
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${RDS_USERNAME:root}
+    password: ${RDS_PASSWORD:password}
+    url: jdbc:mysql://${RDS_HOST:localhost}:${RDS_PORT:3306}/${RDS_SCHEMA:artzip}
+  redis:
+    host: ${ELASTICACHE_URL:localhost}
+    port: 6379
+  jwt:
+    client-secret: ${JWT_DEV_SECRET:DEFAULT_JWT_SECRET}
