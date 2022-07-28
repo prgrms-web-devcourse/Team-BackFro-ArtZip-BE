@@ -33,7 +33,7 @@ public class LoggingAspect {
   private static final String LOG_FORMAT = "REQUEST : {}";
   private static final String ERROR_LOG_FORMAT = "API 로그를 생성하는 과정에서 문제가 발생하였습니다.";
 
-  @Around("execution(* com.prgrms.coretime..controller.*Controller.*(..))")
+  @Around("execution(* com.prgrms.artzip..controller.*Controller.*(..))")
   public Object printLog(ProceedingJoinPoint joinPoint) throws Throwable {
     HttpServletRequest request = (
         (ServletRequestAttributes) Objects.requireNonNull(
