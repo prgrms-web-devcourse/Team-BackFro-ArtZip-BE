@@ -1,0 +1,25 @@
+spring:
+  application:
+      name: artzip
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_batch_fetch_size: 1000
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 5MB
+      max-request-size: 50MB
+  jwt:
+    issuer: backfro
+    accessToken:
+      header: accessToken
+      expiry-seconds: 1800
+    refreshToken:
+      header: refreshToken
+      expiry-seconds: 604800
+    blacklist:
+      access-token:

@@ -1,4 +1,4 @@
-package com.prgrms.datahandle.user.domain;
+package com.prgrms.artzip.user.domain;
 
 public class Role {
 

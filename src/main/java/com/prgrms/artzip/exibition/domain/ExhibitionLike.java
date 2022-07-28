@@ -3,7 +3,7 @@ package com.prgrms.artzip.exibition.domain;
 import static javax.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PROTECTED;
 
-import com.prgrms.datahandle.user.domain.User;
+import com.prgrms.artzip.user.domain.User;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
