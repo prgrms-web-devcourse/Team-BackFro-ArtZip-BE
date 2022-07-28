@@ -32,6 +32,10 @@ dependencies {
 
 	//swagger setting
 	implementation "io.springfox:springfox-boot-starter:3.0.0"
+
+	// flyway
+	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.flywaydb:flyway-mysql'
 }
 
 tasks.named('test') {
