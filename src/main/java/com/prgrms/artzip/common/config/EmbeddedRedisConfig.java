@@ -24,7 +24,6 @@ import java.util.Objects;
 @Configuration
 @Profile("!dev")
 public class EmbeddedRedisConfig {
-    //TODO: 내장 Redis Port 자동 설정
     private final Logger log = LoggerFactory.getLogger(getClass());
     private static final String BIN_SH = "/bin/sh";
     private static final String BIN_SH_OPTION = "-c";
