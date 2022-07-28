@@ -4,11 +4,10 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-application-dev.yml
-application-local.yml
-application-aws.yml
+**/resources/application-dev.yml
+**/resources/application-local.yml
+**/resources/application-aws.yml
 .env
-BackFro-BE-submodule/*
 .DS_Store
 
 ### STS ###
