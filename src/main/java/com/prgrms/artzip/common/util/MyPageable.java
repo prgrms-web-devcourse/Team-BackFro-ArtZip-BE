@@ -1,4 +1,4 @@
-package com.prgrms.artzip.common.entity;
+package com.prgrms.artzip.common.util;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
