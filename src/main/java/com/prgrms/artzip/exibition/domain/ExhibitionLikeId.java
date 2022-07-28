@@ -1,4 +1,4 @@
-package com.prgrms.datahandle.exhibition.domain;
+package com.prgrms.artzip.exibition.domain;
 
 import java.io.Serializable;
 import javax.persistence.Embeddable;
