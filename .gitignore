@@ -9,6 +9,7 @@ application-local.yml
 application-aws.yml
 .env
 BackFro-BE-submodule/*
+.DS_Store
 
 ### STS ###
 .apt_generated
