@@ -1,7 +1,7 @@
 package com.prgrms.artzip.common.config;
 
 import com.fasterxml.classmate.TypeResolver;
-import com.prgrms.artzip.common.entity.MyPageable;
+import com.prgrms.artzip.common.util.MyPageable;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
