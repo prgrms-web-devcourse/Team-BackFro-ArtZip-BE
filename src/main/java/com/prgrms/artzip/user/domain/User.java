@@ -1,8 +1,8 @@
-package com.prgrms.datahandle.user.domain;
+package com.prgrms.artzip.user.domain;
 
 import static lombok.AccessLevel.PROTECTED;
 
-import com.prgrms.datahandle.common.BaseEntity;
+import com.prgrms.artzip.common.entity.BaseEntity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -25,7 +25,5 @@ public class User extends BaseEntity {
   private String nickname;
 
   private String phone;
-
-
 
 }

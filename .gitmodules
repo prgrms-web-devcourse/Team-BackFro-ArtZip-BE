@@ -1,0 +1,3 @@
+[submodule "BackFro-BE-submodule"]
+	path = BackFro-BE-submodule
+	url = https://github.com/prgrms-web-devcourse/BackFro-BE-submodule.git
