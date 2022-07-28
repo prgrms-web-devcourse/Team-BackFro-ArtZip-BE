@@ -52,6 +52,10 @@ dependencies {
 
 	//s3 mock
 	testImplementation 'io.findify:s3mock_2.12:0.2.4'
+
+	// flyway
+	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.flywaydb:flyway-mysql'
 }
 
 tasks.named('test') {
