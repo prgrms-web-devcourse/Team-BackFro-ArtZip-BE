@@ -1,4 +1,4 @@
-package com.prgrms.datahandle.exhibition.domain;
+package com.prgrms.artzip.exibition.domain;
 
 import static lombok.AccessLevel.PROTECTED;
 
