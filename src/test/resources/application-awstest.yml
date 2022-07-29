@@ -6,6 +6,6 @@ cloud:
     s3:
       bucket: bucket
     region:
-      static: region
+      static: ap-northeast-2
     stack:
       auto: false
