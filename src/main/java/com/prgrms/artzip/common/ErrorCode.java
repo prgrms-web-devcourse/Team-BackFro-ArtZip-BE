@@ -41,8 +41,8 @@ public enum ErrorCode {
    * Review Domain
    */
   REVIEW_FIELD_CONTAINS_NULL_VALUE(400, "R001", "리뷰 필드에 NULL값이 포함되어 있습니다."),
-  INVALID_REVIEW_CONTENT_LENGTH(400, "R002", "리뷰 내용은 리뷰 내용은 1글자 이상 1000자 이하이어야 합니다."),
-  INVALID_REVIEW_TITLE_LENGTH(400, "R003", "리뷰 내용은 리뷰 제목은 1글자 이상 50자 이하이어야 합니다."),
+  INVALID_REVIEW_CONTENT_LENGTH(400, "R002", "리뷰 내용은 1글자 이상 1000자 이하이어야 합니다."),
+  INVALID_REVIEW_TITLE_LENGTH(400, "R003", "리뷰 제목은 1글자 이상 50자 이하이어야 합니다."),
   INVALID_REVIEW_DATE(400, "R004", "방문일은 오늘 이후일 수 없습니다."),
   REVIEW_LIKE_FIELD_CONTAINS_NULL_VALUE(400, "R005", "리뷰 좋아요 필드에 NULL값이 포함되어 있습니다."),
   REVIEW_PHOTO_FIELD_CONTAINS_NULL_VALUE(400, "R006", "리뷰 사진 필드에 NULL값이 포함되어 있습니다."),
