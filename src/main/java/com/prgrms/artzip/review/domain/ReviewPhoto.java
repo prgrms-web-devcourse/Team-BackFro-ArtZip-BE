@@ -50,7 +50,7 @@ public class ReviewPhoto extends BaseEntity {
   }
 
   private void validatePath(String path) {
-    Assert.isTrue(path.length() <= 2083,
-        "path는 2083자 이하이어야 합니다.");
+    Assert.isTrue(path.length() > 0 && path.length() <= 2083,
+        "path는 1글자 이상 2083자 이하이어야 합니다.");
   }
 }

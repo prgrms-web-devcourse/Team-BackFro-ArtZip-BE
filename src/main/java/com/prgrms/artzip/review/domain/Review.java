@@ -81,13 +81,13 @@ public class Review extends BaseEntity {
   }
 
   private void validateContent(String content) {
-    Assert.isTrue(content.length() <= 1000,
-        "리뷰 내용은 1000자 이하이어야 합니다.");
+    Assert.isTrue(content.length() > 0 && content.length() <= 1000,
+        "리뷰 내용은 1글자 이상 1000자 이하이어야 합니다.");
   }
 
   private void validateTitle(String title) {
-    Assert.isTrue(title.length() <= 50,
-        "리뷰 제목은 50자 이하이어야 합니다.");
+    Assert.isTrue(title.length() > 0 && title.length() <= 50,
+        "리뷰 제목은 1글자 이상 50자 이하이어야 합니다.");
   }
 
   private void validateDate(LocalDate date) {
