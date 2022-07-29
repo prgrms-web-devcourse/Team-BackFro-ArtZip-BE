@@ -1,9 +1,12 @@
 package com.prgrms.artzip.review.domain;
 
+import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.entity.BaseEntity;
+import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.exibition.domain.Exhibition;
 import com.prgrms.artzip.user.domain.User;
 import java.time.LocalDate;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -17,7 +20,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.util.Assert;
 
 @Entity
 @Table(name = "review")
@@ -72,26 +74,36 @@ public class Review extends BaseEntity {
 
   private void validateNotNull(User user, Exhibition exhibition, String content, String title,
       LocalDate date, Boolean isPublic) {
-    Assert.notNull(user, "리뷰 작성자는 필수값입니다.");
-    Assert.notNull(exhibition, "전시회는 필수값입니다.");
-    Assert.notNull(content, "리뷰 내용은 필수값입니다.");
-    Assert.notNull(title, "리뷰 제목은 필수값입니다.");
-    Assert.notNull(date, "방문일은 필수값입니다.");
-    Assert.notNull(isPublic, "공개 여부는 필수값입니다.");
+    if (Objects.isNull(user)) {
+      throw new InvalidRequestException(ErrorCode.REVIEW_FIELD_CONTAINS_NULL_VALUE);
+    } else if (Objects.isNull(exhibition)) {
+      throw new InvalidRequestException(ErrorCode.REVIEW_FIELD_CONTAINS_NULL_VALUE);
+    } else if (Objects.isNull(content)) {
+      throw new InvalidRequestException(ErrorCode.REVIEW_FIELD_CONTAINS_NULL_VALUE);
+    } else if (Objects.isNull(title)) {
+      throw new InvalidRequestException(ErrorCode.REVIEW_FIELD_CONTAINS_NULL_VALUE);
+    } else if (Objects.isNull(date)) {
+      throw new InvalidRequestException(ErrorCode.REVIEW_FIELD_CONTAINS_NULL_VALUE);
+    } else if (Objects.isNull(isPublic)) {
+      throw new InvalidRequestException(ErrorCode.REVIEW_FIELD_CONTAINS_NULL_VALUE);
+    }
   }
 
   private void validateContent(String content) {
-    Assert.isTrue(content.length() > 0 && content.length() <= 1000,
-        "리뷰 내용은 1글자 이상 1000자 이하이어야 합니다.");
+    if (content.length() <= 0 && content.length() > 1000) {
+      throw new InvalidRequestException(ErrorCode.INVALID_REVIEW_CONTENT_LENGTH);
+    }
   }
 
   private void validateTitle(String title) {
-    Assert.isTrue(title.length() > 0 && title.length() <= 50,
-        "리뷰 제목은 1글자 이상 50자 이하이어야 합니다.");
+    if (content.length() <= 0 && content.length() > 50) {
+      throw new InvalidRequestException(ErrorCode.INVALID_REVIEW_CONTENT_LENGTH);
+    }
   }
 
   private void validateDate(LocalDate date) {
-    Assert.isTrue(date.compareTo(LocalDate.now()) <= 0,
-        "방문일은 오늘 이후일 수 없습니다.");
+    if (date.compareTo(LocalDate.now()) > 0) {
+      throw new InvalidRequestException(ErrorCode.INVALID_REVIEW_CONTENT_LENGTH);
+    }
   }
 }
