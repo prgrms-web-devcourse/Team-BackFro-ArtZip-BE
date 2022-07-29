@@ -31,6 +31,7 @@ public class ExhibitionLike {
   private User user;
 
   public ExhibitionLike(Exhibition exhibition, User user) {
+    validateExhibitionLikeField(exhibition, user);
     this.exhibitionLikeId = new ExhibitionLikeId(exhibition.getId(), user.getId());
     setExhibition(exhibition);
     setUser(user);
