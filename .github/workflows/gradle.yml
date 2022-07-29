@@ -32,8 +32,7 @@ jobs:
       
     - name: Build With Gradle
       run: |
-        gradle clean build --stacktrace --warning-mode=all
-        cat /home/runner/work/Team-BackFro-ArtZip-BE/Team-BackFro-ArtZip-BE/build/reports/tests/test/index.html
+        ./gradlew clean build --stacktrace --warning-mode=all
       
 #    - name: Docker build
 #      run: |
