@@ -82,107 +82,107 @@ public class Exhibition extends BaseEntity {
 
   @Builder
   public Exhibition(Integer seq, String name, LocalDate startDate, LocalDate endDate, Genre genre, String description, Double latitude, Double longitude, Area area, String place, String address, String inquiry, String fee, String thumbnail, String url, String placeUrl) {
-    validateExhibitionField(seq, name, startDate, endDate, genre, description, latitude, longitude, area, place, address, inquiry, fee, thumbnail, url, placeUrl);
-    this.seq = seq;
-    this.name = name;
-    this.period = new Period(startDate, endDate);
+    setSeq(seq);
+    setName(name);
+    setPeriod(startDate, endDate);
     this.genre = genre;
-    this.description = description;
-    this.location = new Location(latitude, longitude, area, place, address);
-    this.inquiry = inquiry;
-    this.fee = fee;
-    this.thumbnail = thumbnail;
-    this.url = url;
-    this.placeUrl = placeUrl;
+    setDescription(description);
+    setLocation(latitude, longitude, area, place, address);
+    setInquiry(inquiry);
+    setFee(fee);
+    setThumbnail(thumbnail);
+    setUrl(url);
+    setPlaceUrl(placeUrl);
   }
 
-  private void validateExhibitionField(Integer seq, String name, LocalDate startDate, LocalDate endDate, Genre genre, String description, Double latitude, Double longitude, Area area, String place, String address, String inquiry, String fee, String thumbnail, String url, String placeUrl) {
-    validateSeq(seq);
-    validateName(name);
-    validatePeriod(startDate, endDate);
-    validateDescription(description);
-    validateLocation(latitude, longitude, area, place, address);
-    validateInquiry(inquiry);
-    validateFee(fee);
-    validateThumbnail(thumbnail);
-    validateUrl(url);
-    validatePlaceUrl(placeUrl);
-  }
-
-  private void validateSeq(Integer seq) {
+  private void setSeq(Integer seq) {
     if(isNull(seq)) {
       throw new InvalidRequestException(INVALID_EXHBN_SEQ);
+    }else{
+      this.seq = seq;
     }
   }
 
-  private void validateName(String name) {
+  private void setName(String name) {
     if(!hasText(name) || name.length() < 1 || name.length() > 70) {
       throw new InvalidRequestException(INVALID_EXHBN_NAME);
+    }else{
+      this.name = name;
     }
   }
 
-  private void validatePeriod(LocalDate startDate, LocalDate endDate) {
+  private void setPeriod(LocalDate startDate, LocalDate endDate) {
     if(isNull(startDate) || isNull(endDate) || startDate.isAfter(endDate)) {
       throw new InvalidRequestException(INVALID_EXHBN_PERIOD);
+    }else{
+      this.period = new Period(startDate, endDate);
     }
   }
 
-  private void validateDescription(String description) {
+  private void setDescription(String description) {
     if(hasText(description)) {
       if(description.length() < 1 || description.length() > 1000) {
         throw new InvalidRequestException(INVALID_EXHBN_DESCRIPTION);
+      }else{
+        this.description = description;
       }
     }
   }
 
-  private void validateLocation(Double latitude, Double longitude, Area area, String place, String address) {
+  private void setLocation(Double latitude, Double longitude, Area area, String place, String address) {
     if(isNull(latitude) || isNull(longitude)) {
       throw new InvalidRequestException(INVALID_EXHBN_COORDINATE);
-    }
-
-    if(isNull(area)) {
+    }else if(isNull(area)) {
       throw new InvalidRequestException(INVALID_EXHB_AREA);
-    }
-
-    if(isNull(place) || place.length() < 1 || place.length() > 20) {
+    }else if(isNull(place) || place.length() < 1 || place.length() > 20) {
       throw new InvalidRequestException(INVALID_EXHB_PLACE);
-    }
-
-    if(isNull(address) || address.length() < 1 || address.length() > 100) {
+    }else if(isNull(address) || address.length() < 1 || address.length() > 100) {
       throw new InvalidRequestException(INVALID_EXHB_ADDRESS);
+    }else{
+      this.location = new Location(latitude, longitude, area, place, address);
     }
   }
 
-  private void validateInquiry(String inquiry) {
+  private void setInquiry(String inquiry) {
     if(!hasText(inquiry) || inquiry.length() < 1 || inquiry.length() > 100) {
       throw new InvalidRequestException(INVALID_EXHB_INQUIRY);
+    }else{
+      this.inquiry = inquiry;
     }
   }
 
-  private void validateFee(String fee) {
+  private void setFee(String fee) {
     if(!hasText(fee) || fee.length() < 1 || fee.length() > 1000) {
       throw new InvalidRequestException(INVALID_EXHB_FEE);
+    }else{
+      this.fee = fee;
     }
   }
 
-  private void validateThumbnail(String thumbnail) {
+  private void setThumbnail(String thumbnail) {
     if(!hasText(thumbnail) || thumbnail.length() < 1 || thumbnail.length() > 2083 || !isValidUrl(thumbnail)) {
       throw new InvalidRequestException(INVALID_EXHB_THUMBNAIL);
+    }else{
+      this.thumbnail = thumbnail;
     }
   }
 
-  private void validateUrl(String url) {
+  private void setUrl(String url) {
     if(hasText(url)) {
       if(url.length() > 2083 || !isValidUrl(url)) {
         throw new InvalidRequestException(INVALID_EXHB_URL);
+      }else{
+        this.url = url;
       }
     }
   }
 
-  private void validatePlaceUrl(String placeUrl) {
+  private void setPlaceUrl(String placeUrl) {
     if(hasText(placeUrl)) {
       if(placeUrl.length() > 2083 || !isValidUrl(placeUrl)) {
         throw new InvalidRequestException(INVALID_EXHB_PLACEURL);
+      }else{
+        this.placeUrl = placeUrl;
       }
     }
   }
