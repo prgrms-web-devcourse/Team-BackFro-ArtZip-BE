@@ -90,20 +90,20 @@ public class Review extends BaseEntity {
   }
 
   private void validateContent(String content) {
-    if (content.length() <= 0 && content.length() > 1000) {
+    if (content.isBlank() || content.length() > 1000) {
       throw new InvalidRequestException(ErrorCode.INVALID_REVIEW_CONTENT_LENGTH);
     }
   }
 
   private void validateTitle(String title) {
-    if (content.length() <= 0 && content.length() > 50) {
-      throw new InvalidRequestException(ErrorCode.INVALID_REVIEW_CONTENT_LENGTH);
+    if (title.isBlank() || title.length() > 50) {
+      throw new InvalidRequestException(ErrorCode.INVALID_REVIEW_TITLE_LENGTH);
     }
   }
 
   private void validateDate(LocalDate date) {
     if (date.compareTo(LocalDate.now()) > 0) {
-      throw new InvalidRequestException(ErrorCode.INVALID_REVIEW_CONTENT_LENGTH);
+      throw new InvalidRequestException(ErrorCode.INVALID_REVIEW_DATE);
     }
   }
 }
