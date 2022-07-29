@@ -28,9 +28,15 @@ public enum ErrorCode {
   INVALID_ACCOUNT_REQUEST(400, "U002", "아이디 및 비밀번호가 올바르지 않습니다."),
   INVALID_TOKEN_REQUEST(400, "U003", "토큰이 올바르지 않습니다."),
   USER_ALREADY_EXISTS(400, "U004", "유저가 이미 존재합니다."),
-  TOKEN_EXPIRED(400, "U005", "토큰이 만료되었습니다.");
+  TOKEN_EXPIRED(400, "U005", "토큰이 만료되었습니다."),
 
-
+  /**
+   * Comment Domain
+   */
+  COMMENT_NOT_FOUND(400, "C001", "댓글이 존재하지 않습니다."),
+  CONTENT_IS_REQUIRED(400, "C002", "댓글 내용은 필수입니다.(최대 500자)"),
+  CONTENT_IS_TOO_LONG(400, "C003", "댓글은 최대 500자입니다.")
+;
   private final int status;
   private final String code;
   private final String message;

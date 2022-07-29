@@ -35,6 +35,7 @@ public class ExhibitionLike {
 
   private void setExhibition(Exhibition exhibition) {
     this.exhibition = exhibition;
+    exhibition.getExhibitionLikes().add(this);
   }
 
   private void setUser(User user) {
