@@ -4,13 +4,17 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.exibition.domain.Area;
 import com.prgrms.artzip.exibition.domain.Exhibition;
 import com.prgrms.artzip.exibition.domain.Genre;
+import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import java.time.LocalDate;
+import java.util.List;
+
 import org.assertj.core.internal.bytebuddy.utility.RandomString;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -18,7 +22,7 @@ import org.junit.jupiter.api.Test;
 
 class ReviewTest {
 
-  private User user = new User("test@example.com", "Emily");
+  private User user = new User("test@example.com", "Emily", List.of(new Role(Authority.USER)));
   private Exhibition exhibition = Exhibition.builder()
       .seq(32)
       .name("전시회 제목")
