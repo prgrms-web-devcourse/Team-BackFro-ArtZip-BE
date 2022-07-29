@@ -9,8 +9,6 @@ import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.exibition.domain.Area;
 import com.prgrms.artzip.exibition.domain.Exhibition;
 import com.prgrms.artzip.exibition.domain.Genre;
-import com.prgrms.artzip.exibition.domain.Location;
-import com.prgrms.artzip.exibition.domain.Period;
 import com.prgrms.artzip.user.domain.User;
 import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
@@ -34,7 +32,7 @@ class ReviewLikeTest {
       .address("부산 동구 중앙대로 11")
       .inquiry("문의처 정보")
       .fee("성인 20,000원")
-      .thumbnail("http://image.com")
+      .thumbnail("https://www.image-example.com")
       .url("https://www.example.com")
       .placeUrl("https://www.place-example.com")
       .build();
