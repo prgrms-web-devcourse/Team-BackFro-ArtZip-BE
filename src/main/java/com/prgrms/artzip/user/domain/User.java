@@ -1,20 +1,17 @@
 package com.prgrms.artzip.user.domain;
 
 import static com.prgrms.artzip.common.ErrorCode.*;
+import static org.springframework.util.StringUtils.*;
 
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
-import org.springframework.util.Assert;
 import com.prgrms.artzip.common.entity.BaseEntity;
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.Table;
+
+import javax.persistence.*;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,7 +28,6 @@ public class User extends BaseEntity {
   private static final String NICKNAME_REGEX = "[a-zA-Z가-힣0-9]+( [a-zA-Z가-힣0-9]+)*";
   private static final int MAX_EMAIL_LENGTH = 100;
   private static final int MAX_NICKNAME_LENGTH = 10;
-  private static final int MAX_NAME_LENGTH = 10;
   private static final int MAX_PROFILEIMAGE_LENGTH = 300;
 
   // TODO: max 값 erd 보고 확인
@@ -51,10 +47,38 @@ public class User extends BaseEntity {
   @Column(name = "nickname", nullable = false, length = MAX_NICKNAME_LENGTH)
   private String nickname;
 
+  @ManyToMany
+  @JoinTable(
+          name = "user_role",
+          joinColumns = @JoinColumn(
+                  name = "user_id"),
+          inverseJoinColumns = @JoinColumn(
+                  name = "role_id")
+  )
+  private List<Role> roles = new ArrayList<>();
+
   @Column(name = "is_quit")
   private Boolean isQuit = false;
 
-  /*TODO : Refactoring*/
+  public User(String email, String nickname, List<Role> roles) {
+    if(!hasText(email)) throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
+    if(!hasText(nickname)) throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
+
+    validateEmail(email);
+    validateNickname(nickname);
+
+    this.roles = roles;
+    this.email = email;
+    this.nickname = nickname;
+  }
+
+  public void changeQuitFlag(Boolean flag) {
+    this.isQuit = flag;
+  }
+
+  public void addRole(Role role) {
+    roles.add(role);
+  }
 
   private static void validateNickname(String nickname) {
     if(nickname.length() > MAX_NICKNAME_LENGTH) {
@@ -75,24 +99,9 @@ public class User extends BaseEntity {
   }
 
   private static void validateProfileImage(String profileImage) {
-    if(profileImage.length() > MAX_PROFILEIMAGE_LENGTH) {
+    if (profileImage.length() > MAX_PROFILEIMAGE_LENGTH) {
       throw new InvalidRequestException(INVALID_LENGTH);
     }
-  }
-
-  public User(String email, String nickname) {
-    Assert.hasText(email, "email이 누락되었습니다.");
-    Assert.hasText(nickname, "nickname이 누락되었습니다.");
-
-    validateEmail(email);
-    validateNickname(nickname);
-
-    this.email = email;
-    this.nickname = nickname;
-  }
-
-  public void changeQuitFlag(Boolean flag) {
-    this.isQuit = flag;
   }
 }
 
