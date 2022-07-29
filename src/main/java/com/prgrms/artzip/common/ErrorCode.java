@@ -54,8 +54,21 @@ public enum ErrorCode {
    */
   COMMENT_NOT_FOUND(400, "C001", "댓글이 존재하지 않습니다."),
   CONTENT_IS_REQUIRED(400, "C002", "댓글 내용은 필수입니다.(최대 500자)"),
-  CONTENT_IS_TOO_LONG(400, "C003", "댓글은 최대 500자입니다.")
-;
+  CONTENT_IS_TOO_LONG(400, "C003", "댓글은 최대 500자입니다."),
+
+  /**
+   * Review Domain
+   */
+  REVIEW_FIELD_CONTAINS_NULL_VALUE(400, "R001", "리뷰 필드에 NULL값이 포함되어 있습니다."),
+  INVALID_REVIEW_CONTENT_LENGTH(400, "R002", "리뷰 내용은 1글자 이상 1000자 이하이어야 합니다."),
+  INVALID_REVIEW_TITLE_LENGTH(400, "R003", "리뷰 제목은 1글자 이상 50자 이하이어야 합니다."),
+  INVALID_REVIEW_DATE(400, "R004", "방문일은 오늘 이후일 수 없습니다."),
+  REVIEW_LIKE_FIELD_CONTAINS_NULL_VALUE(400, "R005", "리뷰 좋아요 필드에 NULL값이 포함되어 있습니다."),
+  REVIEW_PHOTO_FIELD_CONTAINS_NULL_VALUE(400, "R006", "리뷰 사진 필드에 NULL값이 포함되어 있습니다."),
+  INVALID_REVIEW_PHOTO_PATH_LENGTH(400, "R007", "path는 1글자 이상 2083자 이하이어야 합니다.")
+  ;
+
+
   private final int status;
   private final String code;
   private final String message;

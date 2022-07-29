@@ -1,6 +1,9 @@
 package com.prgrms.artzip.review.domain;
 
+import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.entity.BaseEntity;
+import com.prgrms.artzip.common.error.exception.InvalidRequestException;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,7 +16,6 @@ import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.util.Assert;
 
 @Entity
 @Table(name = "review_photo")
@@ -45,12 +47,16 @@ public class ReviewPhoto extends BaseEntity {
   }
 
   private void validateNotNull(Review review, String path) {
-    Assert.notNull(review, "review는 필수값입니다.");
-    Assert.notNull(path, "path는 필수값입니다.");
+    if (Objects.isNull(review)) {
+      throw new InvalidRequestException(ErrorCode.REVIEW_PHOTO_FIELD_CONTAINS_NULL_VALUE);
+    } else if (Objects.isNull(path)) {
+      throw new InvalidRequestException(ErrorCode.REVIEW_PHOTO_FIELD_CONTAINS_NULL_VALUE);
+    }
   }
 
   private void validatePath(String path) {
-    Assert.isTrue(path.length() > 0 && path.length() <= 2083,
-        "path는 1글자 이상 2083자 이하이어야 합니다.");
+    if (path.isBlank() || path.length() > 2083) {
+      throw new InvalidRequestException(ErrorCode.INVALID_REVIEW_PHOTO_PATH_LENGTH);
+    }
   }
 }
