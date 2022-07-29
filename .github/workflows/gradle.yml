@@ -9,7 +9,7 @@ name: Java CI with Gradle
 
 on:
   push:
-    branches: [ "test/ci-env" ]
+    branches: [ "main" ]
 
 permissions:
   contents: read
@@ -35,7 +35,7 @@ jobs:
       
     - name: Build With Gradle
       run: |
-        ./gradlew clean build --stacktrace --warning-mode=all
+        ./gradlew clean build --stacktrace
       
 #    - name: Docker build
 #      run: |
