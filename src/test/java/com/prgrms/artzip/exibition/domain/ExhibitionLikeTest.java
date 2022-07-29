@@ -3,9 +3,13 @@ package com.prgrms.artzip.exibition.domain;
 import static com.prgrms.artzip.exibition.domain.Area.GYEONGGI;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
+import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import java.time.LocalDate;
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +29,7 @@ class ExhibitionLikeTest {
       .thumbnail("http://image.com")
       .build();
 
-  private User user = new User("test@test.com", "tester");
+  private User user = new User("test@test.com", "tester", List.of(new Role(Authority.USER)));
 
   @Test
   @DisplayName("전시회 정보가 null인 경우 테스트")

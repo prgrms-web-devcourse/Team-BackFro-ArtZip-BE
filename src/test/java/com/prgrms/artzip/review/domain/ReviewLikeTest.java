@@ -4,22 +4,24 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.exibition.domain.Area;
 import com.prgrms.artzip.exibition.domain.Exhibition;
 import com.prgrms.artzip.exibition.domain.Genre;
-import com.prgrms.artzip.exibition.domain.Location;
-import com.prgrms.artzip.exibition.domain.Period;
+import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import java.time.LocalDate;
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 class ReviewLikeTest {
 
-  private User user = new User("test@example.com", "Emily");
+  private User user = new User("test@example.com", "Emily", List.of(new Role(Authority.USER)));
   private Exhibition exhibition = Exhibition.builder()
       .seq(32)
       .name("전시회 제목")
@@ -34,7 +36,7 @@ class ReviewLikeTest {
       .address("부산 동구 중앙대로 11")
       .inquiry("문의처 정보")
       .fee("성인 20,000원")
-      .thumbnail("http://image.com")
+      .thumbnail("https://www.image-example.com")
       .url("https://www.example.com")
       .placeUrl("https://www.place-example.com")
       .build();
