@@ -14,12 +14,16 @@ import lombok.NoArgsConstructor;
 public class Location {
   @Column(name = "latitude", nullable = false)
   private Double latitude; // 위도, y
+
   @Column(name = "longitude", nullable = false)
   private Double longitude; // 경도, x
+
   @Column(name = "area", nullable = false, length = 20)
   private Area area; // 지역
+
   @Column(name = "place", nullable = false, length = 50)
   private String place; // 장소
+
   @Column(name = "address", nullable = false, length = 100)
   private String address; // 장소의 주소
 

@@ -31,6 +31,25 @@ public enum ErrorCode {
   TOKEN_EXPIRED(400, "U005", "토큰이 만료되었습니다."),
 
   /**
+   * Exhibition Domain
+   */
+  INVALID_EXHBN_SEQ(400, "EX001", "전시회 seq는 필수입니다."),
+  INVALID_EXHBN_NAME(400, "EX002", "전시회 이름은 필수입니다.(1 <= 전시회 이름 <= 70)"),
+  INVALID_EXHBN_PERIOD(400, "EX003", "전시회 기간 정보는 필수입니다.(startDate <= endDate)"),
+  INVALID_EXHBN_DESCRIPTION(400, "EX004", "전시회 설명은 최대 1000자 입니다."),
+  INVALID_EXHBN_COORDINATE(400, "EX005", "전시회 좌표는 필수입니다."),
+  INVALID_EXHB_AREA(400, "EX006", "전시회 지역은 필수입니다."),
+  INVALID_EXHB_PLACE(400, "EX007", "전시회 장소는 필수입니다.(1 <= 전시회 장소 <= 20)"),
+  INVALID_EXHB_ADDRESS(400, "EX008", "전시회 상세 주소는 필수입니다.(1 <= 전시회 주소 <= 100)"),
+  INVALID_EXHB_INQUIRY(400, "EX008", "전시회 문의처는 필수입니다.(1 <= 전시회 문의처 <= 100)"),
+  INVALID_EXHB_FEE(400, "EX009", "전시회 요금 정보는 필수입니다.(1 <= 전시회 요금 정보 <= 1000)"),
+  INVALID_EXHB_THUMBNAIL(400, "EX010", "전시회 썸네일을 필수입니다. 전시회 썸네일 저장 형태는 URL 입니다.(1 <= 전시회 썸네일 URL <= 2083)"),
+  INVALID_EXHB_URL(400, "EX011", "전시회 URL은 필수입니다.(1 <= 전시회 URL <= 2083)"),
+  INVALID_EXHB_PLACEURL(400, "EX012", "전시회 장소 URL은 필수입니다.(1 <= 전시회 장소 URL <= 2083)"),
+  INVALID_EXHB_LIKE(400, "EX013", "전시회 좋아요에는 전시회 정보와 사용자 정보가 필수입니다."),
+
+
+  /**
    * Comment Domain
    */
   COMMENT_NOT_FOUND(400, "C001", "댓글이 존재하지 않습니다."),
