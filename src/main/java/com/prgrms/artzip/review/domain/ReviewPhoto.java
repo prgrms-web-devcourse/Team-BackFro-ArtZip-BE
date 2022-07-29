@@ -56,7 +56,7 @@ public class ReviewPhoto extends BaseEntity {
 
   private void validatePath(String path) {
     if (path.length() <= 0 && path.length() > 2083) {
-      throw new InvalidRequestException(ErrorCode.REVIEW_PHOTO_FIELD_CONTAINS_NULL_VALUE);
+      throw new InvalidRequestException(ErrorCode.INVALID_REVIEW_PHOTO_PATH_LENGTH);
     }
   }
 }
