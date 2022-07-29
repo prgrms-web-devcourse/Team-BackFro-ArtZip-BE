@@ -4,6 +4,8 @@ import static com.prgrms.artzip.common.ErrorCode.*;
 
 import com.prgrms.artzip.common.error.exception.AuthErrorException;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
+
+import java.util.List;
 import java.util.regex.Pattern;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -25,8 +27,8 @@ public class LocalUser extends User {
     private String password;
 
     @Builder
-    public LocalUser(String email, String nickname, String password) {
-        super(email, nickname);
+    public LocalUser(String email, String nickname, String password, List<Role> roles) {
+        super(email, nickname, roles);
         this.password = password;
     }
 
