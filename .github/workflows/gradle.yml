@@ -31,7 +31,7 @@ jobs:
       run: chmod +x gradlew
       
     - name: Build With Gradle
-      run: gradle clean build --stacktrace
+      run: gradle clean build --stacktrace --warning-mode=all
       
 #    - name: Docker build
 #      run: |
