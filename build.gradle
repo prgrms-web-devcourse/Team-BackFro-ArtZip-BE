@@ -65,6 +65,25 @@ dependencies {
 	implementation 'mysql:mysql-connector-java'
 }
 
+def querydslDir = "$buildDir/generated/querydsl" as Object
+
+querydsl {
+	jpa = true
+	querydslSourcesDir = querydslDir
+}
+sourceSets {
+	main.java.srcDir querydslDir
+}
+compileQuerydsl {
+	options.annotationProcessorPath = configurations.querydsl
+}
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+	querydsl.extendsFrom compileClasspath
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
 	finalizedBy 'jacocoTestReport'
@@ -134,23 +153,4 @@ jacocoTestCoverageVerification {
 			] + Qdomains
 		}
 	}
-}
-
-def querydslDir = "$buildDir/generated/querydsl" as Object
-
-querydsl {
-	jpa = true
-	querydslSourcesDir = querydslDir
-}
-sourceSets {
-	main.java.srcDir querydslDir
-}
-compileQuerydsl {
-	options.annotationProcessorPath = configurations.querydsl
-}
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-	querydsl.extendsFrom compileClasspath
 }
