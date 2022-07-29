@@ -1,8 +1,11 @@
 package com.prgrms.artzip.exibition.domain;
 
+import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHB_LIKE;
+import static java.util.Objects.isNull;
 import static javax.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PROTECTED;
 
+import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.user.domain.User;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -40,5 +43,11 @@ public class ExhibitionLike {
 
   private void setUser(User user) {
     this.user = user;
+  }
+
+  private void validateExhibitionLikeField(Exhibition exhibition, User user) {
+    if(isNull(exhibition) || isNull(user)) {
+      throw new InvalidRequestException(INVALID_EXHB_LIKE);
+    }
   }
 }
