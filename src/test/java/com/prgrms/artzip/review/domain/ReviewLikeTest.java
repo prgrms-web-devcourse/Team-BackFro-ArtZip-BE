@@ -9,8 +9,6 @@ import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.exibition.domain.Area;
 import com.prgrms.artzip.exibition.domain.Exhibition;
 import com.prgrms.artzip.exibition.domain.Genre;
-import com.prgrms.artzip.exibition.domain.Location;
-import com.prgrms.artzip.exibition.domain.Period;
 import com.prgrms.artzip.user.domain.User;
 import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
@@ -23,21 +21,18 @@ class ReviewLikeTest {
   private Exhibition exhibition = Exhibition.builder()
       .seq(32)
       .name("전시회 제목")
-      .period(new Period(
-          LocalDate.of(2022, 4, 11),
-          LocalDate.of(2022, 6, 2)))
+      .startDate(LocalDate.of(2022, 4, 11))
+      .endDate(LocalDate.of(2022, 6, 2))
       .genre(Genre.FINEART)
       .description("이것은 전시회 설명입니다.")
-      .location(Location.builder()
-          .latitude(36.22)
-          .longitude(128.02)
-          .area(Area.BUSAN)
-          .place("미술관")
-          .address("부산 동구 중앙대로 11")
-          .build())
+      .latitude(36.22)
+      .longitude(128.02)
+      .area(Area.BUSAN)
+      .place("미술관")
+      .address("부산 동구 중앙대로 11")
       .inquiry("문의처 정보")
       .fee("성인 20,000원")
-      .thumbnail("https://www.example-thumbnail-image.png")
+      .thumbnail("https://www.image-example.com")
       .url("https://www.example.com")
       .placeUrl("https://www.place-example.com")
       .build();
