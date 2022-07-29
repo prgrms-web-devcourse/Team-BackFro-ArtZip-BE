@@ -23,7 +23,6 @@ import lombok.NoArgsConstructor;
 @DiscriminatorColumn
 @Getter
 public class User extends BaseEntity {
-
   private static final String EMAIL_REGEX = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
   private static final String NICKNAME_REGEX = "[a-zA-Z가-힣0-9]+( [a-zA-Z가-힣0-9]+)*";
   private static final int MAX_EMAIL_LENGTH = 100;
