@@ -157,4 +157,10 @@ task copyPrivate(type: Copy) {
 		include "application-aws.yml"
 		into 'src/main/resources'
 	}
+
+	copy {
+		from './BackFro-BE-submodule'
+		include "application-aws.yml"
+		into 'src/test/resources'
+	}
 }

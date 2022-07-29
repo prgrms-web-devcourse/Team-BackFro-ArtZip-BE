@@ -1,7 +1,10 @@
 package com.prgrms.artzip.review.domain;
 
+import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.entity.BaseEntity;
+import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.user.domain.User;
+import java.util.Objects;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,7 +16,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JoinColumnOrFormula;
-import org.springframework.util.Assert;
 
 @Entity
 @Table(name = "review_like")
@@ -48,7 +50,10 @@ public class ReviewLike extends BaseEntity {
   }
 
   private void validateFields(Review review, User user) {
-    Assert.notNull(review, "review는 필수값입니다.");
-    Assert.notNull(user, "user는 필수값입니다.");
+    if (Objects.isNull(review)) {
+      throw new InvalidRequestException(ErrorCode.REVIEW_LIKE_FIELD_CONTAINS_NULL_VALUE);
+    } else if (Objects.isNull(user)) {
+      throw new InvalidRequestException(ErrorCode.REVIEW_LIKE_FIELD_CONTAINS_NULL_VALUE);
+    }
   }
 }
