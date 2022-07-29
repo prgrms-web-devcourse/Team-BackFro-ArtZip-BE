@@ -3,24 +3,26 @@ package com.prgrms.artzip.common;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.data.domain.Page;
 
 @Getter
 public class PageResponse {
   private List<Object> content;
-  private Long numberOfElement;
-  private Long offset;
-  private Long pageSize;
-  private Long totalElements;
-  private Long totalPage;
+  private int numberOfElements;
+  private int pageNumber;
+  private long offset;
+  private int pageSize;
+  private long totalElements;
+  private int totalPage;
 
   @Builder
-  public PageResponse(List<Object> content, Long numberOfElement, Long offset,
-      Long pageSize, Long totalElements, Long totalPage) {
-    this.content = content;
-    this.numberOfElement = numberOfElement;
-    this.offset = offset;
-    this.pageSize = pageSize;
-    this.totalElements = totalElements;
-    this.totalPage = totalPage;
+  public PageResponse(Page page) {
+    this.content = page.getContent();
+    this.numberOfElements = page.getNumberOfElements();
+    this.pageNumber = page.getPageable().getPageNumber();
+    this.offset = page.getPageable().getOffset();
+    this.pageSize = page.getPageable().getPageSize();
+    this.totalElements = page.getTotalElements();
+    this.totalPage = page.getTotalPages();
   }
 }
