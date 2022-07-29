@@ -5,7 +5,6 @@ build/
 !**/src/test/**/build/
 
 **/resources/application-dev.yml
-**/resources/application-local.yml
 **/resources/application-aws.yml
 .env
 .DS_Store
