@@ -1,13 +1,17 @@
 spring:
   application:
       name: artzip
+  profiles:
+    include:
+      - aws
   jpa:
     open-in-view: false
-    hibernate:
-      ddl-auto: validate
     properties:
       hibernate:
         default_batch_fetch_size: 1000
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
   servlet:
     multipart:
       enabled: true
@@ -22,4 +26,10 @@ spring:
       header: refreshToken
       expiry-seconds: 604800
     blacklist:
-      access-token:
+      access-token: BlackList_AccessToken_
+logging:
+  level:
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: error

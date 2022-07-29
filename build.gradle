@@ -57,31 +57,8 @@ dependencies {
 	//s3 mock
 	testImplementation 'io.findify:s3mock_2.12:0.2.4'
 
-	// flyway
-	implementation 'org.flywaydb:flyway-core'
-	implementation 'org.flywaydb:flyway-mysql'
-
 	//mysql
 	implementation 'mysql:mysql-connector-java'
-}
-
-def querydslDir = "$buildDir/generated/querydsl" as Object
-
-querydsl {
-	jpa = true
-	querydslSourcesDir = querydslDir
-}
-sourceSets {
-	main.java.srcDir querydslDir
-}
-compileQuerydsl {
-	options.annotationProcessorPath = configurations.querydsl
-}
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-	querydsl.extendsFrom compileClasspath
 }
 
 tasks.named('test') {
@@ -152,5 +129,32 @@ jacocoTestCoverageVerification {
 					"com.prgrms.artzip.ArtzipApplication"
 			] + Qdomains
 		}
+	}
+}
+
+def querydslDir = "$buildDir/generated/querydsl" as Object
+
+querydsl {
+	jpa = true
+	querydslSourcesDir = querydslDir
+}
+sourceSets {
+	main.java.srcDir querydslDir
+}
+compileQuerydsl {
+	options.annotationProcessorPath = configurations.querydsl
+}
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+	querydsl.extendsFrom compileClasspath
+}
+
+task copyPrivate(type: Copy) {
+	copy {
+		from './BackFro-BE-submodule'
+		include "application-aws.yml"
+		into 'src/main/resources'
 	}
 }
