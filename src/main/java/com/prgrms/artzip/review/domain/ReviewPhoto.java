@@ -55,7 +55,7 @@ public class ReviewPhoto extends BaseEntity {
   }
 
   private void validatePath(String path) {
-    if (path.length() <= 0 && path.length() > 2083) {
+    if (path.isBlank() || path.length() > 2083) {
       throw new InvalidRequestException(ErrorCode.INVALID_REVIEW_PHOTO_PATH_LENGTH);
     }
   }
