@@ -16,7 +16,17 @@ public class ExhibitionService {
   public Page<ExhibitionInfo> getUpcomingExhibitions(Pageable pageable) {
     Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findUpcomingExhibitions(pageable);
 
-    return exhibitionsPagingResult.map(exhibitionForSimpleQuery -> ExhibitionInfo.builder()
+    return exhibitionsPagingResult.map(this::exhibitionForSimpleQueryToExhibitionInfo);
+  }
+
+  public Page<ExhibitionInfo> getMostLikeExhibitions(boolean includeEnd, Pageable pageable) {
+    Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findMostLikeExhibitions(includeEnd, pageable);
+
+    return exhibitionsPagingResult.map(this::exhibitionForSimpleQueryToExhibitionInfo);
+  }
+
+  private ExhibitionInfo exhibitionForSimpleQueryToExhibitionInfo(ExhibitionForSimpleQuery exhibitionForSimpleQuery) {
+    return ExhibitionInfo.builder()
         .exhibitionId(exhibitionForSimpleQuery.getId())
         .name(exhibitionForSimpleQuery.getName())
         .thumbnail(exhibitionForSimpleQuery.getThumbnail())
@@ -24,6 +34,6 @@ public class ExhibitionService {
         .endDate(exhibitionForSimpleQuery.getPeriod().getEndDate())
         .likeCount(exhibitionForSimpleQuery.getLikeCount())
         .reviewCount(exhibitionForSimpleQuery.getReviewCount())
-        .build());
+        .build();
   }
 }

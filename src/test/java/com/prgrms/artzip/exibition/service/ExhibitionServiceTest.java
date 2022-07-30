@@ -53,4 +53,29 @@ class ExhibitionServiceTest {
     // then
     verify(exhibitionRepository).findUpcomingExhibitions(pageRequest);
   }
+
+  @Test
+  @DisplayName("인기 많은 전시회 조회 테스트")
+  void testGetMostLikeExhibitions() {
+    pageRequest = PageRequest.of(0, 1);
+    List<ExhibitionForSimpleQuery> exhibitions = new ArrayList<>();
+    exhibitions.add(ExhibitionForSimpleQuery.builder()
+        .id(11L)
+        .name("요리조리 MOKA Garden")
+        .thumbnail("http://www.culture.go.kr/upload/rdf/22/07/show_2022071411402126915.png")
+        .period(new Period(LocalDate.now().plusDays(1), LocalDate.now().plusDays(10)))
+        .likeCount(30)
+        .reviewCount(15)
+        .build());
+    Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = new PageImpl(exhibitions);
+
+    // given
+    when(exhibitionRepository.findMostLikeExhibitions(true, pageRequest)).thenReturn(exhibitionsPagingResult);
+
+    // when
+    exhibitionService.getMostLikeExhibitions(true, pageRequest);
+
+    // then
+    verify(exhibitionRepository).findMostLikeExhibitions(true, pageRequest);
+  }
 }
