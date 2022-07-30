@@ -31,6 +31,8 @@ public enum ErrorCode {
   TOKEN_EXPIRED(400, "U005", "토큰이 만료되었습니다."),
   PRINCIPAL_REQUIRED(400, "U006", "아이디는 필수입니다."),
   CREDENTIAL_REQUIRED(400, "U006", "비밀번호는 필수입니다."),
+  ACCESS_TOKEN_REQUIRED(400, "U007", "access token은 필수입니다."),
+  EMAIL_REQUIRED(400, "U008", "이메일은 필수입니다."),
   /**
    * Exhibition Domain
    */
