@@ -53,6 +53,7 @@ public class ExhibitionController {
         .body(apiResponse);
   }
 
+  @ApiOperation(value = "전시회 상세 조회", notes = "전시회를 조회합니다.")
   @GetMapping("/{exhibitionId}")
   public ResponseEntity<ApiResponse<ExhibitionDetailInfo>> getExhibition(@PathVariable Long exhibitionId) {
     ApiResponse apiResponse = ApiResponse.builder()
