@@ -6,8 +6,11 @@ import static com.prgrms.artzip.review.domain.QReview.review;
 import static com.querydsl.core.types.ExpressionUtils.count;
 
 import com.prgrms.artzip.exibition.dto.ExhibitionForSimpleQuery;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -23,7 +26,7 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository{
   private final JPAQueryFactory queryFactory;
 
   @Override
-  public Page<ExhibitionForSimpleQuery> findUpcomingExhibition(Pageable pageable) {
+  public Page<ExhibitionForSimpleQuery> findUpcomingExhibitions(Pageable pageable) {
     LocalDate today = LocalDate.now();
 
     List<ExhibitionForSimpleQuery> exhibitions = queryFactory
@@ -52,5 +55,48 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository{
         .where(exhibition.period.startDate.goe(today));
 
     return PageableExecutionUtils.getPage(exhibitions, pageable, countQuery::fetchOne);
+  }
+
+  @Override
+  public Page<ExhibitionForSimpleQuery> findMostLikeExhibitions(boolean includeEnd, Pageable pageable) {
+    BooleanBuilder mostLikeCondition = getMostLikeCondition(includeEnd);
+    NumberPath<Long> likeCount = Expressions.numberPath(Long.class, "likeCount");
+
+    List<ExhibitionForSimpleQuery> exhibitions = queryFactory
+        .select(Projections.fields(ExhibitionForSimpleQuery.class,
+            exhibition.id.as("exhibitionId"), exhibition.name, exhibition.thumbnail, exhibition.period, exhibition.exhibitionLikes.size().as("likeCount"),
+            ExpressionUtils.as(
+                JPAExpressions.select(count(exhibitionLike))
+                    .from(exhibitionLike)
+                    .where(exhibitionLike.exhibition.id.eq(exhibition.id)),
+                "likeCount"),
+            ExpressionUtils.as(
+                JPAExpressions.select(count(review))
+                    .from(review)
+                    .where(review.exhibition.id.eq(exhibition.id)),
+                "reviewCount")))
+        .from(exhibition)
+        .where(mostLikeCondition)
+        .offset(pageable.getOffset())
+        .limit(pageable.getPageSize())
+        .orderBy(likeCount.desc())
+        .fetch();
+
+    JPAQuery<Long> countQuery = queryFactory
+        .select(exhibition.count())
+        .from(exhibition)
+        .where(mostLikeCondition);
+
+    return PageableExecutionUtils.getPage(exhibitions, pageable, countQuery::fetchOne);
+  }
+
+  private BooleanBuilder getMostLikeCondition(boolean includeEnd) {
+    BooleanBuilder mostLikeCondition = new BooleanBuilder();
+
+    if(!includeEnd) {
+      mostLikeCondition.and(exhibition.period.endDate.goe(LocalDate.now()));
+    }
+
+    return mostLikeCondition;
   }
 }

@@ -16,7 +16,7 @@ public class ExhibitionService {
 
   @Transactional(readOnly = true)
   public Page<ExhibitionInfo> getUpcomingExhibitions(Pageable pageable) {
-    Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findUpcomingExhibition(pageable);
+    Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findUpcomingExhibitions(pageable);
 
     return exhibitionsPagingResult.map(exhibitionForSimpleQuery -> ExhibitionInfo.builder()
         .exhibitionId(exhibitionForSimpleQuery.getExhibitionId())

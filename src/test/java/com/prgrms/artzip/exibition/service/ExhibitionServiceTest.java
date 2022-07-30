@@ -45,12 +45,12 @@ class ExhibitionServiceTest {
     Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = new PageImpl(exhibitions);
 
     // given
-    when(exhibitionRepository.findUpcomingExhibition(pageRequest)).thenReturn(exhibitionsPagingResult);
+    when(exhibitionRepository.findUpcomingExhibitions(pageRequest)).thenReturn(exhibitionsPagingResult);
 
     // when
     exhibitionService.getUpcomingExhibitions(pageRequest);
 
     // then
-    verify(exhibitionRepository).findUpcomingExhibition(pageRequest);
+    verify(exhibitionRepository).findUpcomingExhibitions(pageRequest);
   }
 }

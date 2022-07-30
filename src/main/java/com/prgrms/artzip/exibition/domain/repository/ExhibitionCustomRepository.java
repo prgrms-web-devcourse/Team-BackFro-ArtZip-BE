@@ -5,5 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface ExhibitionCustomRepository {
-   Page<ExhibitionForSimpleQuery> findUpcomingExhibition(Pageable pageable);
+   Page<ExhibitionForSimpleQuery> findUpcomingExhibitions(Pageable pageable);
+
+   Page<ExhibitionForSimpleQuery> findMostLikeExhibitions(boolean includeEnd, Pageable pageable);
 }
