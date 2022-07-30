@@ -1,7 +1,5 @@
 package com.prgrms.artzip.exibition.dto.response;
 
-import static java.util.Objects.isNull;
-
 import com.prgrms.artzip.exibition.domain.Area;
 import com.prgrms.artzip.exibition.domain.Genre;
 import java.time.LocalDate;
@@ -13,11 +11,11 @@ import lombok.experimental.SuperBuilder;
 public class ExhibitionDetailInfo extends ExhibitionBasicInfo{
   private LocalDate startDate;
   private LocalDate endDate;
-  private String area; // enum 조심
+  private Area area;
   private String url;
   private String placeUrl;
   private String inquiry;
-  private String genre; // enum 조심
+  private Genre genre;
   private String description;
   private long likeCount;
   private String placeAddress;
@@ -33,11 +31,11 @@ public class ExhibitionDetailInfo extends ExhibitionBasicInfo{
     super(exhibitionId, name, thumbnail);
     this.startDate = startDate;
     this.endDate = endDate;
-    this.area = isNull(area) ? "" : area.toString();
+    this.area = area;
     this.url = url;
     this.placeUrl = placeUrl;
     this.inquiry = inquiry;
-    this.genre = isNull(genre) ? "" : genre.toString();
+    this.genre = genre;
     this.description = description;
     this.likeCount = likeCount;
     this.placeAddress = placeAddress;
