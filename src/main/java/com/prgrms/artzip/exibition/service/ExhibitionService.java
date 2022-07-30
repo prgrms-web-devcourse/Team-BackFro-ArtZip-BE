@@ -3,7 +3,6 @@ package com.prgrms.artzip.exibition.service;
 import com.prgrms.artzip.exibition.domain.repository.ExhibitionRepository;
 import com.prgrms.artzip.exibition.dto.ExhibitionForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.ExhibitionInfo;
-import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,8 +16,6 @@ public class ExhibitionService {
 
   @Transactional(readOnly = true)
   public Page<ExhibitionInfo> getUpcomingExhibitions(Pageable pageable) {
-    LocalDate today = LocalDate.now();
-
     Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findUpcomingExhibition(pageable);
 
     return exhibitionsPagingResult.map(exhibitionForSimpleQuery -> ExhibitionInfo.builder()
@@ -31,4 +28,5 @@ public class ExhibitionService {
         .reviewCount(exhibitionForSimpleQuery.getReviewCount())
         .build());
   }
+
 }
