@@ -1,6 +1,5 @@
 package com.prgrms.artzip.exibition.service;
 
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -39,19 +38,19 @@ class ExhibitionServiceTest {
             .exhibitionId(11L)
             .name("요리조리 MOKA Garden")
             .thumbnail("http://www.culture.go.kr/upload/rdf/22/07/show_2022071411402126915.png")
-            .period(new Period(LocalDate.of(2022, 7, 4), LocalDate.of(2022, 10, 30)))
+            .period(new Period(LocalDate.now().plusDays(1), LocalDate.now().plusDays(10)))
             .likeCount(30)
             .reviewCount(15)
         .build());
     Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = new PageImpl(exhibitions);
 
     // given
-    when(exhibitionRepository.findUpcomingExhibition(LocalDate.now(), pageRequest)).thenReturn(exhibitionsPagingResult);
+    when(exhibitionRepository.findUpcomingExhibition(pageRequest)).thenReturn(exhibitionsPagingResult);
 
     // when
     exhibitionService.getUpcomingExhibitions(pageRequest);
 
     // then
-    verify(exhibitionRepository).findUpcomingExhibition(LocalDate.now(), pageRequest);
+    verify(exhibitionRepository).findUpcomingExhibition(pageRequest);
   }
 }

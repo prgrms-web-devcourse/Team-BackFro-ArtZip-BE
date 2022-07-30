@@ -23,10 +23,12 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository{
   private final JPAQueryFactory queryFactory;
 
   @Override
-  public Page<ExhibitionForSimpleQuery> findUpcomingExhibition(LocalDate today, Pageable pageable) {
+  public Page<ExhibitionForSimpleQuery> findUpcomingExhibition(Pageable pageable) {
+    LocalDate today = LocalDate.now();
+
     List<ExhibitionForSimpleQuery> exhibitions = queryFactory
         .select(Projections.fields(ExhibitionForSimpleQuery.class,
-            exhibition.id.as("exhibitionId"), exhibition.name, exhibition.thumbnail, exhibition.period,
+            exhibition.id.as("exhibitionId"), exhibition.name, exhibition.thumbnail, exhibition.period, exhibition.exhibitionLikes.size().as("likeCount"),
             ExpressionUtils.as(
                 JPAExpressions.select(count(exhibitionLike))
                     .from(exhibitionLike)
@@ -47,7 +49,7 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository{
     JPAQuery<Long> countQuery = queryFactory
         .select(exhibition.count())
         .from(exhibition)
-        .where();
+        .where(exhibition.period.startDate.goe(today));
 
     return PageableExecutionUtils.getPage(exhibitions, pageable, countQuery::fetchOne);
   }

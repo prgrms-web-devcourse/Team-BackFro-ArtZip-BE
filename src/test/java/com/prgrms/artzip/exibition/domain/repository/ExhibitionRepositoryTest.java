@@ -45,8 +45,8 @@ class ExhibitionRepositoryTest {
     Exhibition exhibitionAtBusan = Exhibition.builder()
         .seq(32)
         .name("전시회 at 부산")
-        .startDate(LocalDate.of(2022, 12, 1))
-        .endDate(LocalDate.of(2022, 12, 30))
+        .startDate(LocalDate.now().plusDays(10))
+        .endDate(LocalDate.now().plusDays(15))
         .genre(Genre.FINEART)
         .description("이것은 전시회 설명입니다.")
         .latitude(36.22)
@@ -65,8 +65,8 @@ class ExhibitionRepositoryTest {
     Exhibition exhibitionAtSeoul = Exhibition.builder()
         .seq(33)
         .name("전시회 at 서울")
-        .startDate(LocalDate.of(2022, 11, 11))
-        .endDate(LocalDate.of(2022, 12, 30))
+        .startDate(LocalDate.now().plusDays(3))
+        .endDate(LocalDate.now().plusDays(5))
         .genre(Genre.FINEART)
         .description("이것은 전시회 설명입니다.")
         .latitude(37.22)
@@ -102,10 +102,10 @@ class ExhibitionRepositoryTest {
   @Test
   @DisplayName("실제로 시작일이 빠른 전시회가 먼저 오는지 확인하는 테스트")
   void testFindUpcomingExhibition() {
-    Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findUpcomingExhibition(LocalDate.of(2022, 7, 30), PageRequest.of(0, 10));
-
+    Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findUpcomingExhibition(PageRequest.of(0, 10));
     ExhibitionForSimpleQuery exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);
 
+    assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(2);
     assertThat(exhibitionAtSeoul.getName()).isEqualTo("전시회 at 서울");
     assertThat(exhibitionAtSeoul.getLikeCount()).isEqualTo(0);
     assertThat(exhibitionAtSeoul.getReviewCount()).isEqualTo(0);

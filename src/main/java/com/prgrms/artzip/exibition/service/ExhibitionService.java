@@ -19,7 +19,7 @@ public class ExhibitionService {
   public Page<ExhibitionInfo> getUpcomingExhibitions(Pageable pageable) {
     LocalDate today = LocalDate.now();
 
-    Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findUpcomingExhibition(today, pageable);
+    Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findUpcomingExhibition(pageable);
 
     return exhibitionsPagingResult.map(exhibitionForSimpleQuery -> ExhibitionInfo.builder()
         .exhibitionId(exhibitionForSimpleQuery.getExhibitionId())
