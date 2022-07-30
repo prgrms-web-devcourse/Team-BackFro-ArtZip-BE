@@ -1,6 +1,7 @@
 package com.prgrms.artzip.common.jwt;
 
 import static java.util.Objects.*;
+import static org.springframework.util.StringUtils.*;
 
 import com.prgrms.artzip.common.jwt.claims.AccessClaim;
 import com.prgrms.artzip.common.util.JwtService;
@@ -43,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       FilterChain chain) throws ServletException, IOException {
     if (SecurityContextHolder.getContext().getAuthentication() == null) {
       String token = getAccessToken(request);
-      if (token != null) {
+      if (nonNull(token)) {
         try {
           AccessClaim claims = jwtService.verifyAccessToken(token);
           String email = claims.getEmail();
@@ -68,7 +69,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private String getAccessToken(HttpServletRequest request) {
     String token = request.getHeader(accessHeaderKey);
-    if(token != null && !token.trim().equals("")) {
+    if(hasText(token)) {
       log.debug("Jwt authorization api detected: {}", token);
       return URLDecoder.decode(token, StandardCharsets.UTF_8);
     }

@@ -29,7 +29,8 @@ public enum ErrorCode {
   INVALID_TOKEN_REQUEST(400, "U003", "토큰이 올바르지 않습니다."),
   USER_ALREADY_EXISTS(400, "U004", "유저가 이미 존재합니다."),
   TOKEN_EXPIRED(400, "U005", "토큰이 만료되었습니다."),
-
+  PRINCIPAL_REQUIRED(400, "U006", "아이디는 필수입니다."),
+  CREDENTIAL_REQUIRED(400, "U006", "비밀번호는 필수입니다."),
   /**
    * Exhibition Domain
    */

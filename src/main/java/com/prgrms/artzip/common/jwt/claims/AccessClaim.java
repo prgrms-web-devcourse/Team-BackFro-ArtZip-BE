@@ -10,7 +10,6 @@ import java.util.Date;
 @Getter
 public class AccessClaim implements Claims {
   private Long userId;
-
   private String email;
   private String[] roles;
   private Date iat; // 발행 시각

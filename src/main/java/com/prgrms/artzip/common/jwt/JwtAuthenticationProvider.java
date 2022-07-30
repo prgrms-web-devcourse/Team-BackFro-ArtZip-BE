@@ -1,6 +1,7 @@
 package com.prgrms.artzip.common.jwt;
 
 import com.prgrms.artzip.common.util.JwtService;
+import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.service.UserService;
 import org.springframework.dao.DataAccessException;
@@ -14,6 +15,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.util.Assert;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class JwtAuthenticationProvider implements AuthenticationProvider {
 
@@ -42,8 +44,8 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
   private Authentication processUserAuthentication(String principal, String credentials) {
     try{
       User user = userService.login(principal, credentials);
-      // TODO : 확장성 고려할 것
-      List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("USER"));
+      List<GrantedAuthority> authorities = user.getRoles().stream()
+              .map(role -> new SimpleGrantedAuthority(role.getAuthority().name())).collect(Collectors.toList());
       String accessToken = jwtService.createAccessToken(user.getId(), user.getEmail(), authorities);
       String refreshToken = jwtService.createRefreshToken(user.getEmail());
       JwtAuthenticationToken authenticated = new JwtAuthenticationToken(new JwtPrincipal(accessToken, user.getEmail(), user.getId()), null, authorities);
