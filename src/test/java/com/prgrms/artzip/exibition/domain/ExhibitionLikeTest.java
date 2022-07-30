@@ -1,7 +1,7 @@
 package com.prgrms.artzip.exibition.domain;
 
 import static com.prgrms.artzip.exibition.domain.Area.GYEONGGI;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
@@ -34,12 +34,16 @@ class ExhibitionLikeTest {
   @Test
   @DisplayName("전시회 정보가 null인 경우 테스트")
   void testExhibitionNull() {
-    assertThrows(InvalidRequestException.class, () -> new ExhibitionLike(null, user));
+    assertThatThrownBy(() -> new ExhibitionLike(null, user))
+        .isInstanceOf(InvalidRequestException.class)
+        .hasMessage("전시회 좋아요에는 전시회 정보와 사용자 정보가 필수입니다.");
   }
 
   @Test
   @DisplayName("사용자 정보가 null인 경우 테스트")
   void testUserNull() {
-    assertThrows(InvalidRequestException.class, () -> new ExhibitionLike(exhibition, null));
+    assertThatThrownBy(() -> new ExhibitionLike(exhibition, null))
+        .isInstanceOf(InvalidRequestException.class)
+        .hasMessage("전시회 좋아요에는 전시회 정보와 사용자 정보가 필수입니다.");
   }
 }
