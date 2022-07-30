@@ -1,7 +1,7 @@
 {
   "AWSEBDockerrunVersion": "1",
   "Authentication": {
-    "Bucket": "devcourse-backfro-s3",
+    "Bucket": "devcourse-backfro-s3-docker",
     "Key": "config.json"
   },
   "Image": {
