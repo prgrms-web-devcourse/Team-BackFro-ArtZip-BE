@@ -9,7 +9,7 @@ name: Java CI with Gradle
 
 on:
   push:
-    branches: [ "chore/cd" ]
+    branches: [ "main" ]
 
 permissions:
   contents: read
