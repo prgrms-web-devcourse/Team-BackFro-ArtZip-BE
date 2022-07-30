@@ -9,6 +9,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +28,7 @@ public class ExhibitionController {
 
   @ApiOperation(value = "다가오는 전시회 조회", notes = "다가오는 전시회를 조회합니다.")
   @GetMapping("/upcoming")
-  public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfo>>> getUpcomingExhibitions(Pageable pageable) {
+  public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfo>>> getUpcomingExhibitions(@PageableDefault(size = 10) Pageable pageable) {
     ApiResponse apiResponse = ApiResponse.builder()
         .message("다가오는 전시회 조회 성공")
         .code(HttpStatus.OK.value())
@@ -41,7 +42,7 @@ public class ExhibitionController {
 
   @ApiOperation(value = "인기 많은 전시회 조회", notes = "인기 많은 전시회를 조회합니다.")
   @GetMapping("/mostlike")
-  public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfo>>> getMostLikeExhibitions(@RequestParam(value = "include-end", required = false, defaultValue = "true") boolean includeEnd, Pageable pageable) {
+  public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfo>>> getMostLikeExhibitions(@RequestParam(value = "include-end", required = false, defaultValue = "true") boolean includeEnd, @PageableDefault(size = 10) Pageable pageable) {
     ApiResponse apiResponse = ApiResponse.builder()
         .message("인기 많은 전시회 조회 성공")
         .code(HttpStatus.OK.value())
