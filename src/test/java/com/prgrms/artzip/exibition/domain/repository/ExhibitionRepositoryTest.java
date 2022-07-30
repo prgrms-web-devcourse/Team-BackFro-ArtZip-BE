@@ -148,7 +148,7 @@ class ExhibitionRepositoryTest {
   }
 
   @Test
-  @DisplayName("종료된 전시회 포함하여 인기 많은 전시회 조회 테스트")
+  @DisplayName("종료된 전시회 제외하고 인기 많은 전시회 조회 테스트")
   void testFindMostLikeExhibitionExcludeEnd() {
     Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findMostLikeExhibitions(false, PageRequest.of(0, 10));
     ExhibitionForSimpleQuery exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);

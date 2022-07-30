@@ -35,7 +35,7 @@ class ExhibitionServiceTest {
     pageRequest = PageRequest.of(0, 1);
     List<ExhibitionForSimpleQuery> exhibitions = new ArrayList<>();
     exhibitions.add(ExhibitionForSimpleQuery.builder()
-            .exhibitionId(11L)
+            .id(11L)
             .name("요리조리 MOKA Garden")
             .thumbnail("http://www.culture.go.kr/upload/rdf/22/07/show_2022071411402126915.png")
             .period(new Period(LocalDate.now().plusDays(1), LocalDate.now().plusDays(10)))

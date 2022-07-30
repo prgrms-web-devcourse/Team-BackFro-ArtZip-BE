@@ -7,19 +7,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class ExhibitionService {
   private final ExhibitionRepository exhibitionRepository;
 
-  @Transactional(readOnly = true)
   public Page<ExhibitionInfo> getUpcomingExhibitions(Pageable pageable) {
     Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findUpcomingExhibitions(pageable);
 
     return exhibitionsPagingResult.map(exhibitionForSimpleQuery -> ExhibitionInfo.builder()
-        .exhibitionId(exhibitionForSimpleQuery.getExhibitionId())
+        .exhibitionId(exhibitionForSimpleQuery.getId())
         .name(exhibitionForSimpleQuery.getName())
         .thumbnail(exhibitionForSimpleQuery.getThumbnail())
         .startDate(exhibitionForSimpleQuery.getPeriod().getStartDate())
@@ -28,5 +26,4 @@ public class ExhibitionService {
         .reviewCount(exhibitionForSimpleQuery.getReviewCount())
         .build());
   }
-
 }

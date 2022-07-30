@@ -31,21 +31,23 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository{
 
     List<ExhibitionForSimpleQuery> exhibitions = queryFactory
         .select(Projections.fields(ExhibitionForSimpleQuery.class,
-            exhibition.id.as("exhibitionId"), exhibition.name, exhibition.thumbnail, exhibition.period, exhibition.exhibitionLikes.size().as("likeCount"),
-            ExpressionUtils.as(
-                JPAExpressions.select(count(exhibitionLike))
-                    .from(exhibitionLike)
-                    .where(exhibitionLike.exhibition.id.eq(exhibition.id)),
-                "likeCount"),
-            ExpressionUtils.as(
-                JPAExpressions.select(count(review))
-                    .from(review)
-                    .where(review.exhibition.id.eq(exhibition.id)),
-                "reviewCount")))
+            exhibition.id,
+            exhibition.name,
+            exhibition.thumbnail,
+            exhibition.period,
+            exhibitionLike.exhibition.id.count().as("likeCount"),
+            review.exhibition.id.count().as("reviewCount")
+          )
+        )
         .from(exhibition)
+        .leftJoin(exhibitionLike)
+        .on(exhibitionLike.exhibition.eq(exhibition))
+        .leftJoin(review)
+        .on(review.exhibition.eq(exhibition))
         .where(exhibition.period.startDate.goe(today))
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize())
+        .groupBy(exhibition.id)
         .orderBy(exhibition.period.startDate.asc(), exhibition.period.endDate.asc())
         .fetch();
 
@@ -64,21 +66,23 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository{
 
     List<ExhibitionForSimpleQuery> exhibitions = queryFactory
         .select(Projections.fields(ExhibitionForSimpleQuery.class,
-            exhibition.id.as("exhibitionId"), exhibition.name, exhibition.thumbnail, exhibition.period, exhibition.exhibitionLikes.size().as("likeCount"),
-            ExpressionUtils.as(
-                JPAExpressions.select(count(exhibitionLike))
-                    .from(exhibitionLike)
-                    .where(exhibitionLike.exhibition.id.eq(exhibition.id)),
-                "likeCount"),
-            ExpressionUtils.as(
-                JPAExpressions.select(count(review))
-                    .from(review)
-                    .where(review.exhibition.id.eq(exhibition.id)),
-                "reviewCount")))
+            exhibition.id,
+            exhibition.name,
+            exhibition.thumbnail,
+            exhibition.period,
+            exhibitionLike.exhibition.id.count().as("likeCount"),
+            review.exhibition.id.count().as("reviewCount")
+          )
+        )
         .from(exhibition)
+        .leftJoin(exhibitionLike)
+        .on(exhibitionLike.exhibition.eq(exhibition))
+        .leftJoin(review)
+        .on(review.exhibition.eq(exhibition))
         .where(mostLikeCondition)
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize())
+        .groupBy(exhibition.id)
         .orderBy(likeCount.desc())
         .fetch();
 
