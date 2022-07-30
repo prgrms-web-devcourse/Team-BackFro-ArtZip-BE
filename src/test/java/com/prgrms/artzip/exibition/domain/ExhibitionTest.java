@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -13,7 +12,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 class ExhibitionTest {
   @ParameterizedTest
   @MethodSource("thumbnailParameter")
-  @DisplayName("Exhibition 생성시 url 검증 테스트")
   void testUrlValidation(String url) {
     Exhibition exhibition = Exhibition.builder()
         .seq(12345)
