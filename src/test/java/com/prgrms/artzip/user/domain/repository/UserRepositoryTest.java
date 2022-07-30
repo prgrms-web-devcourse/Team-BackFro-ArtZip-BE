@@ -1,5 +1,6 @@
 package com.prgrms.artzip.user.domain.repository;
 
+import com.prgrms.artzip.QueryDslTestConfig;
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
@@ -21,8 +22,10 @@ import javax.transaction.Transactional;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
+import org.springframework.context.annotation.Import;
 
 @DataJpaTest
+@Import({QueryDslTestConfig.class})
 class UserRepositoryTest {
 
     private final Logger log = LoggerFactory.getLogger(getClass());

@@ -114,13 +114,13 @@ jacocoTestCoverageVerification {
 			limit {
 				counter = 'LINE'
 				value = 'COVEREDRATIO'
-				minimum = 0.00
+				minimum = 0.70
 			}
 
 			limit {
 				counter = 'BRANCH'
 				value = 'COVEREDRATIO'
-				minimum = 0.00
+				minimum = 0.70
 			}
 
 			excludes = [
@@ -158,6 +158,12 @@ task copyPrivate(type: Copy) {
 	copy {
 		from './BackFro-BE-submodule'
 		include "application-aws.yml"
+		into 'src/main/resources'
+	}
+
+	copy {
+		from './BackFro-BE-submodule'
+		include "application-dev.yml"
 		into 'src/main/resources'
 	}
 
