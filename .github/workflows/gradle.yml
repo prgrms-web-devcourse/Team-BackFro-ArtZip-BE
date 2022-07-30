@@ -68,8 +68,10 @@ jobs:
         # Beanstalk application name
         application_name: "devcourse-backfro-artzip-eb"
         # Beanstalk environment name. If empty a version will be created but not deployed anywhere.
-        environment_name: "Devcoursebackfroartzipeb-env"
+        environment_name: "Devcourse-backfro-artzip-eb-env"
         # Version label for new Beanstalk version
         version_label: "github-action--${{steps.format-time.outputs.replaced}}"
         # Zip file with the version to deploy. If skipped the action will deploy existing version.
         deployment_package: Dockerrun.aws.json
+        # set waiting time of convertion to green health
+        wait_for_environment_recovery: 300
