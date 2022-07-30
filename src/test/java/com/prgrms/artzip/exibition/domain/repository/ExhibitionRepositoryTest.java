@@ -8,12 +8,14 @@ import com.prgrms.artzip.exibition.domain.Area;
 import com.prgrms.artzip.exibition.domain.Exhibition;
 import com.prgrms.artzip.exibition.domain.ExhibitionLike;
 import com.prgrms.artzip.exibition.domain.Genre;
-import com.prgrms.artzip.exibition.dto.ExhibitionForSimpleQuery;
+import com.prgrms.artzip.exibition.dto.projection.ExhibitionDetailForSimpleQuery;
+import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQuery;
 import com.prgrms.artzip.review.domain.Review;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +35,7 @@ class ExhibitionRepositoryTest {
 
   @Autowired
   private ExhibitionRepository exhibitionRepository;
+  private Exhibition exhibitionAtBusan, exhibitionAtSeoul,exhibitionAlreadyEnd;
 
   @BeforeEach
   void setUp() {
@@ -45,7 +48,7 @@ class ExhibitionRepositoryTest {
     User user2 = new User("tes2t@example.com", "Jerry", List.of(role));
     em.persist(user2);
 
-    Exhibition exhibitionAtBusan = Exhibition.builder()
+    exhibitionAtBusan = Exhibition.builder()
         .seq(32)
         .name("전시회 at 부산")
         .startDate(LocalDate.now().plusDays(10))
@@ -65,7 +68,7 @@ class ExhibitionRepositoryTest {
         .build();
     em.persist(exhibitionAtBusan);
 
-    Exhibition exhibitionAtSeoul = Exhibition.builder()
+    exhibitionAtSeoul = Exhibition.builder()
         .seq(33)
         .name("전시회 at 서울")
         .startDate(LocalDate.now().plusDays(3))
@@ -85,7 +88,7 @@ class ExhibitionRepositoryTest {
         .build();
     em.persist(exhibitionAtSeoul);
 
-    Exhibition exhibitionAlreadyEnd = Exhibition.builder()
+    exhibitionAlreadyEnd = Exhibition.builder()
         .seq(34)
         .name("전시회 at 경기")
         .startDate(LocalDate.now().minusDays(6))
@@ -157,5 +160,23 @@ class ExhibitionRepositoryTest {
     assertThat(exhibitionAtSeoul.getName()).isEqualTo("전시회 at 부산");
     assertThat(exhibitionAtSeoul.getLikeCount()).isEqualTo(1);
     assertThat(exhibitionAtSeoul.getReviewCount()).isEqualTo(1);
+  }
+
+  @Test
+  @DisplayName("존재하지 않는 전시회 조회 테스트")
+  void testFindEmptyExhibition() {
+    Optional<ExhibitionDetailForSimpleQuery> exhibition = exhibitionRepository.findExhibition(123431L);
+    assertThat(exhibition).isEmpty();
+  }
+
+  @Test
+  @DisplayName("전시회 조회 테스트")
+  void testFindExhibition() {
+    Optional<ExhibitionDetailForSimpleQuery> exhibition = exhibitionRepository.findExhibition(exhibitionAlreadyEnd.getId());
+
+    assertThat(exhibition).isNotEmpty();
+    assertThat(exhibition.get().getSeq()).isEqualTo(34);
+    assertThat(exhibition.get().getName()).isEqualTo("전시회 at 경기");
+    assertThat(exhibition.get().getLikeCount()).isEqualTo(2);
   }
 }

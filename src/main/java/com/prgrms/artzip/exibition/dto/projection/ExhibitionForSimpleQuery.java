@@ -1,4 +1,4 @@
-package com.prgrms.artzip.exibition.dto;
+package com.prgrms.artzip.exibition.dto.projection;
 
 import com.prgrms.artzip.exibition.domain.Period;
 import lombok.Builder;

@@ -3,19 +3,18 @@ package com.prgrms.artzip.exibition.domain.repository;
 import static com.prgrms.artzip.exibition.domain.QExhibition.exhibition;
 import static com.prgrms.artzip.exibition.domain.QExhibitionLike.exhibitionLike;
 import static com.prgrms.artzip.review.domain.QReview.review;
-import static com.querydsl.core.types.ExpressionUtils.count;
 
-import com.prgrms.artzip.exibition.dto.ExhibitionForSimpleQuery;
+import com.prgrms.artzip.exibition.dto.projection.ExhibitionDetailForSimpleQuery;
+import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQuery;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberPath;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -92,6 +91,32 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository{
         .where(mostLikeCondition);
 
     return PageableExecutionUtils.getPage(exhibitions, pageable, countQuery::fetchOne);
+  }
+
+  @Override
+  public Optional<ExhibitionDetailForSimpleQuery> findExhibition(Long exhibitionId) {
+    return Optional.ofNullable(queryFactory
+        .select(Projections.fields(ExhibitionDetailForSimpleQuery.class,
+            exhibition.id,
+            exhibition.seq,
+            exhibition.name,
+            exhibition.period,
+            exhibition.genre,
+            exhibition.description,
+            exhibition.location,
+            exhibition.fee,
+            exhibition.thumbnail,
+            exhibition.url,
+            exhibition.placeUrl,
+            exhibitionLike.exhibition.id.count().as("likeCount")
+          )
+        )
+        .from(exhibition)
+        .leftJoin(exhibitionLike)
+        .where(exhibition.id.eq(exhibitionId))
+        .on(exhibitionLike.exhibition.eq(exhibition))
+        .groupBy(exhibition.id)
+        .fetchOne());
   }
 
   private BooleanBuilder getMostLikeCondition(boolean includeEnd) {
