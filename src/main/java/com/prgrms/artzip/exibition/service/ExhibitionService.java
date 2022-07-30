@@ -1,6 +1,7 @@
 package com.prgrms.artzip.exibition.service;
 
 import static com.prgrms.artzip.common.ErrorCode.EXHB_NOT_FOUND;
+import static org.springframework.util.StringUtils.*;
 
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.exibition.domain.repository.ExhibitionRepository;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -64,8 +66,8 @@ public class ExhibitionService {
         .startDate(exhibition.getPeriod().getStartDate())
         .endDate(exhibition.getPeriod().getEndDate())
         .area(exhibition.getLocation().getArea())
-        .url(exhibition.getUrl())
-        .placeUrl(exhibition.getPlaceUrl())
+        .url(hasText(exhibition.getUrl()) ? exhibition.getUrl() : null)
+        .placeUrl(hasText(exhibition.getPlaceUrl()) ? exhibition.getPlaceUrl() : null)
         .inquiry(exhibition.getInquiry())
         .genre(exhibition.getGenre())
         .description(exhibition.getDescription())

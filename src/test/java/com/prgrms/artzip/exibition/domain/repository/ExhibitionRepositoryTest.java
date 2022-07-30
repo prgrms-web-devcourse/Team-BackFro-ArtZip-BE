@@ -178,6 +178,8 @@ class ExhibitionRepositoryTest {
     assertThat(exhibition.get().getSeq()).isEqualTo(34);
     assertThat(exhibition.get().getName()).isEqualTo("전시회 at 경기");
     assertThat(exhibition.get().getInquiry()).isEqualTo("문의처 정보");
+    assertThat(exhibition.get().getUrl()).isEqualTo("https://www.example.com");
+    assertThat(exhibition.get().getPlaceUrl()).isEqualTo("https://www.place-example.com");
     assertThat(exhibition.get().getLikeCount()).isEqualTo(2);
   }
 }
