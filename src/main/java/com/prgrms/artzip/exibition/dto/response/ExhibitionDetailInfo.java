@@ -21,8 +21,8 @@ public class ExhibitionDetailInfo extends ExhibitionBasicInfo{
   private String placeAddress;
   private double lat;
   private double lng;
-  private boolean isLiked;
-  // reviews 추가 필요
+  private Boolean isLiked;
+  // reviews
 
   public ExhibitionDetailInfo(Long exhibitionId, String name, String thumbnail,
       LocalDate startDate, LocalDate endDate, Area area, String url, String placeUrl,
