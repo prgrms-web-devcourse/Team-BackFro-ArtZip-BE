@@ -104,6 +104,7 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository{
             exhibition.genre,
             exhibition.description,
             exhibition.location,
+            exhibition.inquiry,
             exhibition.fee,
             exhibition.thumbnail,
             exhibition.url,

@@ -177,6 +177,7 @@ class ExhibitionRepositoryTest {
     assertThat(exhibition).isNotEmpty();
     assertThat(exhibition.get().getSeq()).isEqualTo(34);
     assertThat(exhibition.get().getName()).isEqualTo("전시회 at 경기");
+    assertThat(exhibition.get().getInquiry()).isEqualTo("문의처 정보");
     assertThat(exhibition.get().getLikeCount()).isEqualTo(2);
   }
 }
