@@ -104,11 +104,10 @@ public class Exhibition extends BaseEntity {
   }
 
   private void setName(String name) {
-    if(!hasText(name) || name.length() < 1 || name.length() > 70) {
+    if(!hasText(name) || name.length() > 70) {
       throw new InvalidRequestException(INVALID_EXHBN_NAME);
-    }else{
-      this.name = name;
     }
+    this.name = name;
   }
 
   private void setPeriod(LocalDate startDate, LocalDate endDate) {
@@ -121,11 +120,10 @@ public class Exhibition extends BaseEntity {
 
   private void setDescription(String description) {
     if(hasText(description)) {
-      if(description.length() < 1 || description.length() > 1000) {
+      if(description.length() > 1000) {
         throw new InvalidRequestException(INVALID_EXHBN_DESCRIPTION);
-      }else{
-        this.description = description;
       }
+      this.description = description;
     }
   }
 
@@ -134,9 +132,9 @@ public class Exhibition extends BaseEntity {
       throw new InvalidRequestException(INVALID_EXHBN_COORDINATE);
     }else if(isNull(area)) {
       throw new InvalidRequestException(INVALID_EXHB_AREA);
-    }else if(isNull(place) || place.length() < 1 || place.length() > 20) {
+    }else if(isNull(place) || place.length() > 20) {
       throw new InvalidRequestException(INVALID_EXHB_PLACE);
-    }else if(isNull(address) || address.length() < 1 || address.length() > 100) {
+    }else if(isNull(address) || address.length() > 100) {
       throw new InvalidRequestException(INVALID_EXHB_ADDRESS);
     }else{
       this.location = new Location(latitude, longitude, area, place, address);
@@ -144,36 +142,32 @@ public class Exhibition extends BaseEntity {
   }
 
   private void setInquiry(String inquiry) {
-    if(!hasText(inquiry) || inquiry.length() < 1 || inquiry.length() > 100) {
+    if(!hasText(inquiry) || inquiry.length() > 100) {
       throw new InvalidRequestException(INVALID_EXHB_INQUIRY);
-    }else{
-      this.inquiry = inquiry;
     }
+    this.inquiry = inquiry;
   }
 
   private void setFee(String fee) {
-    if(!hasText(fee) || fee.length() < 1 || fee.length() > 1000) {
+    if(!hasText(fee) || fee.length() > 1000) {
       throw new InvalidRequestException(INVALID_EXHB_FEE);
-    }else{
-      this.fee = fee;
     }
+    this.fee = fee;
   }
 
   private void setThumbnail(String thumbnail) {
-    if(!hasText(thumbnail) || thumbnail.length() < 1 || thumbnail.length() > 2083 || !isValidUrl(thumbnail)) {
+    if(!hasText(thumbnail) || thumbnail.length() > 2083 || !isValidUrl(thumbnail)) {
       throw new InvalidRequestException(INVALID_EXHB_THUMBNAIL);
-    }else{
-      this.thumbnail = thumbnail;
     }
+    this.thumbnail = thumbnail;
   }
 
   private void setUrl(String url) {
     if(hasText(url)) {
       if(url.length() > 2083 || !isValidUrl(url)) {
         throw new InvalidRequestException(INVALID_EXHB_URL);
-      }else{
-        this.url = url;
       }
+      this.url = url;
     }
   }
 
@@ -181,9 +175,8 @@ public class Exhibition extends BaseEntity {
     if(hasText(placeUrl)) {
       if(placeUrl.length() > 2083 || !isValidUrl(placeUrl)) {
         throw new InvalidRequestException(INVALID_EXHB_PLACEURL);
-      }else{
-        this.placeUrl = placeUrl;
       }
+      this.placeUrl = placeUrl;
     }
   }
 
