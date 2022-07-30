@@ -2,7 +2,7 @@ package com.prgrms.artzip.exibition.service;
 
 import com.prgrms.artzip.exibition.domain.repository.ExhibitionRepository;
 import com.prgrms.artzip.exibition.dto.ExhibitionForSimpleQuery;
-import com.prgrms.artzip.exibition.dto.ExhibitionInfo;
+import com.prgrms.artzip.exibition.dto.response.ExhibitionInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
