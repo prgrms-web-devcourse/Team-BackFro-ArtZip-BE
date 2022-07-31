@@ -60,7 +60,7 @@ public class ExhibitionController {
     ApiResponse apiResponse = ApiResponse.builder()
         .message("전시회 조회 성공")
         .code(HttpStatus.OK.value())
-        .data(exhibitionService.getExhibition(null, exhibitionId))
+        .data(exhibitionService.getExhibition(exhibitionId, null))
         .build();
 
     return ResponseEntity

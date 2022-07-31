@@ -4,6 +4,8 @@ import static com.prgrms.artzip.common.ErrorCode.EXHB_NOT_FOUND;
 import static org.springframework.util.StringUtils.hasText;
 
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
+import com.prgrms.artzip.exibition.domain.ExhibitionLikeId;
+import com.prgrms.artzip.exibition.domain.repository.ExhibitionLikeRepository;
 import com.prgrms.artzip.exibition.domain.repository.ExhibitionRepository;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQuery;
@@ -18,8 +20,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ExhibitionService {
-  private final ExhibitionLikeService exhibitionLikeService;
   private final ExhibitionRepository exhibitionRepository;
+  private final ExhibitionLikeRepository exhibitionLikeRepository;
 
   public Page<ExhibitionInfo> getUpcomingExhibitions(Pageable pageable) {
     Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findUpcomingExhibitions(pageable);
@@ -31,13 +33,13 @@ public class ExhibitionService {
     return exhibitionsPagingResult.map(this::exhibitionForSimpleQueryToExhibitionInfo);
   }
 
-  public ExhibitionDetailInfo getExhibition(User user, Long exhibitionId) {
+  public ExhibitionDetailInfo getExhibition(Long exhibitionId, User user) {
     ExhibitionDetailForSimpleQuery exhibition = exhibitionRepository.findExhibition(exhibitionId)
         .orElseThrow(() -> new InvalidRequestException(EXHB_NOT_FOUND));
 
     boolean isLiked = false;
     if(user != null) {
-      isLiked = exhibitionLikeService.isLikedExhibition(exhibitionId, user.getId());
+      isLiked = exhibitionLikeRepository.findById(new ExhibitionLikeId(exhibitionId, user.getId())).isPresent();
     }
 
     // getReviews()

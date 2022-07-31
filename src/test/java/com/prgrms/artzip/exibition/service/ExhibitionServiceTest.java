@@ -9,8 +9,14 @@ import static org.mockito.Mockito.when;
 
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
+import com.prgrms.artzip.exibition.domain.Area;
+import com.prgrms.artzip.exibition.domain.Exhibition;
+import com.prgrms.artzip.exibition.domain.ExhibitionLike;
+import com.prgrms.artzip.exibition.domain.ExhibitionLikeId;
+import com.prgrms.artzip.exibition.domain.Genre;
 import com.prgrms.artzip.exibition.domain.Location;
 import com.prgrms.artzip.exibition.domain.Period;
+import com.prgrms.artzip.exibition.domain.repository.ExhibitionLikeRepository;
 import com.prgrms.artzip.exibition.domain.repository.ExhibitionRepository;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQuery;
@@ -38,7 +44,7 @@ class ExhibitionServiceTest {
   private ExhibitionRepository exhibitionRepository;
 
   @Mock
-  private ExhibitionLikeService exhibitionLikeService;
+  private ExhibitionLikeRepository exhibitionLikeRepository;
 
   @InjectMocks
   private ExhibitionService exhibitionService;
@@ -101,9 +107,29 @@ class ExhibitionServiceTest {
   class GetExhibitionTest {
     private User user = new User("test@example.com", "Emily", List.of(new Role(Authority.USER)));
 
-    private Long exhibitionId = 123L;
+    private Exhibition exhibition = Exhibition.builder()
+        .seq(32)
+        .name("전시회 제목")
+        .startDate(LocalDate.of(2022, 4, 11))
+        .endDate(LocalDate.of(2022, 6, 2))
+        .genre(Genre.FINEART)
+        .description("이것은 전시회 설명입니다.")
+        .latitude(36.22)
+        .longitude(128.02)
+        .area(Area.BUSAN)
+        .place("미술관")
+        .address("부산 동구 중앙대로 11")
+        .inquiry("문의처 정보")
+        .fee("성인 20,000원")
+        .thumbnail("https://www.image-example.com")
+        .url("https://www.example.com")
+        .placeUrl("https://www.place-example.com")
+        .build();
 
-    private ExhibitionDetailForSimpleQuery exhibition1 = ExhibitionDetailForSimpleQuery.builder()
+    private ExhibitionLike exhibitionLike = new ExhibitionLike(exhibition, user);
+
+    private Long exhibitionId = 123L;
+    private ExhibitionDetailForSimpleQuery exhibitionDetail1 = ExhibitionDetailForSimpleQuery.builder()
         .id(exhibitionId)
         .seq(12345)
         .name("전시회 제목")
@@ -125,9 +151,9 @@ class ExhibitionServiceTest {
         .likeCount(10)
         .build();
 
-    private ExhibitionDetailForSimpleQuery exhibition2 = ExhibitionDetailForSimpleQuery.builder()
+    private ExhibitionDetailForSimpleQuery exhibitionDetail2 = ExhibitionDetailForSimpleQuery.builder()
         .id(exhibitionId)
-        .seq(12345)
+        .seq(12346)
         .name("전시회 제목2")
         .period(new Period(LocalDate.now(), LocalDate.now().plusDays(1)))
         .location(
@@ -150,7 +176,7 @@ class ExhibitionServiceTest {
     void testExhibitionNotFound() {
       when(exhibitionRepository.findExhibition(exhibitionId)).thenReturn(Optional.empty());
 
-      assertThatThrownBy(() -> exhibitionService.getExhibition(null, exhibitionId))
+      assertThatThrownBy(() -> exhibitionService.getExhibition(exhibitionId, null))
           .isInstanceOf(InvalidRequestException.class)
           .hasMessage("존재하지 않는 전시회 입니다.");
     }
@@ -158,33 +184,33 @@ class ExhibitionServiceTest {
     @Test
     @DisplayName("인증되지 않은 사용자인 경우")
     void testNotAuthorized() {
-       when(exhibitionRepository.findExhibition(123L)).thenReturn(Optional.of(exhibition1));
+       when(exhibitionRepository.findExhibition(123L)).thenReturn(Optional.of(exhibitionDetail1));
 
-      exhibitionService.getExhibition(null, exhibitionId);
+      exhibitionService.getExhibition(exhibitionId, null);
 
-       verify(exhibitionLikeService, never()).isLikedExhibition(any(), any());
+       verify(exhibitionLikeRepository, never()).findById(any());
     }
 
     @Test
     @DisplayName("인증된 사용자이며 좋아요를 누른 경우")
     void testAuthorizedLike() {
-      when(exhibitionRepository.findExhibition(exhibitionId)).thenReturn(Optional.of(exhibition1));
-      when(exhibitionLikeService.isLikedExhibition(exhibitionId, user.getId())).thenReturn(true);
+      when(exhibitionRepository.findExhibition(exhibitionId)).thenReturn(Optional.of(exhibitionDetail1));
+      when(exhibitionLikeRepository.findById(new ExhibitionLikeId(exhibitionId, user.getId()))).thenReturn(Optional.of(exhibitionLike));
 
-      exhibitionService.getExhibition(user, exhibitionId);
+      exhibitionService.getExhibition(exhibitionId, user);
 
-      verify(exhibitionLikeService).isLikedExhibition(exhibitionId, user.getId());
+      verify(exhibitionLikeRepository).findById(new ExhibitionLikeId(exhibitionId, user.getId()));
     }
 
     @Test
     @DisplayName("인증된 사용자이며 좋아요를 누르지 않은 경우")
     void testAuthorizedNotLike() {
-      when(exhibitionRepository.findExhibition(exhibitionId)).thenReturn(Optional.of(exhibition2));
-      when(exhibitionLikeService.isLikedExhibition(exhibitionId, user.getId())).thenReturn(false);
+      when(exhibitionRepository.findExhibition(exhibitionId)).thenReturn(Optional.of(exhibitionDetail2));
+      when(exhibitionLikeRepository.findById(new ExhibitionLikeId(exhibitionId, user.getId()))).thenReturn(Optional.empty());
 
-      exhibitionService.getExhibition(user, exhibitionId);
+      exhibitionService.getExhibition(exhibitionId, user);
 
-      verify(exhibitionLikeService).isLikedExhibition(exhibitionId, user.getId());
+      verify(exhibitionLikeRepository).findById(new ExhibitionLikeId(exhibitionId, user.getId()));
     }
   }
 }
