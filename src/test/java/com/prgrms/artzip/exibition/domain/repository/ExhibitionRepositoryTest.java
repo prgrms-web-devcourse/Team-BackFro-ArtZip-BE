@@ -20,6 +20,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -29,13 +30,17 @@ import org.springframework.data.domain.PageRequest;
 
 @DataJpaTest
 @Import({QueryDslTestConfig.class})
+@DisplayName("ExhibitionRepository 테스트")
 class ExhibitionRepositoryTest {
   @PersistenceContext
   private EntityManager em;
 
   @Autowired
   private ExhibitionRepository exhibitionRepository;
-  private Exhibition exhibitionAtBusan, exhibitionAtSeoul,exhibitionAlreadyEnd;
+
+  private Exhibition exhibitionAtBusan;
+  private Exhibition exhibitionAtSeoul;
+  private Exhibition exhibitionAlreadyEnd;
 
   @BeforeEach
   void setUp() {
@@ -126,60 +131,72 @@ class ExhibitionRepositoryTest {
     em.clear();
   }
 
-  @Test
-  @DisplayName("실제로 시작일이 빠른 전시회가 먼저 오는지 확인하는 테스트")
-  void testFindUpcomingExhibition() {
-    Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findUpcomingExhibitions(PageRequest.of(0, 10));
-    ExhibitionForSimpleQuery exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);
+  @Nested
+  @DisplayName("findUpcomingExhibitions() 테스트")
+  class FindUpcomingExhibitionsTest {
+    @Test
+    @DisplayName("실제로 시작일이 빠른 전시회가 먼저 오는지 확인하는 테스트")
+    void testFindUpcomingExhibition() {
+      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findUpcomingExhibitions(PageRequest.of(0, 10));
+      ExhibitionForSimpleQuery exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);
 
-    assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(2);
-    assertThat(exhibitionAtSeoul.getName()).isEqualTo("전시회 at 서울");
-    assertThat(exhibitionAtSeoul.getLikeCount()).isEqualTo(0);
-    assertThat(exhibitionAtSeoul.getReviewCount()).isEqualTo(0);
+      assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(2);
+      assertThat(exhibitionAtSeoul.getName()).isEqualTo("전시회 at 서울");
+      assertThat(exhibitionAtSeoul.getLikeCount()).isEqualTo(0);
+      assertThat(exhibitionAtSeoul.getReviewCount()).isEqualTo(0);
+    }
   }
 
-  @Test
-  @DisplayName("종료된 전시회 포함하여 인기 많은 전시회 조회 테스트")
-  void testFindMostLikeExhibitionIncludeEnd() {
-    Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findMostLikeExhibitions(true, PageRequest.of(0, 10));
-    ExhibitionForSimpleQuery exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);
+  @Nested
+  @DisplayName("findMostLikeExhibitions() 테스트")
+  class FindMostLikeExhibitionsTest {
+    @Test
+    @DisplayName("종료된 전시회 포함하여 인기 많은 전시회 조회 테스트")
+    void testFindMostLikeExhibitionIncludeEnd() {
+      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findMostLikeExhibitions(true, PageRequest.of(0, 10));
+      ExhibitionForSimpleQuery exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);
 
-    assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(3);
-    assertThat(exhibitionAtSeoul.getName()).isEqualTo("전시회 at 경기");
-    assertThat(exhibitionAtSeoul.getLikeCount()).isEqualTo(2);
-    assertThat(exhibitionAtSeoul.getReviewCount()).isEqualTo(0);
+      assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(3);
+      assertThat(exhibitionAtSeoul.getName()).isEqualTo("전시회 at 경기");
+      assertThat(exhibitionAtSeoul.getLikeCount()).isEqualTo(2);
+      assertThat(exhibitionAtSeoul.getReviewCount()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("종료된 전시회 제외하고 인기 많은 전시회 조회 테스트")
+    void testFindMostLikeExhibitionExcludeEnd() {
+      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findMostLikeExhibitions(false, PageRequest.of(0, 10));
+      ExhibitionForSimpleQuery exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);
+
+      assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(2);
+      assertThat(exhibitionAtSeoul.getName()).isEqualTo("전시회 at 부산");
+      assertThat(exhibitionAtSeoul.getLikeCount()).isEqualTo(1);
+      assertThat(exhibitionAtSeoul.getReviewCount()).isEqualTo(1);
+    }
   }
 
-  @Test
-  @DisplayName("종료된 전시회 제외하고 인기 많은 전시회 조회 테스트")
-  void testFindMostLikeExhibitionExcludeEnd() {
-    Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findMostLikeExhibitions(false, PageRequest.of(0, 10));
-    ExhibitionForSimpleQuery exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);
+  @Nested
+  @DisplayName("findExhibition() 테스트")
+  class FindExhibitionTest {
+    @Test
+    @DisplayName("존재하지 않는 전시회 조회 테스트")
+    void testFindEmptyExhibition() {
+      Optional<ExhibitionDetailForSimpleQuery> exhibition = exhibitionRepository.findExhibition(123431L);
+      assertThat(exhibition).isEmpty();
+    }
 
-    assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(2);
-    assertThat(exhibitionAtSeoul.getName()).isEqualTo("전시회 at 부산");
-    assertThat(exhibitionAtSeoul.getLikeCount()).isEqualTo(1);
-    assertThat(exhibitionAtSeoul.getReviewCount()).isEqualTo(1);
-  }
+    @Test
+    @DisplayName("전시회 조회 테스트")
+    void testFindExhibition() {
+      Optional<ExhibitionDetailForSimpleQuery> exhibition = exhibitionRepository.findExhibition(exhibitionAlreadyEnd.getId());
 
-  @Test
-  @DisplayName("존재하지 않는 전시회 조회 테스트")
-  void testFindEmptyExhibition() {
-    Optional<ExhibitionDetailForSimpleQuery> exhibition = exhibitionRepository.findExhibition(123431L);
-    assertThat(exhibition).isEmpty();
-  }
-
-  @Test
-  @DisplayName("전시회 조회 테스트")
-  void testFindExhibition() {
-    Optional<ExhibitionDetailForSimpleQuery> exhibition = exhibitionRepository.findExhibition(exhibitionAlreadyEnd.getId());
-
-    assertThat(exhibition).isNotEmpty();
-    assertThat(exhibition.get().getSeq()).isEqualTo(34);
-    assertThat(exhibition.get().getName()).isEqualTo("전시회 at 경기");
-    assertThat(exhibition.get().getInquiry()).isEqualTo("문의처 정보");
-    assertThat(exhibition.get().getUrl()).isEqualTo("https://www.example.com");
-    assertThat(exhibition.get().getPlaceUrl()).isEqualTo("https://www.place-example.com");
-    assertThat(exhibition.get().getLikeCount()).isEqualTo(2);
+      assertThat(exhibition).isNotEmpty();
+      assertThat(exhibition.get().getSeq()).isEqualTo(34);
+      assertThat(exhibition.get().getName()).isEqualTo("전시회 at 경기");
+      assertThat(exhibition.get().getInquiry()).isEqualTo("문의처 정보");
+      assertThat(exhibition.get().getUrl()).isEqualTo("https://www.example.com");
+      assertThat(exhibition.get().getPlaceUrl()).isEqualTo("https://www.place-example.com");
+      assertThat(exhibition.get().getLikeCount()).isEqualTo(2);
+    }
   }
 }

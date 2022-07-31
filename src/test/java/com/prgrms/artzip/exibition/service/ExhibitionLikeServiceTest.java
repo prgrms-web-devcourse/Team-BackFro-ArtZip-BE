@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,6 +24,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("ExhibitionLikeService 테스트")
 class ExhibitionLikeServiceTest {
   @Mock
   private ExhibitionLikeRepository exhibitionLikeRepository;
@@ -53,17 +55,21 @@ class ExhibitionLikeServiceTest {
 
   private ExhibitionLike exhibitionLike = new ExhibitionLike(exhibition, user);
 
-  @Test
-  @DisplayName("사용자가 전시회에 좋아요를 누른 경우")
-  void isLiked() {
-    when(exhibitionLikeRepository.findById(any())).thenReturn(Optional.of(exhibitionLike));
-    assertThat(exhibitionLikeService.isLikedExhibition(exhibition.getId(), user.getId())).isTrue();
-  }
+  @Nested
+  @DisplayName("isLikedExhibition() 테스트")
+  class IsLikedExhibitionTest {
+    @Test
+    @DisplayName("사용자가 전시회에 좋아요를 누른 경우")
+    void isLiked() {
+      when(exhibitionLikeRepository.findById(any())).thenReturn(Optional.of(exhibitionLike));
+      assertThat(exhibitionLikeService.isLikedExhibition(exhibition.getId(), user.getId())).isTrue();
+    }
 
-  @Test
-  @DisplayName("사용자가 전시회에 좋아요를 누르지 않은 경우")
-  void isNotLiked() {
-    when(exhibitionLikeRepository.findById(any())).thenReturn(Optional.empty());
-    assertThat(exhibitionLikeService.isLikedExhibition(exhibition.getId(), user.getId())).isFalse();
+    @Test
+    @DisplayName("사용자가 전시회에 좋아요를 누르지 않은 경우")
+    void isNotLiked() {
+      when(exhibitionLikeRepository.findById(any())).thenReturn(Optional.empty());
+      assertThat(exhibitionLikeService.isLikedExhibition(exhibition.getId(), user.getId())).isFalse();
+    }
   }
 }

@@ -5,11 +5,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+@DisplayName("Exhibition 엔티티 테스트")
 class ExhibitionTest {
+
+  @DisplayName("url 검증 테스트")
   @ParameterizedTest
   @MethodSource("thumbnailParameter")
   void testUrlValidation(String url) {

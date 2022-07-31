@@ -32,6 +32,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("ExhibitionService 테스트")
 class ExhibitionServiceTest {
   @Mock
   private ExhibitionRepository exhibitionRepository;
