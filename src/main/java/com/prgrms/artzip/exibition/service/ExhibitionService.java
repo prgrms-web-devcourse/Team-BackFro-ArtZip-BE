@@ -33,6 +33,7 @@ public class ExhibitionService {
     return exhibitionsPagingResult.map(this::exhibitionForSimpleQueryToExhibitionInfo);
   }
 
+  // 차후 수정 필요!
   public ExhibitionDetailInfo getExhibition(Long exhibitionId, User user) {
     ExhibitionDetailForSimpleQuery exhibition = exhibitionRepository.findExhibition(exhibitionId)
         .orElseThrow(() -> new InvalidRequestException(EXHB_NOT_FOUND));
