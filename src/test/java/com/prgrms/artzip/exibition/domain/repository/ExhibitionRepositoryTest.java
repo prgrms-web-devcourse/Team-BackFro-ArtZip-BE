@@ -4,10 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.prgrms.artzip.QueryDslTestConfig;
 import com.prgrms.artzip.common.Authority;
-import com.prgrms.artzip.exibition.domain.Area;
 import com.prgrms.artzip.exibition.domain.Exhibition;
 import com.prgrms.artzip.exibition.domain.ExhibitionLike;
-import com.prgrms.artzip.exibition.domain.Genre;
+import com.prgrms.artzip.exibition.domain.enumType.Area;
+import com.prgrms.artzip.exibition.domain.enumType.Genre;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQuery;
 import com.prgrms.artzip.review.domain.Review;
@@ -32,6 +32,7 @@ import org.springframework.data.domain.PageRequest;
 @Import({QueryDslTestConfig.class})
 @DisplayName("ExhibitionRepository 테스트")
 class ExhibitionRepositoryTest {
+
   @PersistenceContext
   private EntityManager em;
 
@@ -134,10 +135,12 @@ class ExhibitionRepositoryTest {
   @Nested
   @DisplayName("findUpcomingExhibitions() 테스트")
   class FindUpcomingExhibitionsTest {
+
     @Test
     @DisplayName("실제로 시작일이 빠른 전시회가 먼저 오는지 확인하는 테스트")
     void testFindUpcomingExhibition() {
-      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findUpcomingExhibitions(PageRequest.of(0, 10));
+      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findUpcomingExhibitions(
+          PageRequest.of(0, 10));
       ExhibitionForSimpleQuery exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);
 
       assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(2);
@@ -150,10 +153,12 @@ class ExhibitionRepositoryTest {
   @Nested
   @DisplayName("findMostLikeExhibitions() 테스트")
   class FindMostLikeExhibitionsTest {
+
     @Test
     @DisplayName("종료된 전시회 포함하여 인기 많은 전시회 조회 테스트")
     void testFindMostLikeExhibitionIncludeEnd() {
-      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findMostLikeExhibitions(true, PageRequest.of(0, 10));
+      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findMostLikeExhibitions(
+          true, PageRequest.of(0, 10));
       ExhibitionForSimpleQuery exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);
 
       assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(3);
@@ -165,7 +170,8 @@ class ExhibitionRepositoryTest {
     @Test
     @DisplayName("종료된 전시회 제외하고 인기 많은 전시회 조회 테스트")
     void testFindMostLikeExhibitionExcludeEnd() {
-      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findMostLikeExhibitions(false, PageRequest.of(0, 10));
+      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findMostLikeExhibitions(
+          false, PageRequest.of(0, 10));
       ExhibitionForSimpleQuery exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);
 
       assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(2);
@@ -178,17 +184,20 @@ class ExhibitionRepositoryTest {
   @Nested
   @DisplayName("findExhibition() 테스트")
   class FindExhibitionTest {
+
     @Test
     @DisplayName("존재하지 않는 전시회 조회 테스트")
     void testFindEmptyExhibition() {
-      Optional<ExhibitionDetailForSimpleQuery> exhibition = exhibitionRepository.findExhibition(123431L);
+      Optional<ExhibitionDetailForSimpleQuery> exhibition = exhibitionRepository.findExhibition(
+          123431L);
       assertThat(exhibition).isEmpty();
     }
 
     @Test
     @DisplayName("전시회 조회 테스트")
     void testFindExhibition() {
-      Optional<ExhibitionDetailForSimpleQuery> exhibition = exhibitionRepository.findExhibition(exhibitionAlreadyEnd.getId());
+      Optional<ExhibitionDetailForSimpleQuery> exhibition = exhibitionRepository.findExhibition(
+          exhibitionAlreadyEnd.getId());
 
       assertThat(exhibition).isNotEmpty();
       assertThat(exhibition.get().getSeq()).isEqualTo(34);

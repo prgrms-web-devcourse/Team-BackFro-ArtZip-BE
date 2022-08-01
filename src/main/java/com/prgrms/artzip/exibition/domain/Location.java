@@ -1,9 +1,12 @@
 package com.prgrms.artzip.exibition.domain;
 
+import static javax.persistence.EnumType.STRING;
 import static lombok.AccessLevel.PROTECTED;
 
+import com.prgrms.artzip.exibition.domain.enumType.Area;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.Enumerated;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,12 +15,14 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = PROTECTED)
 public class Location {
+
   @Column(name = "latitude", nullable = false)
   private Double latitude; // 위도, y
 
   @Column(name = "longitude", nullable = false)
   private Double longitude; // 경도, x
 
+  @Enumerated(STRING)
   @Column(name = "area", nullable = false, length = 20)
   private Area area; // 지역
 

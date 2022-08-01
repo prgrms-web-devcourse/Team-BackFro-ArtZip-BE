@@ -1,6 +1,6 @@
 package com.prgrms.artzip.exibition.domain;
 
-import static com.prgrms.artzip.exibition.domain.Area.GYEONGGI;
+import static com.prgrms.artzip.exibition.domain.enumType.Area.GYEONGGI;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
@@ -43,8 +43,10 @@ class ExhibitionTest {
         Arguments.of("http://www.culture.go.kr/upload/rdf/21/11/show_20211181717993881.jpg"),
         Arguments.of("http://www.culture.go.kr/upload/rdf/22/01/show_2022011310122915168.png"),
         Arguments.of("http://soma.kspo.or.kr"),
-        Arguments.of("https://www.hangeul.go.kr/traceHangeul/traceHangeul1List.do?curr_menu_cd=0103010100"),
-        Arguments.of("https://www.hangeul.go.kr/traceHangeul/traceHangeul1List.do?curr_menu_cd=0103010100"),
+        Arguments.of(
+            "https://www.hangeul.go.kr/traceHangeul/traceHangeul1List.do?curr_menu_cd=0103010100"),
+        Arguments.of(
+            "https://www.hangeul.go.kr/traceHangeul/traceHangeul1List.do?curr_menu_cd=0103010100"),
         Arguments.of("http://galleryraon.com/?page_id=2472#upcoming")
     );
   }
