@@ -6,8 +6,8 @@ import lombok.Getter;
 import org.springframework.data.domain.Page;
 
 @Getter
-public class PageResponse {
-  private List<Object> content;
+public class PageResponse<T> {
+  private List<T> content;
   private int numberOfElements;
   private int pageNumber;
   private long offset;
