@@ -26,12 +26,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class ExhibitionController {
+
   private final ExhibitionService exhibitionService;
   private final ExhibitionLikeService exhibitionLikeService;
 
   @ApiOperation(value = "다가오는 전시회 조회", notes = "다가오는 전시회를 조회합니다.")
   @GetMapping("/upcoming")
-  public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfo>>> getUpcomingExhibitions(@PageableDefault(size = 10) Pageable pageable) {
+  public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfo>>> getUpcomingExhibitions(
+      @PageableDefault(page = 0, size = 10) Pageable pageable) {
     ApiResponse apiResponse = ApiResponse.builder()
         .message("다가오는 전시회 조회 성공")
         .code(HttpStatus.OK.value())
@@ -45,7 +47,9 @@ public class ExhibitionController {
 
   @ApiOperation(value = "인기 많은 전시회 조회", notes = "인기 많은 전시회를 조회합니다.")
   @GetMapping("/mostlike")
-  public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfo>>> getMostLikeExhibitions(@RequestParam(value = "include-end", required = false, defaultValue = "true") boolean includeEnd, @PageableDefault(size = 10) Pageable pageable) {
+  public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfo>>> getMostLikeExhibitions(
+      @RequestParam(value = "include-end", required = false, defaultValue = "true") boolean includeEnd,
+      @PageableDefault(page = 0, size = 10) Pageable pageable) {
     ApiResponse apiResponse = ApiResponse.builder()
         .message("인기 많은 전시회 조회 성공")
         .code(HttpStatus.OK.value())
@@ -60,7 +64,8 @@ public class ExhibitionController {
   // 수정 필요!
   @ApiOperation(value = "전시회 상세 조회", notes = "전시회를 조회합니다.")
   @GetMapping("/{exhibitionId}")
-  public ResponseEntity<ApiResponse<ExhibitionDetailInfo>> getExhibition(@PathVariable Long exhibitionId) {
+  public ResponseEntity<ApiResponse<ExhibitionDetailInfo>> getExhibition(
+      @PathVariable Long exhibitionId) {
     ApiResponse apiResponse = ApiResponse.builder()
         .message("전시회 조회 성공")
         .code(HttpStatus.OK.value())
@@ -75,7 +80,8 @@ public class ExhibitionController {
   // 기능이 정상적으로 동작할 수 없기에 주석 처리하였습니다.
   // @ApiOperation(value = "전시회 좋아요 수정", notes = "전시회에 대한 좋아요를 추가 또는 삭제합니다.")
   // @GetMapping("/{exhibitionId}/likes")
-  public ResponseEntity<ApiResponse<ExhibitionLikeResult>> updateExhibitionLike(@PathVariable Long exhibitionId) {
+  public ResponseEntity<ApiResponse<ExhibitionLikeResult>> updateExhibitionLike(
+      @PathVariable Long exhibitionId) {
     ApiResponse apiResponse = ApiResponse.builder()
         .message("전시회 좋아요 수정 성공")
         .code(HttpStatus.OK.value())
