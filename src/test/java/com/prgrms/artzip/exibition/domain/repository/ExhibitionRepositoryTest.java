@@ -208,4 +208,28 @@ class ExhibitionRepositoryTest {
       assertThat(exhibition.get().getLikeCount()).isEqualTo(2);
     }
   }
+
+  @Nested
+  @DisplayName("findExhibitionsByQuery() 테스트")
+  class FindExhibitionsByQueryTest {
+
+    @Test
+    @DisplayName("끝난 전시회 제외 하지 않는 경우 태스트")
+    void testWithEndExhibition() {
+      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findExhibitionsByQuery(
+          "부산", true, PageRequest.of(0, 10));
+
+      assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("끝난 전시회 제외 하는 경우 태스트")
+    void testWithOutEndExhibition() {
+      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findExhibitionsByQuery(
+          "전시회", false, PageRequest.of(0, 10));
+
+      assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(2);
+    }
+  }
+
 }

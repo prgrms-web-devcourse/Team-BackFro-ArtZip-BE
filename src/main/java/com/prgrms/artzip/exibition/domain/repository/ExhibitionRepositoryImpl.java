@@ -8,6 +8,7 @@ import com.prgrms.artzip.exibition.dto.projection.ExhibitionDetailForSimpleQuery
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQuery;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -122,14 +123,64 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
         .fetchOne());
   }
 
+  @Override
+  public Page<ExhibitionForSimpleQuery> findExhibitionsByQuery(String query, boolean includeEnd,
+      Pageable pageable) {
+    BooleanBuilder exhibitionsByQueryCondition = getExhibitionsByQueryCondition(query, includeEnd);
+
+    List<ExhibitionForSimpleQuery> exhibitions = queryFactory
+        .select(Projections.fields(ExhibitionForSimpleQuery.class,
+                exhibition.id,
+                exhibition.name,
+                exhibition.thumbnail,
+                exhibition.period,
+                exhibitionLike.exhibition.id.count().as("likeCount"),
+                review.exhibition.id.count().as("reviewCount")
+            )
+        )
+        .from(exhibition)
+        .leftJoin(exhibitionLike)
+        .on(exhibitionLike.exhibition.eq(exhibition))
+        .leftJoin(review)
+        .on(review.exhibition.eq(exhibition))
+        .where(exhibitionsByQueryCondition)
+        .offset(pageable.getOffset())
+        .limit(pageable.getPageSize())
+        .groupBy(exhibition.id)
+        .fetch();
+
+    JPAQuery<Long> countQuery = queryFactory
+        .select(exhibition.count())
+        .from(exhibition)
+        .where(exhibitionsByQueryCondition);
+
+    return PageableExecutionUtils.getPage(exhibitions, pageable, countQuery::fetchOne);
+  }
 
   private BooleanBuilder getMostLikeCondition(boolean includeEnd) {
     BooleanBuilder mostLikeCondition = new BooleanBuilder();
 
-    if (!includeEnd) {
-      mostLikeCondition.and(exhibition.period.endDate.goe(LocalDate.now()));
-    }
+    mostLikeCondition
+        .and(!includeEnd ? exhibitionEndDateGoe() : null);
 
     return mostLikeCondition;
+  }
+
+  private BooleanBuilder getExhibitionsByQueryCondition(String query, boolean includeEnd) {
+    BooleanBuilder searchCondition = new BooleanBuilder();
+
+    searchCondition
+        .and(exhibitionNameContains(query))
+        .and(!includeEnd ? exhibitionEndDateGoe() : null);
+
+    return searchCondition;
+  }
+
+  private BooleanExpression exhibitionEndDateGoe() {
+    return exhibition.period.endDate.goe(LocalDate.now());
+  }
+
+  private BooleanExpression exhibitionNameContains(String name) {
+    return name == null ? null : exhibition.name.contains(name);
   }
 }

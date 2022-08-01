@@ -14,9 +14,9 @@ public interface ExhibitionCustomRepository {
 
   Optional<ExhibitionDetailForSimpleQuery> findExhibition(Long exhibitionId);
 
-  // 검색 레파지토리
-  // 쪼갤 것인가?
-  // 유사한 기능
-  // 동일한 데이터
+  Page<ExhibitionForSimpleQuery> findExhibitionsByQuery(String query, boolean includeEnd,
+      Pageable pageable);
+
+  // findExhibitionsForReview
 
 }
