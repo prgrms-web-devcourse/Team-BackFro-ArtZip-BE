@@ -43,12 +43,13 @@ public enum ErrorCode {
   INVALID_EXHB_ADDRESS(400, "EX008", "전시회 상세 주소는 필수입니다.(1 <= 전시회 주소 <= 100)"),
   INVALID_EXHB_INQUIRY(400, "EX008", "전시회 문의처는 필수입니다.(1 <= 전시회 문의처 <= 100)"),
   INVALID_EXHB_FEE(400, "EX009", "전시회 요금 정보는 필수입니다.(1 <= 전시회 요금 정보 <= 1000)"),
-  INVALID_EXHB_THUMBNAIL(400, "EX010", "전시회 썸네일을 필수입니다. 전시회 썸네일 저장 형태는 URL 입니다.(1 <= 전시회 썸네일 URL <= 2083)"),
+  INVALID_EXHB_THUMBNAIL(400, "EX010",
+      "전시회 썸네일을 필수입니다. 전시회 썸네일 저장 형태는 URL 입니다.(1 <= 전시회 썸네일 URL <= 2083)"),
   INVALID_EXHB_URL(400, "EX011", "전시회 URL은 필수입니다.(1 <= 전시회 URL <= 2083)"),
   INVALID_EXHB_PLACEURL(400, "EX012", "전시회 장소 URL은 필수입니다.(1 <= 전시회 장소 URL <= 2083)"),
   INVALID_EXHB_LIKE(400, "EX013", "전시회 좋아요에는 전시회 정보와 사용자 정보가 필수입니다."),
-  EXHB_NOT_FOUND(404, "EX014",  "존재하지 않는 전시회 입니다."),
-
+  EXHB_NOT_FOUND(404, "EX014", "존재하지 않는 전시회 입니다."),
+  EXHB_QUERY_BLANK(400, "EX015", "검색어(query)는 필수 입니다."),
 
   /**
    * Comment Domain
@@ -66,8 +67,7 @@ public enum ErrorCode {
   INVALID_REVIEW_DATE(400, "R004", "방문일은 오늘 이후일 수 없습니다."),
   REVIEW_LIKE_FIELD_CONTAINS_NULL_VALUE(400, "R005", "리뷰 좋아요 필드에 NULL값이 포함되어 있습니다."),
   REVIEW_PHOTO_FIELD_CONTAINS_NULL_VALUE(400, "R006", "리뷰 사진 필드에 NULL값이 포함되어 있습니다."),
-  INVALID_REVIEW_PHOTO_PATH_LENGTH(400, "R007", "path는 1글자 이상 2083자 이하이어야 합니다.")
-  ;
+  INVALID_REVIEW_PHOTO_PATH_LENGTH(400, "R007", "path는 1글자 이상 2083자 이하이어야 합니다.");
 
 
   private final int status;
