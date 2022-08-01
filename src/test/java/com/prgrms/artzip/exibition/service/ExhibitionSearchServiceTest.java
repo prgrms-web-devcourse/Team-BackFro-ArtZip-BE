@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.exibition.domain.Period;
 import com.prgrms.artzip.exibition.domain.repository.ExhibitionRepository;
+import com.prgrms.artzip.exibition.dto.projection.ExhibitionBasicForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQuery;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -85,4 +86,48 @@ class ExhibitionSearchServiceTest {
       );
     }
   }
+
+  @Nested
+  @DisplayName("getExhibitionsForReview() 테스트")
+  class GetExhibitionsForReview {
+
+    @ParameterizedTest
+    @MethodSource("queryParameter")
+    @DisplayName("검색어가 blank인 경우 테스트")
+    void testBlankQuery(String query) {
+      assertThatThrownBy(
+          () -> exhibitionSearchService.getExhibitionsForReview(query))
+          .isInstanceOf(InvalidRequestException.class)
+          .hasMessage("검색어(query)는 필수 입니다.");
+
+      verify(exhibitionRepository, never()).findExhibitionsForReview(query);
+    }
+
+    @Test
+    @DisplayName("성공적으로 검색한 경우 테스트")
+    void testNormalQuery() {
+      PageRequest pageRequest = PageRequest.of(0, 10);
+      List<ExhibitionBasicForSimpleQuery> exhibitions = new ArrayList<>();
+      exhibitions.add(ExhibitionBasicForSimpleQuery.builder()
+          .id(11L)
+          .name("고흐 전시")
+          .thumbnail("http://www.culture.go.kr/upload/rdf/22/07/show_2022071411402126915.png")
+          .build());
+
+      when(exhibitionRepository.findExhibitionsForReview("고흐")).thenReturn(exhibitions);
+
+      exhibitionSearchService.getExhibitionsForReview("고흐");
+
+      verify(exhibitionRepository).findExhibitionsForReview("고흐");
+    }
+
+    private static Stream<Arguments> queryParameter() {
+      return Stream.of(
+          null,
+          Arguments.of(""),
+          Arguments.of(" ")
+      );
+    }
+  }
+
 }

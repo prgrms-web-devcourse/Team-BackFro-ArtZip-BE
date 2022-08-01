@@ -5,8 +5,10 @@ import static java.util.Objects.isNull;
 
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.exibition.domain.repository.ExhibitionRepository;
+import com.prgrms.artzip.exibition.dto.projection.ExhibitionBasicForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.response.ExhibitionInfo;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,16 +23,16 @@ public class ExhibitionSearchService {
   public Page<ExhibitionInfo> getExhibitionByQuery(String query, boolean includeEnd,
       Pageable pageable) {
     validateQuery(query);
-
     Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findExhibitionsByQuery(
         query, includeEnd, pageable);
 
     return exhibitionsPagingResult.map(ExhibitionInfo::new);
   }
 
-  // 후기 작성시 검색
-  // query, pageable
-  // query : 필수로 입력 (notblank)
+  public List<ExhibitionBasicForSimpleQuery> getExhibitionsForReview(String query) {
+    validateQuery(query);
+    return exhibitionRepository.findExhibitionsForReview(query);
+  }
 
 
   private void validateQuery(String query) {
