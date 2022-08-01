@@ -13,6 +13,7 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+@DisplayName("ExhibitionLike 엔티티 테스트")
 class ExhibitionLikeTest {
   private Exhibition exhibition = Exhibition.builder()
       .seq(12345)
