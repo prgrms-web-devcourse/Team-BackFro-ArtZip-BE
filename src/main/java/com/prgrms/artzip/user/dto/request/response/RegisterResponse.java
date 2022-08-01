@@ -1,6 +1,6 @@
 package com.prgrms.artzip.user.dto.request.response;
 
-import com.prgrms.coretime.user.domain.User;
+import com.prgrms.artzip.user.domain.User;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -22,11 +22,8 @@ public class RegisterResponse {
   public static RegisterResponse from(User user) {
     return RegisterResponse.builder()
         .userId(user.getId())
-        .schoolId(user.getSchool().getId())
         .email(user.getEmail())
-        .profileImage(user.getProfileImage())
         .nickname(user.getNickname())
-        .name(user.getName())
         .build();
   }
 }

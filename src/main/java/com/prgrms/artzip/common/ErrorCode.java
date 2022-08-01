@@ -33,6 +33,7 @@ public enum ErrorCode {
   CREDENTIAL_REQUIRED(400, "U006", "비밀번호는 필수입니다."),
   ACCESS_TOKEN_REQUIRED(400, "U007", "access token은 필수입니다."),
   EMAIL_REQUIRED(400, "U008", "이메일은 필수입니다."),
+  ROLE_NOT_FOUND(400, "U009", "역할이 존재하지 않습니다."),
   /**
    * Exhibition Domain
    */

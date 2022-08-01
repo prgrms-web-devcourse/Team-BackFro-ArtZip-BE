@@ -34,7 +34,7 @@ public class User extends BaseEntity {
 
   @Id
   @Column(name = "user_id")
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @Column(name = "email", nullable = false, length = MAX_EMAIL_LENGTH)
@@ -46,7 +46,7 @@ public class User extends BaseEntity {
   @Column(name = "nickname", nullable = false, length = MAX_NICKNAME_LENGTH)
   private String nickname;
 
-  @ManyToMany
+  @ManyToMany //(fetch = FetchType.EAGER)
   @JoinTable(
           name = "user_role",
           joinColumns = @JoinColumn(
