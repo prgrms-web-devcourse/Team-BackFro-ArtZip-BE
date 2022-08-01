@@ -1,9 +1,9 @@
-package com.prgrms.artzip.exibition.dto;
+package com.prgrms.artzip.exibition.dto.response;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.*;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.prgrms.artzip.exibition.dto.response.ExhibitionBasicInfo;
 import java.time.LocalDate;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Getter
 @JsonInclude(NON_NULL)
-public class ExhibitionInfo extends ExhibitionBasicInfo{
+public class ExhibitionInfo extends ExhibitionBasicInfo {
   private LocalDate startDate;
   private LocalDate endDate;
   private long likeCount;

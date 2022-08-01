@@ -2,8 +2,8 @@ package com.prgrms.artzip.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import lombok.Builder;
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
 
 @Getter
 @JsonInclude(Include.NON_NULL)
@@ -12,11 +12,7 @@ public class ApiResponse<T> {
   private Integer code;
   private T data;
 
-  public ApiResponse(String message, Integer code) {
-    this.message = message;
-    this.code = code;
-  }
-
+  @Builder
   public ApiResponse(String message, Integer code, T data) {
     this.message = message;
     this.code = code;
