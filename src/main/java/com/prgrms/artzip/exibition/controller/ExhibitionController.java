@@ -36,7 +36,7 @@ public class ExhibitionController {
       @PageableDefault(page = 0, size = 10) Pageable pageable) {
     ApiResponse apiResponse = ApiResponse.builder()
         .message("다가오는 전시회 조회 성공")
-        .code(HttpStatus.OK.value())
+        .status(HttpStatus.OK.value())
         .data(new PageResponse(exhibitionService.getUpcomingExhibitions(pageable)))
         .build();
 
@@ -52,7 +52,7 @@ public class ExhibitionController {
       @PageableDefault(page = 0, size = 10) Pageable pageable) {
     ApiResponse apiResponse = ApiResponse.builder()
         .message("인기 많은 전시회 조회 성공")
-        .code(HttpStatus.OK.value())
+        .status(HttpStatus.OK.value())
         .data(new PageResponse(exhibitionService.getMostLikeExhibitions(includeEnd, pageable)))
         .build();
 
@@ -68,7 +68,7 @@ public class ExhibitionController {
       @PathVariable Long exhibitionId) {
     ApiResponse apiResponse = ApiResponse.builder()
         .message("전시회 조회 성공")
-        .code(HttpStatus.OK.value())
+        .status(HttpStatus.OK.value())
         .data(exhibitionService.getExhibition(exhibitionId, null))
         .build();
 
@@ -84,7 +84,7 @@ public class ExhibitionController {
       @PathVariable Long exhibitionId) {
     ApiResponse apiResponse = ApiResponse.builder()
         .message("전시회 좋아요 수정 성공")
-        .code(HttpStatus.OK.value())
+        .status(HttpStatus.OK.value())
         .data(exhibitionLikeService.updateExhibitionLike(exhibitionId, null))
         .build();
 
