@@ -6,6 +6,7 @@ import com.prgrms.artzip.exibition.dto.response.ExhibitionDetailInfo;
 import com.prgrms.artzip.exibition.dto.response.ExhibitionInfo;
 import com.prgrms.artzip.exibition.dto.response.ExhibitionLikeResult;
 import com.prgrms.artzip.exibition.service.ExhibitionLikeService;
+import com.prgrms.artzip.exibition.service.ExhibitionSearchService;
 import com.prgrms.artzip.exibition.service.ExhibitionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,6 +30,7 @@ public class ExhibitionController {
 
   private final ExhibitionService exhibitionService;
   private final ExhibitionLikeService exhibitionLikeService;
+  private final ExhibitionSearchService exhibitionSearchService;
 
   @ApiOperation(value = "다가오는 전시회 조회", notes = "다가오는 전시회를 조회합니다.")
   @GetMapping("/upcoming")
@@ -86,6 +88,26 @@ public class ExhibitionController {
         .message("전시회 좋아요 수정 성공")
         .status(HttpStatus.OK.value())
         .data(exhibitionLikeService.updateExhibitionLike(exhibitionId, null))
+        .build();
+
+    return ResponseEntity
+        .ok()
+        .body(apiResponse);
+  }
+
+
+  @ApiOperation(value = "전시회 검색", notes = "전시회를 이름으로 검색합니다.")
+  @GetMapping("/search")
+  public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfo>>> getExhibitionByQuery(
+      String query,
+      @RequestParam(value = "include-end", required = false, defaultValue = "true") boolean includeEnd,
+      @PageableDefault(page = 0, size = 10) Pageable pageable) {
+
+    ApiResponse apiResponse = ApiResponse.builder()
+        .message("전시회 검색 성공")
+        .status(HttpStatus.OK.value())
+        .data(new PageResponse(
+            exhibitionSearchService.getExhibitionByQuery(query, includeEnd, pageable)))
         .build();
 
     return ResponseEntity
