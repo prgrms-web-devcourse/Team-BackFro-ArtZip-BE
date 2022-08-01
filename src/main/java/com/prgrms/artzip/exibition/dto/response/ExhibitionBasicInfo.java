@@ -1,4 +1,4 @@
-package com.prgrms.artzip.exibition.dto;
+package com.prgrms.artzip.exibition.dto.response;
 
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
