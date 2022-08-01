@@ -40,7 +40,7 @@ public class ReviewService {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
     Exhibition exhibition = exhibitionRepository.findById(request.getExhibitionId())
-        .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND));
+        .orElseThrow(() -> new NotFoundException(ErrorCode.EXHB_NOT_FOUND));
 
     Review review = Review.builder()
         .user(user)
