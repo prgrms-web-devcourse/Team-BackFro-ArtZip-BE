@@ -4,6 +4,7 @@ import static com.prgrms.artzip.exibition.domain.QExhibition.exhibition;
 import static com.prgrms.artzip.exibition.domain.QExhibitionLike.exhibitionLike;
 import static com.prgrms.artzip.review.domain.QReview.review;
 
+import com.prgrms.artzip.exibition.dto.projection.ExhibitionBasicForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQuery;
 import com.querydsl.core.BooleanBuilder;
@@ -157,6 +158,22 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
     return PageableExecutionUtils.getPage(exhibitions, pageable, countQuery::fetchOne);
   }
 
+  @Override
+  public List<ExhibitionBasicForSimpleQuery> findExhibitionsForReview(String query) {
+    BooleanBuilder exhibitionsForReviewCondition = getExhibitionsForReviewCondition(query);
+
+    return queryFactory
+        .select(Projections.fields(ExhibitionBasicForSimpleQuery.class,
+                exhibition.id,
+                exhibition.name,
+                exhibition.thumbnail
+            )
+        )
+        .from(exhibition)
+        .where(exhibitionsForReviewCondition)
+        .fetch();
+  }
+
   private BooleanBuilder getMostLikeCondition(boolean includeEnd) {
     BooleanBuilder mostLikeCondition = new BooleanBuilder();
 
@@ -167,13 +184,22 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
   }
 
   private BooleanBuilder getExhibitionsByQueryCondition(String query, boolean includeEnd) {
-    BooleanBuilder searchCondition = new BooleanBuilder();
+    BooleanBuilder exhibitionsByQueryCondition = new BooleanBuilder();
 
-    searchCondition
+    exhibitionsByQueryCondition
         .and(exhibitionNameContains(query))
         .and(!includeEnd ? exhibitionEndDateGoe() : null);
 
-    return searchCondition;
+    return exhibitionsByQueryCondition;
+  }
+
+  private BooleanBuilder getExhibitionsForReviewCondition(String query) {
+    BooleanBuilder exhibitionsForReviewCondition = new BooleanBuilder();
+
+    exhibitionsForReviewCondition
+        .and(exhibitionNameContains(query));
+
+    return exhibitionsForReviewCondition;
   }
 
   private BooleanExpression exhibitionEndDateGoe() {

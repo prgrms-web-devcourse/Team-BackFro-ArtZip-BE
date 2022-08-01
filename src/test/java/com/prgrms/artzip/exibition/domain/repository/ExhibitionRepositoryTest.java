@@ -8,6 +8,7 @@ import com.prgrms.artzip.exibition.domain.Exhibition;
 import com.prgrms.artzip.exibition.domain.ExhibitionLike;
 import com.prgrms.artzip.exibition.domain.enumType.Area;
 import com.prgrms.artzip.exibition.domain.enumType.Genre;
+import com.prgrms.artzip.exibition.dto.projection.ExhibitionBasicForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQuery;
 import com.prgrms.artzip.review.domain.Review;
@@ -232,4 +233,20 @@ class ExhibitionRepositoryTest {
     }
   }
 
+  @Nested
+  @DisplayName("findExhibitionsForReview() 테스트")
+  class FindExhibitionsForReviewTest {
+
+    @Test
+    @DisplayName("검색어에 맞는 결과가 반환되는지 테스트")
+    void testFindExhibitionsForReview() {
+      List<ExhibitionBasicForSimpleQuery> exhibitions = exhibitionRepository.findExhibitionsForReview(
+          "부산");
+
+      assertThat(exhibitions.size()).isEqualTo(1);
+      assertThat(exhibitions.get(0).getName()).isEqualTo("전시회 at 부산");
+      assertThat(exhibitions.get(0).getThumbnail()).isEqualTo(
+          "http://www.culture.go.kr/upload/rdf/22/07/show_2022072010193392447.jpg");
+    }
+  }
 }
