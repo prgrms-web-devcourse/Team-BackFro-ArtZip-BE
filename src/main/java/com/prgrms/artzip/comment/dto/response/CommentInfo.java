@@ -1,4 +1,4 @@
-package com.prgrms.artzip.comment.dto;
+package com.prgrms.artzip.comment.dto.response;
 
 import com.prgrms.artzip.comment.domain.Comment;
 import java.time.LocalDateTime;
