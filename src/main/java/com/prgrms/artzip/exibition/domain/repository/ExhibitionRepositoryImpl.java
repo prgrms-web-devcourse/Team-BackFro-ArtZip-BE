@@ -114,8 +114,8 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository{
         )
         .from(exhibition)
         .leftJoin(exhibitionLike)
-        .where(exhibition.id.eq(exhibitionId))
         .on(exhibitionLike.exhibition.eq(exhibition))
+        .where(exhibition.id.eq(exhibitionId))
         .groupBy(exhibition.id)
         .fetchOne());
   }
