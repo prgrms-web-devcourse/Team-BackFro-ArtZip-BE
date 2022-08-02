@@ -23,6 +23,7 @@ import static org.springframework.http.HttpStatus.*;
 
 @RestController
 @RequestMapping("api/v1/users")
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class UserController {
 
   private final UserService userService;
@@ -46,13 +47,27 @@ public class UserController {
     Authentication authentication = authenticationManager.authenticate(authToken);
     String refreshToken = (String) authentication.getDetails();
     JwtPrincipal principal = (JwtPrincipal) authentication.getPrincipal();
-    return ResponseEntity.ok(new ApiResponse<>("로그인 성공", OK.value(), new LoginResponse(principal.userId, principal.accessToken, refreshToken)));
+    ApiResponse response = ApiResponse.builder()
+            .message("로그인 성공하였습니다.")
+            .status(OK.value())
+            .data(LoginResponse.builder()
+                    .userId(principal.userId)
+                    .accessToken(principal.accessToken)
+                    .refreshToken(refreshToken)
+                    .build())
+            .build();
+    return ResponseEntity.ok(response);
   }
 
   @PostMapping("/register")
   public ResponseEntity<ApiResponse<RegisterResponse>> register(@RequestBody @Valid
       UserRegisterRequest request) {
     User newUser = userService.register(request);
-    return ResponseEntity.created(URI.create("/register")).body(new ApiResponse<>("회원가입 성공하였습니다.", CREATED.value(), RegisterResponse.from(newUser)));
+    ApiResponse response = ApiResponse.builder()
+            .message("회원가입 성공하였습니다.")
+            .status(CREATED.value())
+            .data(RegisterResponse.from(newUser))
+            .build();
+    return ResponseEntity.created(URI.create("/register")).body(response);
   }
 }
