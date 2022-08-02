@@ -46,7 +46,7 @@ public class User extends BaseEntity {
   @Column(name = "nickname", nullable = false, length = MAX_NICKNAME_LENGTH)
   private String nickname;
 
-  @ManyToMany //(fetch = FetchType.EAGER)
+  @ManyToMany
   @JoinTable(
           name = "user_role",
           joinColumns = @JoinColumn(
