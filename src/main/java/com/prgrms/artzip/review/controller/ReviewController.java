@@ -50,8 +50,10 @@ public class ReviewController {
             response));
   }
 
+  @ApiOperation(value = "후기 작성 시, 전시회 검색", notes = "후기 작성 시, 전시회를 '전시회 이름'으로 검색합니다.")
   @GetMapping("/search/exhibitions")
   public ResponseEntity<ApiResponse> getExhibitions(
+      @ApiParam(value = "검색할 전시회 이름", required = true)
       @RequestParam(value = "query") String query) {
 
     ExhibitionsResponse response = new ExhibitionsResponse(
