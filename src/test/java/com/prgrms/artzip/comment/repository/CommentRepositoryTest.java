@@ -14,7 +14,6 @@ import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -139,22 +138,5 @@ class CommentRepositoryTest {
       ))
           .hasSize(2);
     });
-  }
-
-  @Test
-  @DisplayName("댓글 soft delete 테스트")
-  void testDeleteComment() {
-    //Given
-    List<Comment> comments = commentRepository.findAll();
-    Comment comment = comments.get(0);
-    assertThat(comment.getIsDeleted()).isFalse();
-
-    //When
-    commentRepository.deleteCommentById(comment.getId());
-
-    //Then
-    Optional<Comment> foundComment = commentRepository.findById(comment.getId());
-    assertThat(foundComment.isEmpty()).isFalse();
-    assertThat(foundComment.get().getIsDeleted()).isTrue();
   }
 }

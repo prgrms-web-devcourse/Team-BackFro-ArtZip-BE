@@ -57,7 +57,7 @@ public enum ErrorCode {
   CONTENT_IS_REQUIRED(400, "CM002", "댓글 내용은 필수입니다.(최대 500자)"),
   CONTENT_IS_TOO_LONG(400, "CM003", "댓글은 최대 500자입니다."),
   COMMENT_USER_IS_REQUIRED(400, "CM004", "댓글 작성 유저는 필수입니다."),
-
+  COMMENT_ALREADY_DELETED(400, "CM005", "댓글이 이미 삭제되었습니다."),
   /**
    * Review Domain
    */
@@ -67,7 +67,8 @@ public enum ErrorCode {
   INVALID_REVIEW_DATE(400, "R004", "방문일은 오늘 이후일 수 없습니다."),
   REVIEW_LIKE_FIELD_CONTAINS_NULL_VALUE(400, "R005", "리뷰 좋아요 필드에 NULL값이 포함되어 있습니다."),
   REVIEW_PHOTO_FIELD_CONTAINS_NULL_VALUE(400, "R006", "리뷰 사진 필드에 NULL값이 포함되어 있습니다."),
-  INVALID_REVIEW_PHOTO_PATH_LENGTH(400, "R007", "path는 1글자 이상 2083자 이하이어야 합니다.")
+  INVALID_REVIEW_PHOTO_PATH_LENGTH(400, "R007", "path는 1글자 이상 2083자 이하이어야 합니다."),
+  REVIEW_NOT_FOUND(400, "R008", "리뷰가 존재하지 않습니다.")
   ;
 
 

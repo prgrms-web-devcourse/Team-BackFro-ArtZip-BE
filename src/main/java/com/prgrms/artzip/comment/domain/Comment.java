@@ -2,6 +2,8 @@ package com.prgrms.artzip.comment.domain;
 
 import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.entity.BaseEntity;
+import com.prgrms.artzip.common.error.exception.AlreadyExistsException;
+import com.prgrms.artzip.common.error.exception.DuplicateRequestException;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.review.domain.Review;
 import com.prgrms.artzip.user.domain.User;
@@ -57,7 +59,7 @@ public class Comment extends BaseEntity {
     this.review = review;
   }
 
-  private void setContent(String content) {
+  public void setContent(String content) {
     if (Objects.isNull(content) || content.isBlank()) {
       throw new InvalidRequestException(ErrorCode.CONTENT_IS_REQUIRED);
     }
@@ -72,5 +74,12 @@ public class Comment extends BaseEntity {
       throw new InvalidRequestException(ErrorCode.COMMENT_USER_IS_REQUIRED);
     }
     this.user = user;
+  }
+
+  public void softDelete() {
+    if (this.isDeleted) {
+      throw new DuplicateRequestException(ErrorCode.COMMENT_ALREADY_DELETED);
+    }
+    this.isDeleted = true;
   }
 }
