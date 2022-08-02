@@ -4,10 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.prgrms.artzip.QueryDslTestConfig;
 import com.prgrms.artzip.common.Authority;
-import com.prgrms.artzip.exibition.domain.Area;
 import com.prgrms.artzip.exibition.domain.Exhibition;
 import com.prgrms.artzip.exibition.domain.ExhibitionLike;
-import com.prgrms.artzip.exibition.domain.Genre;
+import com.prgrms.artzip.exibition.domain.enumType.Area;
+import com.prgrms.artzip.exibition.domain.enumType.Genre;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import java.time.LocalDate;
@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Import;
 @Import({QueryDslTestConfig.class})
 @DisplayName("ExhibitionLikeRepository 테스트")
 class ExhibitionLikeRepositoryTest {
+
   @PersistenceContext
   private EntityManager em;
 

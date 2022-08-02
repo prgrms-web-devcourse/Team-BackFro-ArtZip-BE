@@ -9,13 +9,13 @@ import lombok.Getter;
 @JsonInclude(Include.NON_NULL)
 public class ApiResponse<T> {
   private String message;
-  private Integer code;
+  private Integer status;
   private T data;
 
   @Builder
-  public ApiResponse(String message, Integer code, T data) {
+  public ApiResponse(String message, Integer status, T data) {
     this.message = message;
-    this.code = code;
+    this.status = status;
     this.data = data;
   }
 }

@@ -1,14 +1,15 @@
 package com.prgrms.artzip.exibition.dto.response;
 
-import com.prgrms.artzip.exibition.domain.Area;
-import com.prgrms.artzip.exibition.domain.Genre;
+import com.prgrms.artzip.exibition.domain.enumType.Area;
+import com.prgrms.artzip.exibition.domain.enumType.Genre;
 import java.time.LocalDate;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
 @Getter
-public class ExhibitionDetailInfo extends ExhibitionBasicInfo{
+public class ExhibitionDetailInfo extends ExhibitionBasicInfo {
+
   private LocalDate startDate;
   private LocalDate endDate;
   private Area area;

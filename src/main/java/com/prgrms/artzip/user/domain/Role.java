@@ -6,11 +6,13 @@ import static java.util.Objects.*;
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Role {
 
@@ -22,7 +24,7 @@ public class Role {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "authority", nullable = false, length = 10)
+    @Column(name = "authority", unique = true, nullable = false, length = 10)
     private Authority authority;
 
     public Role(Authority authority) {

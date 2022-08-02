@@ -9,11 +9,11 @@ import static org.mockito.Mockito.when;
 
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
-import com.prgrms.artzip.exibition.domain.Area;
 import com.prgrms.artzip.exibition.domain.Exhibition;
 import com.prgrms.artzip.exibition.domain.ExhibitionLike;
 import com.prgrms.artzip.exibition.domain.ExhibitionLikeId;
-import com.prgrms.artzip.exibition.domain.Genre;
+import com.prgrms.artzip.exibition.domain.enumType.Area;
+import com.prgrms.artzip.exibition.domain.enumType.Genre;
 import com.prgrms.artzip.exibition.domain.repository.ExhibitionLikeRepository;
 import com.prgrms.artzip.exibition.domain.repository.ExhibitionRepository;
 import com.prgrms.artzip.exibition.dto.response.ExhibitionLikeResult;
@@ -23,7 +23,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,6 +32,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ExhibitionLikeService 테스트")
 class ExhibitionLikeServiceTest {
+
   @Mock
   ExhibitionRepository exhibitionRepository;
 
@@ -94,7 +94,8 @@ class ExhibitionLikeServiceTest {
     when(exhibitionRepository.findById(exhibitionId)).thenReturn(Optional.of(exhibition));
     when(exhibitionLikeRepository.countByExhibitionId(exhibitionId)).thenReturn(100L);
 
-    ExhibitionLikeResult exhibitionLikeResult = exhibitionLikeService.updateExhibitionLike(exhibitionId, user);
+    ExhibitionLikeResult exhibitionLikeResult = exhibitionLikeService.updateExhibitionLike(
+        exhibitionId, user);
 
     verify(exhibitionLikeRepository).findById(exhibitionLikeId);
     verify(exhibitionRepository).findById(exhibitionId);
@@ -113,10 +114,12 @@ class ExhibitionLikeServiceTest {
     ExhibitionLikeId exhibitionLikeId = new ExhibitionLikeId(exhibitionId, user.getId());
     ExhibitionLike exhibitionLike = new ExhibitionLike(exhibition, user);
 
-    when(exhibitionLikeRepository.findById(exhibitionLikeId)).thenReturn(Optional.of(exhibitionLike));
+    when(exhibitionLikeRepository.findById(exhibitionLikeId)).thenReturn(
+        Optional.of(exhibitionLike));
     when(exhibitionLikeRepository.countByExhibitionId(exhibitionId)).thenReturn(100L);
 
-    ExhibitionLikeResult exhibitionLikeResult = exhibitionLikeService.updateExhibitionLike(exhibitionId, user);
+    ExhibitionLikeResult exhibitionLikeResult = exhibitionLikeService.updateExhibitionLike(
+        exhibitionId, user);
 
     verify(exhibitionLikeRepository).findById(exhibitionLikeId);
     verify(exhibitionLikeRepository).deleteById(exhibitionLikeId);

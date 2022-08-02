@@ -1,6 +1,6 @@
 package com.prgrms.artzip.exibition.domain;
 
-import static com.prgrms.artzip.exibition.domain.Area.GYEONGGI;
+import static com.prgrms.artzip.exibition.domain.enumType.Area.GYEONGGI;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.prgrms.artzip.common.Authority;
@@ -9,12 +9,12 @@ import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import java.time.LocalDate;
 import java.util.List;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("ExhibitionLike 엔티티 테스트")
 class ExhibitionLikeTest {
+
   private Exhibition exhibition = Exhibition.builder()
       .seq(12345)
       .name("전시회 제목")
