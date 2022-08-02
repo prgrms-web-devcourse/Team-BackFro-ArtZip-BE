@@ -33,7 +33,7 @@ public class UserService {
         this.roleRepository = roleRepository;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public User login(String principal, String credentials){
         if(!hasText(principal) || !hasText(credentials)) throw new InvalidRequestException(LOGIN_PARAM_REQUIRED);
 
