@@ -221,7 +221,7 @@ class ReviewServiceTest {
       }
 
       @Test
-      @DisplayName("s3에 이미지 업로드할 IOException 발생")
+      @DisplayName("s3에 이미지 업로드할 때 IOException 발생")
       void invokeIOException() throws IOException {
         doReturn(Optional.of(user)).when(userRepository).findById(user.getId());
         doReturn(Optional.of(exhibition)).when(exhibitionRepository)
