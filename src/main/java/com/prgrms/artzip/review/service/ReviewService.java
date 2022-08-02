@@ -62,6 +62,9 @@ public class ReviewService {
   private void createReviewPhoto(final Review review, final List<MultipartFile> files) {
     files.forEach(file -> {
       validateFileExtension(file);
+    });
+
+    files.forEach(file -> {
       try {
         String path = amazonS3Uploader.upload(file, REVIEW_DIRECTORY_NAME + review.getId());
         reviewPhotoRepository.save(new ReviewPhoto(review, path));
