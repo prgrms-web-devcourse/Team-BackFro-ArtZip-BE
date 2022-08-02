@@ -57,5 +57,9 @@ public class UserService {
         return userRepository.save(newUser);
     }
 
+    @Transactional(readOnly = true)
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+    }
 
 }
