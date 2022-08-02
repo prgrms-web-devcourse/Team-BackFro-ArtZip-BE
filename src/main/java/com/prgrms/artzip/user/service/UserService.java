@@ -35,8 +35,7 @@ public class UserService {
 
     @Transactional
     public User login(String principal, String credentials){
-        if(!hasText(principal)) throw new InvalidRequestException(PRINCIPAL_REQUIRED);
-        if(!hasText(credentials)) throw new InvalidRequestException(CREDENTIAL_REQUIRED);
+        if(!hasText(principal) || !hasText(credentials)) throw new InvalidRequestException(LOGIN_PARAM_REQUIRED);
 
         LocalUser user = (LocalUser) userRepository.findByEmailAndIsQuit(principal, false).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
         user.checkPassword(passwordEncoder, credentials);
