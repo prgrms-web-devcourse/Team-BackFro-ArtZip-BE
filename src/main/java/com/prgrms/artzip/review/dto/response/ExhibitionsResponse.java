@@ -1,4 +1,4 @@
-package com.prgrms.artzip.review.dto;
+package com.prgrms.artzip.review.dto.response;
 
 import com.prgrms.artzip.exibition.dto.response.ExhibitionBasicInfo;
 import java.util.List;
