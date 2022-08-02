@@ -33,6 +33,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("CommentService 테스트")
@@ -86,6 +89,23 @@ class CommentServiceTest {
       .date(LocalDate.now())
       .isPublic(true)
       .build();
+
+  @Test
+  @DisplayName("댓글 다건 조회 테스트")
+  void testGetComments() {
+    //given
+    Pageable pageable = PageRequest.of(0, 10);
+    doReturn(new PageImpl(new ArrayList<>())).when(commentRepository)
+        .getCommentsByReviewId(review.getId(), pageable);
+    doReturn(new ArrayList<>()).when(commentRepository).getCommentsOfParents(new ArrayList<>());
+
+    //when
+    commentService.getCommentsByReviewId(review.getId(), pageable);
+
+    //then
+    verify(commentRepository).getCommentsByReviewId(review.getId(), pageable);
+    verify(commentRepository).getCommentsOfParents(new ArrayList<>());
+  }
 
   @Test
   @DisplayName("댓글 생성 테스트")
