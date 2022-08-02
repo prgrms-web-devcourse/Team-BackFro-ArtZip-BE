@@ -61,10 +61,11 @@ public class ReviewController {
     );
 
     return ResponseEntity.ok()
-        .body(new ApiResponse(
-            "전시회 검색 성공",
-            HttpStatus.OK.value(),
-            response
-        ));
+        .body(ApiResponse.builder()
+            .message("전시회 검색 성공")
+            .status(HttpStatus.OK.value())
+            .data(response)
+            .build()
+        );
   }
 }
