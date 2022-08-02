@@ -20,17 +20,21 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ExhibitionService {
+
   private final ExhibitionRepository exhibitionRepository;
   private final ExhibitionLikeRepository exhibitionLikeRepository;
 
   public Page<ExhibitionInfo> getUpcomingExhibitions(Pageable pageable) {
-    Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findUpcomingExhibitions(pageable);
-    return exhibitionsPagingResult.map(this::exhibitionForSimpleQueryToExhibitionInfo);
+    Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findUpcomingExhibitions(
+        pageable);
+
+    return exhibitionsPagingResult.map(ExhibitionInfo::new);
   }
 
   public Page<ExhibitionInfo> getMostLikeExhibitions(boolean includeEnd, Pageable pageable) {
-    Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findMostLikeExhibitions(includeEnd, pageable);
-    return exhibitionsPagingResult.map(this::exhibitionForSimpleQueryToExhibitionInfo);
+    Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findMostLikeExhibitions(
+        includeEnd, pageable);
+    return exhibitionsPagingResult.map(ExhibitionInfo::new);
   }
 
   // 차후 수정 필요!
@@ -39,28 +43,13 @@ public class ExhibitionService {
         .orElseThrow(() -> new InvalidRequestException(EXHB_NOT_FOUND));
 
     boolean isLiked = false;
-    if(user != null) {
-      isLiked = exhibitionLikeRepository.findById(new ExhibitionLikeId(exhibitionId, user.getId())).isPresent();
+    if (user != null) {
+      isLiked = exhibitionLikeRepository.findById(new ExhibitionLikeId(exhibitionId, user.getId()))
+          .isPresent();
     }
 
     // getReviews()
 
-    return exhibitionDetailForSimpleQueryToExhibitionDetailInfo(exhibition, isLiked);
-  }
-
-  private ExhibitionInfo exhibitionForSimpleQueryToExhibitionInfo(ExhibitionForSimpleQuery exhibitionForSimpleQuery) {
-    return ExhibitionInfo.builder()
-        .exhibitionId(exhibitionForSimpleQuery.getId())
-        .name(exhibitionForSimpleQuery.getName())
-        .thumbnail(exhibitionForSimpleQuery.getThumbnail())
-        .startDate(exhibitionForSimpleQuery.getPeriod().getStartDate())
-        .endDate(exhibitionForSimpleQuery.getPeriod().getEndDate())
-        .likeCount(exhibitionForSimpleQuery.getLikeCount())
-        .reviewCount(exhibitionForSimpleQuery.getReviewCount())
-        .build();
-  }
-
-  private ExhibitionDetailInfo exhibitionDetailForSimpleQueryToExhibitionDetailInfo(ExhibitionDetailForSimpleQuery exhibition, boolean isLiked) {
     return ExhibitionDetailInfo.builder()
         .exhibitionId(exhibition.getId())
         .name(exhibition.getName())

@@ -22,6 +22,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "comment")
 public class Comment extends BaseEntity {
+
   @GeneratedValue
   @Id
   @Column(name = "comment_id")
