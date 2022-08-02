@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+import java.net.URI;
+
 import static org.springframework.http.HttpStatus.*;
 
 @RestController
@@ -51,6 +53,6 @@ public class UserController {
   public ResponseEntity<ApiResponse<RegisterResponse>> register(@RequestBody @Valid
       UserRegisterRequest request) {
     User newUser = userService.register(request);
-    return ResponseEntity.status(CREATED).body(new ApiResponse<>("회원가입 성공하였습니다.", CREATED.value(), RegisterResponse.from(newUser)));
+    return ResponseEntity.created(URI.create("/register")).body(new ApiResponse<>("회원가입 성공하였습니다.", CREATED.value(), RegisterResponse.from(newUser)));
   }
 }
