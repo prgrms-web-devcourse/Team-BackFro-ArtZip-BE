@@ -94,10 +94,9 @@ public class ExhibitionController {
         .ok()
         .body(apiResponse);
   }
-
-
+  
   @ApiOperation(value = "전시회 검색", notes = "전시회를 이름으로 검색합니다.")
-  @GetMapping("/search")
+  @GetMapping
   public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfo>>> getExhibitionByQuery(
       String query,
       @RequestParam(value = "include-end", required = false, defaultValue = "true") boolean includeEnd,
