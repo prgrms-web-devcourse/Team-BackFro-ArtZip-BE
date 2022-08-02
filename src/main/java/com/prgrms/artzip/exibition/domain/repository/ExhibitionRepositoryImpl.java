@@ -171,6 +171,7 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
         )
         .from(exhibition)
         .where(exhibitionsForReviewCondition)
+        .limit(30)
         .fetch();
   }
 
