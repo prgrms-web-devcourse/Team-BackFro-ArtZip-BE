@@ -4,10 +4,12 @@ import static com.prgrms.artzip.exibition.domain.QExhibition.exhibition;
 import static com.prgrms.artzip.exibition.domain.QExhibitionLike.exhibitionLike;
 import static com.prgrms.artzip.review.domain.QReview.review;
 
+import com.prgrms.artzip.exibition.dto.projection.ExhibitionBasicForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQuery;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -21,7 +23,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
 @RequiredArgsConstructor
-public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository{
+public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
+
   private final JPAQueryFactory queryFactory;
 
   @Override
@@ -30,13 +33,13 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository{
 
     List<ExhibitionForSimpleQuery> exhibitions = queryFactory
         .select(Projections.fields(ExhibitionForSimpleQuery.class,
-            exhibition.id,
-            exhibition.name,
-            exhibition.thumbnail,
-            exhibition.period,
-            exhibitionLike.exhibition.id.count().as("likeCount"),
-            review.exhibition.id.count().as("reviewCount")
-          )
+                exhibition.id,
+                exhibition.name,
+                exhibition.thumbnail,
+                exhibition.period,
+                exhibitionLike.exhibition.id.count().as("likeCount"),
+                review.exhibition.id.count().as("reviewCount")
+            )
         )
         .from(exhibition)
         .leftJoin(exhibitionLike)
@@ -59,19 +62,20 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository{
   }
 
   @Override
-  public Page<ExhibitionForSimpleQuery> findMostLikeExhibitions(boolean includeEnd, Pageable pageable) {
+  public Page<ExhibitionForSimpleQuery> findMostLikeExhibitions(boolean includeEnd,
+      Pageable pageable) {
     BooleanBuilder mostLikeCondition = getMostLikeCondition(includeEnd);
     NumberPath<Long> likeCount = Expressions.numberPath(Long.class, "likeCount");
 
     List<ExhibitionForSimpleQuery> exhibitions = queryFactory
         .select(Projections.fields(ExhibitionForSimpleQuery.class,
-            exhibition.id,
-            exhibition.name,
-            exhibition.thumbnail,
-            exhibition.period,
-            exhibitionLike.exhibition.id.count().as("likeCount"),
-            review.exhibition.id.count().as("reviewCount")
-          )
+                exhibition.id,
+                exhibition.name,
+                exhibition.thumbnail,
+                exhibition.period,
+                exhibitionLike.exhibition.id.count().as("likeCount"),
+                review.exhibition.id.count().as("reviewCount")
+            )
         )
         .from(exhibition)
         .leftJoin(exhibitionLike)
@@ -97,20 +101,20 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository{
   public Optional<ExhibitionDetailForSimpleQuery> findExhibition(Long exhibitionId) {
     return Optional.ofNullable(queryFactory
         .select(Projections.fields(ExhibitionDetailForSimpleQuery.class,
-            exhibition.id,
-            exhibition.seq,
-            exhibition.name,
-            exhibition.period,
-            exhibition.genre,
-            exhibition.description,
-            exhibition.location,
-            exhibition.inquiry,
-            exhibition.fee,
-            exhibition.thumbnail,
-            exhibition.url,
-            exhibition.placeUrl,
-            exhibitionLike.exhibition.id.count().as("likeCount")
-          )
+                exhibition.id,
+                exhibition.seq,
+                exhibition.name,
+                exhibition.period,
+                exhibition.genre,
+                exhibition.description,
+                exhibition.location,
+                exhibition.inquiry,
+                exhibition.fee,
+                exhibition.thumbnail,
+                exhibition.url,
+                exhibition.placeUrl,
+                exhibitionLike.exhibition.id.count().as("likeCount")
+            )
         )
         .from(exhibition)
         .leftJoin(exhibitionLike)
@@ -120,13 +124,90 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository{
         .fetchOne());
   }
 
+  @Override
+  public Page<ExhibitionForSimpleQuery> findExhibitionsByQuery(String query, boolean includeEnd,
+      Pageable pageable) {
+    BooleanBuilder exhibitionsByQueryCondition = getExhibitionsByQueryCondition(query, includeEnd);
+
+    List<ExhibitionForSimpleQuery> exhibitions = queryFactory
+        .select(Projections.fields(ExhibitionForSimpleQuery.class,
+                exhibition.id,
+                exhibition.name,
+                exhibition.thumbnail,
+                exhibition.period,
+                exhibitionLike.exhibition.id.count().as("likeCount"),
+                review.exhibition.id.count().as("reviewCount")
+            )
+        )
+        .from(exhibition)
+        .leftJoin(exhibitionLike)
+        .on(exhibitionLike.exhibition.eq(exhibition))
+        .leftJoin(review)
+        .on(review.exhibition.eq(exhibition))
+        .where(exhibitionsByQueryCondition)
+        .offset(pageable.getOffset())
+        .limit(pageable.getPageSize())
+        .groupBy(exhibition.id)
+        .fetch();
+
+    JPAQuery<Long> countQuery = queryFactory
+        .select(exhibition.count())
+        .from(exhibition)
+        .where(exhibitionsByQueryCondition);
+
+    return PageableExecutionUtils.getPage(exhibitions, pageable, countQuery::fetchOne);
+  }
+
+  @Override
+  public List<ExhibitionBasicForSimpleQuery> findExhibitionsForReview(String query) {
+    BooleanBuilder exhibitionsForReviewCondition = getExhibitionsForReviewCondition(query);
+
+    return queryFactory
+        .select(Projections.fields(ExhibitionBasicForSimpleQuery.class,
+                exhibition.id,
+                exhibition.name,
+                exhibition.thumbnail
+            )
+        )
+        .from(exhibition)
+        .where(exhibitionsForReviewCondition)
+        .limit(30)
+        .fetch();
+  }
+
   private BooleanBuilder getMostLikeCondition(boolean includeEnd) {
     BooleanBuilder mostLikeCondition = new BooleanBuilder();
 
-    if(!includeEnd) {
-      mostLikeCondition.and(exhibition.period.endDate.goe(LocalDate.now()));
-    }
+    mostLikeCondition
+        .and(!includeEnd ? exhibitionEndDateGoe() : null);
 
     return mostLikeCondition;
+  }
+
+  private BooleanBuilder getExhibitionsByQueryCondition(String query, boolean includeEnd) {
+    BooleanBuilder exhibitionsByQueryCondition = new BooleanBuilder();
+
+    exhibitionsByQueryCondition
+        .and(exhibitionNameContains(query))
+        .and(!includeEnd ? exhibitionEndDateGoe() : null);
+
+    return exhibitionsByQueryCondition;
+  }
+
+  private BooleanBuilder getExhibitionsForReviewCondition(String query) {
+    BooleanBuilder exhibitionsForReviewCondition = new BooleanBuilder();
+
+    exhibitionsForReviewCondition
+        .and(exhibitionNameContains(query));
+
+    return exhibitionsForReviewCondition;
+  }
+
+  private BooleanExpression exhibitionEndDateGoe() {
+    return exhibition.period.endDate.goe(LocalDate.now());
+  }
+
+  private BooleanExpression exhibitionNameContains(String name) {
+    return name == null ? null : exhibition.name.contains(name);
   }
 }

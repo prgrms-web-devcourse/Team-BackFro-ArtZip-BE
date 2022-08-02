@@ -1,19 +1,33 @@
 package com.prgrms.artzip.exibition.domain;
 
-import static com.prgrms.artzip.common.ErrorCode.*;
-import static java.util.Objects.*;
+import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHBN_COORDINATE;
+import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHBN_DESCRIPTION;
+import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHBN_NAME;
+import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHBN_PERIOD;
+import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHBN_SEQ;
+import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHB_ADDRESS;
+import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHB_AREA;
+import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHB_FEE;
+import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHB_INQUIRY;
+import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHB_PLACE;
+import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHB_PLACEURL;
+import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHB_THUMBNAIL;
+import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHB_URL;
+import static java.util.Objects.isNull;
 import static javax.persistence.EnumType.STRING;
 import static lombok.AccessLevel.PROTECTED;
-import static org.springframework.util.StringUtils.*;
+import static org.springframework.util.StringUtils.hasText;
 
-import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.entity.BaseEntity;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
+import com.prgrms.artzip.exibition.domain.enumType.Area;
+import com.prgrms.artzip.exibition.domain.enumType.Genre;
+import com.prgrms.artzip.exibition.domain.vo.Location;
+import com.prgrms.artzip.exibition.domain.vo.Period;
 import com.prgrms.artzip.review.domain.Review;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.persistence.Column;
@@ -28,13 +42,13 @@ import javax.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.util.StringUtils;
 
 @Entity
 @Table(name = "exhibition")
 @NoArgsConstructor(access = PROTECTED)
 @Getter
 public class Exhibition extends BaseEntity {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "exhibition_id")
@@ -81,7 +95,9 @@ public class Exhibition extends BaseEntity {
   private List<Review> reviews = new ArrayList<>();
 
   @Builder
-  public Exhibition(Integer seq, String name, LocalDate startDate, LocalDate endDate, Genre genre, String description, Double latitude, Double longitude, Area area, String place, String address, String inquiry, String fee, String thumbnail, String url, String placeUrl) {
+  public Exhibition(Integer seq, String name, LocalDate startDate, LocalDate endDate, Genre genre,
+      String description, Double latitude, Double longitude, Area area, String place,
+      String address, String inquiry, String fee, String thumbnail, String url, String placeUrl) {
     setSeq(seq);
     setName(name);
     setPeriod(startDate, endDate);
@@ -96,75 +112,76 @@ public class Exhibition extends BaseEntity {
   }
 
   private void setSeq(Integer seq) {
-    if(isNull(seq)) {
+    if (isNull(seq)) {
       throw new InvalidRequestException(INVALID_EXHBN_SEQ);
-    }else{
+    } else {
       this.seq = seq;
     }
   }
 
   private void setName(String name) {
-    if(!hasText(name) || name.length() > 70) {
+    if (!hasText(name) || name.length() > 70) {
       throw new InvalidRequestException(INVALID_EXHBN_NAME);
     }
     this.name = name;
   }
 
   private void setPeriod(LocalDate startDate, LocalDate endDate) {
-    if(isNull(startDate) || isNull(endDate) || startDate.isAfter(endDate)) {
+    if (isNull(startDate) || isNull(endDate) || startDate.isAfter(endDate)) {
       throw new InvalidRequestException(INVALID_EXHBN_PERIOD);
-    }else{
+    } else {
       this.period = new Period(startDate, endDate);
     }
   }
 
   private void setDescription(String description) {
-    if(hasText(description)) {
-      if(description.length() > 1000) {
+    if (hasText(description)) {
+      if (description.length() > 1000) {
         throw new InvalidRequestException(INVALID_EXHBN_DESCRIPTION);
       }
       this.description = description;
     }
   }
 
-  private void setLocation(Double latitude, Double longitude, Area area, String place, String address) {
-    if(isNull(latitude) || isNull(longitude)) {
+  private void setLocation(Double latitude, Double longitude, Area area, String place,
+      String address) {
+    if (isNull(latitude) || isNull(longitude)) {
       throw new InvalidRequestException(INVALID_EXHBN_COORDINATE);
-    }else if(isNull(area)) {
+    } else if (isNull(area)) {
       throw new InvalidRequestException(INVALID_EXHB_AREA);
-    }else if(isNull(place) || place.length() > 20) {
+    } else if (isNull(place) || place.length() > 20) {
       throw new InvalidRequestException(INVALID_EXHB_PLACE);
-    }else if(isNull(address) || address.length() > 100) {
+    } else if (isNull(address) || address.length() > 100) {
       throw new InvalidRequestException(INVALID_EXHB_ADDRESS);
-    }else{
+    } else {
       this.location = new Location(latitude, longitude, area, place, address);
     }
   }
 
   private void setInquiry(String inquiry) {
-    if(!hasText(inquiry) || inquiry.length() > 100) {
+    if (!hasText(inquiry) || inquiry.length() > 100) {
       throw new InvalidRequestException(INVALID_EXHB_INQUIRY);
     }
     this.inquiry = inquiry;
   }
 
   private void setFee(String fee) {
-    if(!hasText(fee) || fee.length() > 1000) {
+    if (!hasText(fee) || fee.length() > 1000) {
       throw new InvalidRequestException(INVALID_EXHB_FEE);
     }
     this.fee = fee;
   }
 
   private void setThumbnail(String thumbnail) {
-    if(!hasText(thumbnail) || thumbnail.length() > 2083 || !isValidUrl(thumbnail)) {
+    if (!hasText(thumbnail) || thumbnail.length() > 2083 || !isValidUrl(thumbnail)) {
       throw new InvalidRequestException(INVALID_EXHB_THUMBNAIL);
     }
     this.thumbnail = thumbnail;
   }
 
   private void setUrl(String url) {
-    if(hasText(url)) {
-      if(url.length() > 2083 || !isValidUrl(url)) {
+    if (hasText(url)) {
+      if (url.length() > 2083 || !isValidUrl(url)) {
         throw new InvalidRequestException(INVALID_EXHB_URL);
       }
       this.url = url;
@@ -172,8 +189,8 @@ public class Exhibition extends BaseEntity {
   }
 
   private void setPlaceUrl(String placeUrl) {
-    if(hasText(placeUrl)) {
-      if(placeUrl.length() > 2083 || !isValidUrl(placeUrl)) {
+    if (hasText(placeUrl)) {
+      if (placeUrl.length() > 2083 || !isValidUrl(placeUrl)) {
         throw new InvalidRequestException(INVALID_EXHB_PLACEURL);
       }
       this.placeUrl = placeUrl;
@@ -181,7 +198,8 @@ public class Exhibition extends BaseEntity {
   }
 
   private boolean isValidUrl(String url) {
-    Pattern pattern = Pattern.compile("^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
+    Pattern pattern = Pattern.compile(
+        "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
     Matcher matcher = pattern.matcher(url);
     return matcher.matches();
   }
