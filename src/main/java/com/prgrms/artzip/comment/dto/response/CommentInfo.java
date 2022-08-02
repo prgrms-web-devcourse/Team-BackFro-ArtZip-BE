@@ -14,7 +14,7 @@ public class CommentInfo {
   private final Boolean isDeleted;
   private final CommentUser user;
 
-  protected CommentInfo(Comment entity) {
+  public CommentInfo(Comment entity) {
     this.isDeleted = entity.getIsDeleted();
     this.content = isDeleted ? null : entity.getContent();
     this.updatedAt = isDeleted ? null : entity.getUpdatedAt();

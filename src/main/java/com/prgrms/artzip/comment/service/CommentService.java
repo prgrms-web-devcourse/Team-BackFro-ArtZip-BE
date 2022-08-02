@@ -3,6 +3,7 @@ package com.prgrms.artzip.comment.service;
 import com.prgrms.artzip.comment.domain.Comment;
 import com.prgrms.artzip.comment.dto.request.CommentCreateRequest;
 import com.prgrms.artzip.comment.dto.request.CommentUpdateRequest;
+import com.prgrms.artzip.comment.dto.response.CommentInfo;
 import com.prgrms.artzip.comment.dto.response.CommentResponse;
 import com.prgrms.artzip.comment.repository.CommentRepository;
 import com.prgrms.artzip.common.ErrorCode;
@@ -72,6 +73,12 @@ public class CommentService {
     comment.softDelete();
     List<Comment> children = commentRepository.getCommentsOfParents(List.of(commentId));
     return new CommentResponse(comment, children);
+  }
+
+  public List<CommentInfo> getChildren(Long commentId) {
+    Comment comment = getComment(commentId);
+    List<Comment> children = commentRepository.getCommentsOfParents(List.of(commentId));
+    return children.stream().map(CommentInfo::new).toList();
   }
 
   private Review getReview(Long reviewId) {
