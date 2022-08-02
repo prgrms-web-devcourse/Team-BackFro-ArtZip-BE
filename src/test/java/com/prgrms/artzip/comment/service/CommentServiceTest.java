@@ -1,0 +1,207 @@
+package com.prgrms.artzip.comment.service;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+
+import com.prgrms.artzip.comment.domain.Comment;
+import com.prgrms.artzip.comment.dto.request.CommentCreateRequest;
+import com.prgrms.artzip.comment.dto.request.CommentUpdateRequest;
+import com.prgrms.artzip.comment.dto.response.CommentResponse;
+import com.prgrms.artzip.comment.repository.CommentRepository;
+import com.prgrms.artzip.common.Authority;
+import com.prgrms.artzip.common.ErrorCode;
+import com.prgrms.artzip.common.error.exception.NotFoundException;
+import com.prgrms.artzip.exibition.domain.Area;
+import com.prgrms.artzip.exibition.domain.Exhibition;
+import com.prgrms.artzip.exibition.domain.Genre;
+import com.prgrms.artzip.review.domain.Review;
+import com.prgrms.artzip.review.domain.repository.ReviewRepository;
+import com.prgrms.artzip.user.domain.LocalUser;
+import com.prgrms.artzip.user.domain.Role;
+import com.prgrms.artzip.user.domain.User;
+import com.prgrms.artzip.user.domain.repository.UserRepository;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+@ExtendWith(MockitoExtension.class)
+@DisplayName("CommentService 테스트")
+class CommentServiceTest {
+
+  @Mock
+  private CommentRepository commentRepository;
+
+  @Mock
+  private UserRepository userRepository;
+
+  @Mock
+  private ReviewRepository reviewRepository;
+
+  @InjectMocks
+  private CommentService commentService;
+
+  private final Role role = new Role(Authority.USER);
+
+  private final User user = LocalUser.builder()
+      .email("test@test.com")
+      .nickname("안녕하세요")
+      .password("1q2w3e4r!")
+      .roles(List.of(role))
+      .build();
+
+  private final Exhibition exhibition = Exhibition.builder()
+      .seq(32)
+      .name("전시회 제목")
+      .startDate(LocalDate.of(2022, 4, 11))
+      .endDate(LocalDate.of(2022, 6, 2))
+      .genre(Genre.FINEART)
+      .description("이것은 전시회 설명입니다.")
+      .latitude(36.22)
+      .longitude(128.02)
+      .area(Area.BUSAN)
+      .place("미술관")
+      .address("부산 동구 중앙대로 11")
+      .inquiry("문의처 정보")
+      .fee("성인 20,000원")
+      .thumbnail("https://www.image-example.com")
+      .url("https://www.example.com")
+      .placeUrl("https://www.place-example.com")
+      .build();
+
+  private final Review review = Review.builder()
+      .user(user)
+      .exhibition(exhibition)
+      .content("이것은 리뷰 본문입니다.")
+      .title("이것은 리뷰 제목입니다.")
+      .date(LocalDate.now())
+      .isPublic(true)
+      .build();
+
+  @Test
+  @DisplayName("댓글 생성 테스트")
+  void testCreateComment() {
+    //given
+    Comment comment = Comment.builder()
+        .user(user)
+        .review(review)
+        .content("안녕")
+        .build();
+    doReturn(comment).when(commentRepository).save(Mockito.any(Comment.class));
+    doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
+    doReturn(Optional.of(user)).when(userRepository).findById(user.getId());
+
+    //when
+    commentService.createComment(
+        new CommentCreateRequest("안녕", null),
+        review.getId(),
+        user.getId()
+    );
+
+    //then
+    verify(commentRepository).save(Mockito.any(Comment.class));
+    verify(reviewRepository).findById(review.getId());
+    verify(userRepository).findById(user.getId());
+  }
+
+  @Test
+  @DisplayName("잘못된 리뷰의 댓글 생성 테스트")
+  void testCreateCommentWithInvalidReview() {
+    //given
+    doReturn(Optional.empty()).when(reviewRepository).findById(9999L);
+
+    //when //then
+    assertThatThrownBy(() -> commentService.createComment(
+        new CommentCreateRequest("안녕", null),
+        9999L,
+        user.getId()
+    )).isInstanceOf(NotFoundException.class)
+        .hasMessage(ErrorCode.REVIEW_NOT_FOUND.getMessage());
+  }
+
+  @Test
+  @DisplayName("잘못된 유저의 댓글 생성 테스트")
+  void testCreateCommentWithInvalidUser() {
+    //given
+    doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
+    doReturn(Optional.empty()).when(userRepository).findById(9999L);
+
+    //when //then
+    assertThatThrownBy(() -> commentService.createComment(
+        new CommentCreateRequest("안녕", null),
+        review.getId(),
+        9999L
+    )).isInstanceOf(NotFoundException.class)
+        .hasMessage(ErrorCode.USER_NOT_FOUND.getMessage());
+  }
+
+  @Test
+  @DisplayName("잘못된 부모 댓글의 자식 댓글 생성 테스트")
+  void testCreateCommentWithInvalidParent() {
+    //given
+    doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
+    doReturn(Optional.of(user)).when(userRepository).findById(user.getId());
+    doReturn(Optional.empty()).when(commentRepository).findById(9999L);
+
+    //when //then
+    assertThatThrownBy(() -> commentService.createComment(
+        new CommentCreateRequest("안녕", 9999L),
+        review.getId(),
+        user.getId()
+    )).isInstanceOf(NotFoundException.class)
+        .hasMessage(ErrorCode.COMMENT_NOT_FOUND.getMessage());
+  }
+
+  @Test
+  @DisplayName("댓글 갱신 테스트")
+  void testUpdateComment() {
+    //given
+    Comment comment = Comment.builder()
+        .user(user)
+        .review(review)
+        .content("안녕")
+        .build();
+    doReturn(Optional.of(comment)).when(commentRepository).findById(0L);
+    doReturn(new ArrayList<>()).when(commentRepository).getCommentsOfParents(List.of(0L));
+
+    //when
+    CommentResponse response = commentService.updateComment(new CommentUpdateRequest("반가워"), 0L);
+
+    //then
+    verify(commentRepository).findById(0L);
+    verify(commentRepository).getCommentsOfParents(List.of(0L));
+    assertThat(response).hasFieldOrPropertyWithValue("content", "반가워");
+  }
+
+  @Test
+  @DisplayName("댓글 삭제 테스트")
+  void testDeleteComment() {
+    //given
+    Comment comment = Comment.builder()
+        .user(user)
+        .review(review)
+        .content("안녕")
+        .build();
+    doReturn(Optional.of(comment)).when(commentRepository).findById(0L);
+    doReturn(new ArrayList<>()).when(commentRepository).getCommentsOfParents(List.of(0L));
+
+    //when
+    CommentResponse response = commentService.deleteComment(0L);
+
+    //then
+    verify(commentRepository).findById(0L);
+    verify(commentRepository).getCommentsOfParents(List.of(0L));
+    assertThat(response).hasFieldOrPropertyWithValue("isDeleted", true);
+    assertThat(response).hasAllNullFieldsOrPropertiesExcept("createdAt", "isDeleted", "commentId",
+        "children");
+  }
+}
