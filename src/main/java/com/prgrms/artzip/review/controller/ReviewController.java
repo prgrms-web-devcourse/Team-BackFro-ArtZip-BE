@@ -42,7 +42,7 @@ public class ReviewController {
     return ResponseEntity.created(URI.create("/api/v1/reviews/" + response.getReviewId()))
         .body(new ApiResponse(
             "후기 생성 완료",
-            HttpStatus.OK.value(),
+            HttpStatus.CREATED.value(),
             response));
   }
 
