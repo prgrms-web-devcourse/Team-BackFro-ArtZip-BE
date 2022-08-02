@@ -19,6 +19,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -28,6 +31,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -48,13 +52,16 @@ class UserServiceTest {
     private User newUser;
 
     private static final String testPassword = "test1234!";
+    private static final String testEmail = "test@gmail.com";
+
+    private static final String testNickname = "testUser";
 
     @BeforeEach
     void setUp() {
         userRole = new Role(Authority.USER);
         newUser = LocalUser.builder()
-                .email("test@gmail.com")
-                .nickname("testUser")
+                .email(testEmail)
+                .nickname(testNickname)
                 .password(passwordEncoder.encode(testPassword))
                 .roles(List.of(userRole)).build();
     }
@@ -146,23 +153,11 @@ class UserServiceTest {
                 .hasMessage(USER_NOT_FOUND.getMessage());
     }
 
-    @Test
-    @DisplayName("로그인 시 이메일 누락 테스트")
-    void testEmailNullParameter() {
+    @ParameterizedTest
+    @MethodSource("errorLoginParameter")
+    void testLoginParameter(String email, String password) {
         //given
-        UserLocalLoginRequest localLoginRequest = new UserLocalLoginRequest(null, testPassword);
-
-        //when then
-        assertThatThrownBy(() -> userService.login(localLoginRequest.getEmail(), localLoginRequest.getPassword()))
-                .isInstanceOf(InvalidRequestException.class)
-                .hasMessage(LOGIN_PARAM_REQUIRED.getMessage());
-    }
-
-    @Test
-    @DisplayName("로그인 시 비밀번호 누락 테스트")
-    void testPassNullParameter() {
-        //given
-        UserLocalLoginRequest localLoginRequest = new UserLocalLoginRequest(newUser.getEmail(), null);
+        UserLocalLoginRequest localLoginRequest = new UserLocalLoginRequest(email, password);
 
         //when then
         assertThatThrownBy(() -> userService.login(localLoginRequest.getEmail(), localLoginRequest.getPassword()))
@@ -183,5 +178,13 @@ class UserServiceTest {
         assertThatThrownBy(() -> userService.register(registerRequest))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage(ROLE_NOT_FOUND.getMessage());
+    }
+
+    private static Stream<Arguments> errorLoginParameter() {
+        return Stream.of(
+                Arguments.of(testEmail, null),
+                Arguments.of(null, testPassword),
+                Arguments.of(null, null)
+        );
     }
 }
