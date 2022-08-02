@@ -12,7 +12,15 @@ spring:
     username: sa
     password:
   jwt:
-    client-secret: TEST_SECRET
+    issuer: backfro
+    accessToken:
+      header: accessToken
+      expiry-seconds: 1800
+    refreshToken:
+      header: refreshToken
+      expiry-seconds: 604800
+    blacklistPrefix: BlackList_AccessToken_
+    client-secret: backfro-test-secret
   redis:
     host: localhost
     port: 6379
