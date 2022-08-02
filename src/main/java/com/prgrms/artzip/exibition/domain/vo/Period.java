@@ -1,4 +1,4 @@
-package com.prgrms.artzip.exibition.domain;
+package com.prgrms.artzip.exibition.domain.vo;
 
 import static lombok.AccessLevel.PROTECTED;
 
@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = PROTECTED)
 public class Period {
+
   @Column(name = "start_date", nullable = false)
   private LocalDate startDate;
 

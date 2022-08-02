@@ -6,8 +6,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
-import com.prgrms.artzip.exibition.domain.Period;
 import com.prgrms.artzip.exibition.domain.repository.ExhibitionRepository;
+import com.prgrms.artzip.exibition.domain.vo.Period;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionBasicForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQuery;
 import java.time.LocalDate;

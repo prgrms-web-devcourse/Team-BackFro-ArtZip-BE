@@ -22,6 +22,8 @@ import com.prgrms.artzip.common.entity.BaseEntity;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.exibition.domain.enumType.Area;
 import com.prgrms.artzip.exibition.domain.enumType.Genre;
+import com.prgrms.artzip.exibition.domain.vo.Location;
+import com.prgrms.artzip.exibition.domain.vo.Period;
 import com.prgrms.artzip.review.domain.Review;
 import java.time.LocalDate;
 import java.util.ArrayList;

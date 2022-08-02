@@ -1,8 +1,8 @@
 package com.prgrms.artzip.exibition.dto.projection;
 
-import com.prgrms.artzip.exibition.domain.Location;
-import com.prgrms.artzip.exibition.domain.Period;
 import com.prgrms.artzip.exibition.domain.enumType.Genre;
+import com.prgrms.artzip.exibition.domain.vo.Location;
+import com.prgrms.artzip.exibition.domain.vo.Period;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder
 public class ExhibitionDetailForSimpleQuery extends ExhibitionBasicForSimpleQuery {
-  
+
   private Integer seq;
   private Period period;
   private Genre genre;

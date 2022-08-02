@@ -1,4 +1,4 @@
-package com.prgrms.artzip.exibition.domain;
+package com.prgrms.artzip.exibition.domain.vo;
 
 import static javax.persistence.EnumType.STRING;
 import static lombok.AccessLevel.PROTECTED;
