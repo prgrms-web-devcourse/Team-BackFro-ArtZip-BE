@@ -16,7 +16,6 @@ import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ReviewService {
 
   private static final String REVIEW_DIRECTORY_NAME = "review/";
+  private static final int REVIEW_PHOTO_COUNT = 9;
 
   private final ReviewRepository reviewRepository;
   private final ReviewPhotoRepository reviewPhotoRepository;
@@ -41,6 +41,7 @@ public class ReviewService {
         .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
     Exhibition exhibition = exhibitionRepository.findById(request.getExhibitionId())
         .orElseThrow(() -> new NotFoundException(ErrorCode.EXHB_NOT_FOUND));
+    validateFileCount(files);
 
     Review review = Review.builder()
         .user(user)
@@ -52,7 +53,7 @@ public class ReviewService {
         .build();
     Review savedReview = reviewRepository.save(review);
 
-    if (Objects.nonNull(files)) {
+    if (files != null) {
       createReviewPhoto(savedReview, files);
     }
 
@@ -81,6 +82,12 @@ public class ReviewService {
         fileExtension.equalsIgnoreCase(".jpeg") ||
         fileExtension.equalsIgnoreCase(".png"))) {
       throw new InvalidRequestException(ErrorCode.INVALID_FILE_EXTENSION);
+    }
+  }
+
+  private void validateFileCount(List<MultipartFile> files) {
+    if (files != null && files.size() > REVIEW_PHOTO_COUNT) {
+      throw new InvalidRequestException(ErrorCode.INVALID_REVIEW_PHOTO_COUNT);
     }
   }
 }

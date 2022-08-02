@@ -231,6 +231,70 @@ class ReviewServiceTest {
 
         reviewService.createReview(user.getId(), request, files);
       }
+
+      @Test
+      @DisplayName("파일 개수가 최대 개수를 초과하면 InvalidRequestException 발생")
+      void invokeFileCountInvalidRequestException() {
+        doReturn(Optional.of(user)).when(userRepository).findById(user.getId());
+        doReturn(Optional.of(exhibition)).when(exhibitionRepository)
+            .findById(request.getExhibitionId());
+
+        List<MultipartFile> files = List.of(
+            new MockMultipartFile(
+                "test1",
+                "test1.png",
+                MediaType.MULTIPART_FORM_DATA_VALUE,
+                "test1".getBytes()),
+            new MockMultipartFile(
+                "test2",
+                "test2.jpeg",
+                MediaType.MULTIPART_FORM_DATA_VALUE,
+                "test2".getBytes()),
+            new MockMultipartFile(
+                "test3",
+                "test3.png",
+                MediaType.MULTIPART_FORM_DATA_VALUE,
+                "test3".getBytes()),
+            new MockMultipartFile(
+                "test4",
+                "test4.png",
+                MediaType.MULTIPART_FORM_DATA_VALUE,
+                "test4".getBytes()),
+            new MockMultipartFile(
+                "test5",
+                "test5.png",
+                MediaType.MULTIPART_FORM_DATA_VALUE,
+                "test5".getBytes()),
+            new MockMultipartFile(
+                "test6",
+                "test6.png",
+                MediaType.MULTIPART_FORM_DATA_VALUE,
+                "test6".getBytes()),
+            new MockMultipartFile(
+                "test7",
+                "test7.png",
+                MediaType.MULTIPART_FORM_DATA_VALUE,
+                "test7".getBytes()),
+            new MockMultipartFile(
+                "test8",
+                "test8.png",
+                MediaType.MULTIPART_FORM_DATA_VALUE,
+                "test8".getBytes()),
+            new MockMultipartFile(
+                "test9",
+                "test9.png",
+                MediaType.MULTIPART_FORM_DATA_VALUE,
+                "test9".getBytes()),
+            new MockMultipartFile(
+                "test10",
+                "test10.png",
+                MediaType.MULTIPART_FORM_DATA_VALUE,
+                "test10".getBytes())
+        );
+
+        assertThatThrownBy(() -> reviewService.createReview(user.getId(), request, files))
+            .isInstanceOf(InvalidRequestException.class);
+      }
     }
   }
 
