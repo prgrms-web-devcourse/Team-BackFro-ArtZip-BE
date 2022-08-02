@@ -84,7 +84,7 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("이메일이 이미 존재하는 경우 회원가입 테스트")
+    @DisplayName("회원가입 시 이메일이 이미 존재하는 경우 테스트")
     void testEmailExistRegister() {
         UserRegisterRequest registerRequest = UserRegisterRequest.builder()
                 .email(newUser.getEmail())
@@ -99,7 +99,7 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("닉네임이 이미 존재하는 경우 회원가입 테스트")
+    @DisplayName("회원가입 시 닉네임이 이미 존재하는 경우 테스트")
     void testNicknameExistRegister() {
         UserRegisterRequest registerRequest = UserRegisterRequest.builder()
                 .email(newUser.getEmail())
