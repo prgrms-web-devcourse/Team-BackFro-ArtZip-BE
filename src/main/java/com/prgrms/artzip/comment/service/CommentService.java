@@ -7,6 +7,7 @@ import com.prgrms.artzip.comment.dto.response.CommentInfo;
 import com.prgrms.artzip.comment.dto.response.CommentResponse;
 import com.prgrms.artzip.comment.repository.CommentRepository;
 import com.prgrms.artzip.common.ErrorCode;
+import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
 import com.prgrms.artzip.review.domain.Review;
 import com.prgrms.artzip.review.domain.repository.ReviewRepository;
@@ -33,8 +34,8 @@ public class CommentService {
   @Transactional(readOnly = true)
   public Page<CommentResponse> getCommentsByReviewId(Long reviewId, Pageable pageable) {
     Page<Comment> parents = commentRepository.getCommentsByReviewId(reviewId, pageable);
-    List<Comment> children = commentRepository
-        .getCommentsOfParents(parents.map(Comment::getId).toList());
+    List<Comment> children = parents.getSize() > 0 ? commentRepository
+        .getCommentsOfParents(parents.map(Comment::getId).toList()) : new ArrayList<>();
     return parents.map(
         p -> new CommentResponse(
             p, children.stream()
@@ -50,6 +51,9 @@ public class CommentService {
     Comment parent = null;
     if (Objects.nonNull(request.parentId())) {
       parent = getComment(request.parentId());
+      if (Objects.nonNull(parent.getParent())) {
+        throw new InvalidRequestException(ErrorCode.CHILD_CANT_BE_PARENT);
+      }
     }
     Comment comment = commentRepository.save(Comment.builder()
         .content(request.content())

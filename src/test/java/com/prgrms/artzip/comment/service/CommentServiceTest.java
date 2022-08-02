@@ -8,10 +8,12 @@ import static org.mockito.Mockito.verify;
 import com.prgrms.artzip.comment.domain.Comment;
 import com.prgrms.artzip.comment.dto.request.CommentCreateRequest;
 import com.prgrms.artzip.comment.dto.request.CommentUpdateRequest;
+import com.prgrms.artzip.comment.dto.response.CommentInfo;
 import com.prgrms.artzip.comment.dto.response.CommentResponse;
 import com.prgrms.artzip.comment.repository.CommentRepository;
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.ErrorCode;
+import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
 import com.prgrms.artzip.exibition.domain.Area;
 import com.prgrms.artzip.exibition.domain.Exhibition;
@@ -94,17 +96,56 @@ class CommentServiceTest {
   @DisplayName("댓글 다건 조회 테스트")
   void testGetComments() {
     //given
+    List<Comment> parents = List.of(
+        Comment.builder()
+            .user(user)
+            .review(review)
+            .content("안녕")
+            .build()
+    );
+
     Pageable pageable = PageRequest.of(0, 10);
-    doReturn(new PageImpl(new ArrayList<>())).when(commentRepository)
+    doReturn(new PageImpl(parents)).when(commentRepository)
         .getCommentsByReviewId(review.getId(), pageable);
-    doReturn(new ArrayList<>()).when(commentRepository).getCommentsOfParents(new ArrayList<>());
+    doReturn(new ArrayList<>()).when(commentRepository).getCommentsOfParents(
+        parents.stream().map(Comment::getId).toList()
+    );
 
     //when
     commentService.getCommentsByReviewId(review.getId(), pageable);
 
     //then
     verify(commentRepository).getCommentsByReviewId(review.getId(), pageable);
-    verify(commentRepository).getCommentsOfParents(new ArrayList<>());
+    verify(commentRepository).getCommentsOfParents(parents.stream().map(Comment::getId).toList());
+  }
+
+  @Test
+  @DisplayName("대댓글 조회 테스트")
+  void testGetChildren() {
+    //Given
+    Comment parent = Comment.builder()
+        .user(user)
+        .review(review)
+        .content("안녕")
+        .build();
+    List<Comment> children = new ArrayList<>();
+    for (int i = 0; i < 9; i++) {
+      children.add(Comment.builder()
+          .user(user)
+          .review(review)
+          .content("안녕")
+          .build());
+    }
+    doReturn(Optional.of(parent)).when(commentRepository).findById(0L);
+    doReturn(children).when(commentRepository).getCommentsOfParents(List.of(0L));
+
+    //when
+    List<CommentInfo> response = commentService.getChildren(0L);
+
+    //then
+    verify(commentRepository).findById(0L);
+    verify(commentRepository).getCommentsOfParents(List.of(0L));
+    assertThat(response).hasSize(9);
   }
 
   @Test
@@ -182,6 +223,34 @@ class CommentServiceTest {
   }
 
   @Test
+  @DisplayName("자식 댓글의 자식 댓글 생성 테스트")
+  void testCreateCommentOfChildComment() {
+    //given
+    Comment parent = Comment.builder()
+        .user(user)
+        .review(review)
+        .content("안녕")
+        .build();
+    Comment child = Comment.builder()
+        .user(user)
+        .review(review)
+        .content("안녕")
+        .parent(parent)
+        .build();
+    doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
+    doReturn(Optional.of(user)).when(userRepository).findById(user.getId());
+    doReturn(Optional.of(child)).when(commentRepository).findById(0L);
+
+    //when //then
+    assertThatThrownBy(() -> commentService.createComment(
+        new CommentCreateRequest("안녕", 0L),
+        review.getId(),
+        user.getId()
+    )).isInstanceOf(InvalidRequestException.class)
+        .hasMessage(ErrorCode.CHILD_CANT_BE_PARENT.getMessage());
+  }
+
+  @Test
   @DisplayName("댓글 갱신 테스트")
   void testUpdateComment() {
     //given
@@ -222,6 +291,6 @@ class CommentServiceTest {
     verify(commentRepository).getCommentsOfParents(List.of(0L));
     assertThat(response).hasFieldOrPropertyWithValue("isDeleted", true);
     assertThat(response).hasAllNullFieldsOrPropertiesExcept("createdAt", "isDeleted", "commentId",
-        "children");
+        "children", "childrenCount");
   }
 }
