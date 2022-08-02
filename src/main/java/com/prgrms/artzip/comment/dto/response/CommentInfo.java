@@ -15,12 +15,12 @@ public class CommentInfo {
   private final CommentUser user;
 
   protected CommentInfo(Comment entity) {
-    this.commentId = entity.getId();
-    this.content = entity.getContent();
-    this.createdAt = entity.getCreatedAt();
-    this.updatedAt = entity.getUpdatedAt();
-    this.isEdited = updatedAt != null;
     this.isDeleted = entity.getIsDeleted();
-    this.user = new CommentUser(entity.getUser());
+    this.content = isDeleted ? null : entity.getContent();
+    this.updatedAt = isDeleted ? null : entity.getUpdatedAt();
+    this.isEdited = isDeleted ? null : updatedAt != null;
+    this.user = isDeleted ? null : new CommentUser(entity.getUser());
+    this.commentId = entity.getId();
+    this.createdAt = entity.getCreatedAt();
   }
 }
