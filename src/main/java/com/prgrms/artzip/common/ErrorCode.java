@@ -49,7 +49,8 @@ public enum ErrorCode {
   INVALID_EXHB_PLACEURL(400, "EX012", "전시회 장소 URL은 필수입니다.(1 <= 전시회 장소 URL <= 2083)"),
   INVALID_EXHB_LIKE(400, "EX013", "전시회 좋아요에는 전시회 정보와 사용자 정보가 필수입니다."),
   EXHB_NOT_FOUND(404, "EX014", "존재하지 않는 전시회 입니다."),
-  EXHB_QUERY_BLANK(400, "EX015", "검색어(query)는 필수 입니다."),
+  INVALID_EXHB_QUERY(400, "EX015", "검색어는 필수입니다.(2 <= 검색어)"),
+  INVALID_EXHB_QUERY_FOR_REVIEW(400, "EX016", "검색어는 필수입니다."),
 
   /**
    * Comment Domain

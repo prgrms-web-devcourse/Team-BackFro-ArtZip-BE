@@ -94,7 +94,7 @@ public class ExhibitionController {
         .ok()
         .body(apiResponse);
   }
-  
+
   @ApiOperation(value = "전시회 검색", notes = "전시회를 이름으로 검색합니다.")
   @GetMapping
   public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfo>>> getExhibitionByQuery(
@@ -106,7 +106,7 @@ public class ExhibitionController {
         .message("전시회 검색 성공")
         .status(HttpStatus.OK.value())
         .data(new PageResponse(
-            exhibitionSearchService.getExhibitionByQuery(query, includeEnd, pageable)))
+            exhibitionSearchService.getExhibitionsByQuery(query, includeEnd, pageable)))
         .build();
 
     return ResponseEntity

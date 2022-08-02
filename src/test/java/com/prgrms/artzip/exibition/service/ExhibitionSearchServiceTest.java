@@ -46,10 +46,10 @@ class ExhibitionSearchServiceTest {
     @DisplayName("검색어가 blank인 경우 테스트")
     void testBlankQuery(String query) {
       assertThatThrownBy(
-          () -> exhibitionSearchService.getExhibitionByQuery(query, true,
+          () -> exhibitionSearchService.getExhibitionsByQuery(query, true,
               PageRequest.of(0, 10)))
           .isInstanceOf(InvalidRequestException.class)
-          .hasMessage("검색어(query)는 필수 입니다.");
+          .hasMessage("검색어는 필수입니다.(2 <= 검색어)");
 
       verify(exhibitionRepository, never()).findExhibitionsByQuery(query, true,
           PageRequest.of(0, 10));
@@ -73,7 +73,7 @@ class ExhibitionSearchServiceTest {
       when(exhibitionRepository.findExhibitionsByQuery("고흐", true, pageRequest)).thenReturn(
           exhibitionsPagingResult);
 
-      exhibitionSearchService.getExhibitionByQuery("고흐", true, pageRequest);
+      exhibitionSearchService.getExhibitionsByQuery("고흐", true, pageRequest);
 
       verify(exhibitionRepository).findExhibitionsByQuery("고흐", true, pageRequest);
     }
@@ -82,7 +82,8 @@ class ExhibitionSearchServiceTest {
       return Stream.of(
           null,
           Arguments.of(""),
-          Arguments.of(" ")
+          Arguments.of("    "),
+          Arguments.of("고")
       );
     }
   }
@@ -98,7 +99,7 @@ class ExhibitionSearchServiceTest {
       assertThatThrownBy(
           () -> exhibitionSearchService.getExhibitionsForReview(query))
           .isInstanceOf(InvalidRequestException.class)
-          .hasMessage("검색어(query)는 필수 입니다.");
+          .hasMessage("검색어는 필수입니다.");
 
       verify(exhibitionRepository, never()).findExhibitionsForReview(query);
     }
@@ -106,7 +107,6 @@ class ExhibitionSearchServiceTest {
     @Test
     @DisplayName("성공적으로 검색한 경우 테스트")
     void testNormalQuery() {
-      PageRequest pageRequest = PageRequest.of(0, 10);
       List<ExhibitionBasicForSimpleQuery> exhibitions = new ArrayList<>();
       exhibitions.add(ExhibitionBasicForSimpleQuery.builder()
           .id(11L)
@@ -125,7 +125,7 @@ class ExhibitionSearchServiceTest {
       return Stream.of(
           null,
           Arguments.of(""),
-          Arguments.of(" ")
+          Arguments.of("    ")
       );
     }
   }
