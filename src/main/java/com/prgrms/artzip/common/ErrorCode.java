@@ -21,6 +21,7 @@ public enum ErrorCode {
   MISSING_REQUEST_PARAMETER(400, "C005", "필수 파라미터가 누락되었습니다."),
   INVALID_LENGTH(400, "C006", "올바르지 않은 길이입니다."),
   INVALID_FILE_EXTENSION(400, "C008", "올바르지 않은 파일 확장자입니다. (png, jpg, jpeg 가능)"),
+  MAX_UPLOAD_SIZE_EXCEEDED(400, "C008", "최대 파일 크기(5MB)보다 큰 파일입니다."),
 
   /**
    * User Domain
