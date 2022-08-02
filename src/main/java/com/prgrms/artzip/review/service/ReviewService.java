@@ -52,7 +52,7 @@ public class ReviewService {
         .build();
     Review savedReview = reviewRepository.save(review);
 
-    if (!Objects.isNull(files)) {
+    if (Objects.nonNull(files)) {
       createReviewPhoto(savedReview, files);
     }
 
@@ -71,7 +71,7 @@ public class ReviewService {
     });
   }
 
-  private void validateFileExtension(MultipartFile file) {
+  private void validateFileExtension(final MultipartFile file) {
     String filename = file.getOriginalFilename();
     String fileExtension = filename.substring(filename.lastIndexOf("."));
     if (!(fileExtension.equalsIgnoreCase(".jpg") ||
