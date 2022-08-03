@@ -88,7 +88,7 @@ class ReviewServiceTest {
       .date(LocalDate.now())
       .isPublic(true)
       .build();
-
+  
   ReviewCreateRequest request = ReviewCreateRequest.builder()
       .exhibitionId(1L)
       .date(LocalDate.of(2022, 4, 11))
@@ -212,7 +212,6 @@ class ReviewServiceTest {
 
         doReturn(Optional.of(user)).when(userRepository).findById(any());
         doReturn(Optional.of(exhibition)).when(exhibitionRepository).findById(any());
-        doReturn(review).when(reviewRepository).save(any());
 
         assertThatThrownBy(() -> {
           reviewService.createReview(user.getId(), request, files);
