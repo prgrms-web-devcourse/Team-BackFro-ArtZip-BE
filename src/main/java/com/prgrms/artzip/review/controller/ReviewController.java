@@ -3,6 +3,8 @@ package com.prgrms.artzip.review.controller;
 import com.prgrms.artzip.common.ApiResponse;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
 import com.prgrms.artzip.review.dto.response.ReviewCreateResponse;
+import com.prgrms.artzip.review.dto.response.ReviewLikeUpdateResponse;
+import com.prgrms.artzip.review.service.ReviewLikeService;
 import com.prgrms.artzip.review.service.ReviewService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -14,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ReviewController {
 
   private final ReviewService reviewService;
+  private final ReviewLikeService reviewLikeService;
 
   @ApiOperation(value = "후기 생성", notes = "후기 등록을 요청합니다.")
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -46,5 +51,19 @@ public class ReviewController {
             response));
   }
 
+  @PatchMapping("{reviewId}/like")
+  public ResponseEntity<ApiResponse> updateReviewLike(
+      @RequestParam(value = "userId") final Long userId,
+      @PathVariable(value = "reviewId") final Long reviewId) {
 
+    ReviewLikeUpdateResponse response = reviewLikeService.updateReviewLike(userId, reviewId);
+
+    return ResponseEntity.ok()
+        .body(ApiResponse.builder()
+            .message("후기 좋아요 등록/해제 성공")
+            .status(HttpStatus.OK.value())
+            .data(response)
+            .build()
+        );
+  }
 }
