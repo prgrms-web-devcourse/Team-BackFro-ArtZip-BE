@@ -9,7 +9,6 @@ import com.prgrms.artzip.exibition.domain.QExhibitionLike;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionBasicForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQuery;
-import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQueryV1;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.QBean;
@@ -121,21 +120,16 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
   }
 
   @Override
-  public Page<ExhibitionForSimpleQueryV1> findExhibitionsByQuery(String query, boolean includeEnd,
+  public Page<ExhibitionForSimpleQuery> findExhibitionsByQuery(Long userId, String query,
+      boolean includeEnd,
       Pageable pageable) {
     BooleanBuilder exhibitionsByQueryCondition = getExhibitionsByQueryCondition(query, includeEnd);
 
-    List<ExhibitionForSimpleQueryV1> exhibitions = queryFactory
-        .select(Projections.fields(ExhibitionForSimpleQueryV1.class,
-                exhibition.id,
-                exhibition.name,
-                exhibition.thumbnail,
-                exhibition.period,
-                exhibitionLike.exhibition.id.count().as("likeCount"),
-                review.exhibition.id.count().as("reviewCount")
-            )
-        )
+    List<ExhibitionForSimpleQuery> exhibitions = queryFactory
+        .select(getExhibitionForSimpleQueryExpression(userId))
         .from(exhibition)
+        .leftJoin(exhibitionLikeForIsLiked)
+        .on(exhibitionLikeForIsLiked.exhibition.eq(exhibition), exhibitionLikeUserIdEq(userId))
         .leftJoin(exhibitionLike)
         .on(exhibitionLike.exhibition.eq(exhibition))
         .leftJoin(review)

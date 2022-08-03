@@ -97,17 +97,17 @@ public class ExhibitionController {
   }
 
   @ApiOperation(value = "전시회 검색", notes = "전시회를 이름으로 검색합니다.")
-  // @GetMapping
+  @GetMapping
   public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfo>>> getExhibitionByQuery(
       String query,
       @RequestParam(value = "include-end", required = false, defaultValue = "true") boolean includeEnd,
-      @PageableDefault(page = 0, size = 10) Pageable pageable) {
+      @PageableDefault(page = 0, size = 8) Pageable pageable) {
 
     ApiResponse apiResponse = ApiResponse.builder()
         .message("전시회 검색 성공")
         .status(HttpStatus.OK.value())
         .data(new PageResponse(
-            exhibitionSearchService.getExhibitionsByQuery(query, includeEnd, pageable)))
+            exhibitionSearchService.getExhibitionsByQuery(null, query, includeEnd, pageable)))
         .build();
 
     return ResponseEntity

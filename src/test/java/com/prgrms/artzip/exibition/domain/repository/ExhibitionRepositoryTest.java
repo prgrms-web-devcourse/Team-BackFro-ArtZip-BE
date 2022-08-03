@@ -11,7 +11,6 @@ import com.prgrms.artzip.exibition.domain.enumType.Genre;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionBasicForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQuery;
-import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQueryV1;
 import com.prgrms.artzip.review.domain.Review;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
@@ -237,21 +236,22 @@ class ExhibitionRepositoryTest {
   class FindExhibitionsByQueryTest {
 
     @Test
-    @DisplayName("끝난 전시회 제외 하지 않는 경우 태스트")
+    @DisplayName("로그인 하지 않고 끝난 전시회 제외 하지 않고 검색 경우 태스트")
     void testWithEndExhibition() {
-      Page<ExhibitionForSimpleQueryV1> exhibitionsPagingResult = exhibitionRepository.findExhibitionsByQuery(
-          "부산", true, PageRequest.of(0, 10));
+      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
+          .findExhibitionsByQuery(null, "부산", true, PageRequest.of(0, 10));
 
       assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(1);
     }
 
     @Test
-    @DisplayName("끝난 전시회 제외 하는 경우 태스트")
+    @DisplayName("로그인 하고 끝난 전시회 제외하고 검색 경우 태스트")
     void testWithOutEndExhibition() {
-      Page<ExhibitionForSimpleQueryV1> exhibitionsPagingResult = exhibitionRepository.findExhibitionsByQuery(
-          "전시회", false, PageRequest.of(0, 10));
+      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
+          .findExhibitionsByQuery(user2.getId(), "전시회", false, PageRequest.of(0, 10));
 
       assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(2);
+      assertThat(exhibitionsPagingResult.getContent().get(0).getIsLiked()).isEqualTo(false);
     }
   }
 

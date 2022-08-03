@@ -46,12 +46,12 @@ class ExhibitionSearchServiceTest {
     @DisplayName("검색어가 blank인 경우 테스트")
     void testBlankQuery(String query) {
       assertThatThrownBy(
-          () -> exhibitionSearchService.getExhibitionsByQuery(query, true,
+          () -> exhibitionSearchService.getExhibitionsByQuery(null, query, true,
               PageRequest.of(0, 10)))
           .isInstanceOf(InvalidRequestException.class)
           .hasMessage("검색어는 필수입니다.(2 <= 검색어)");
 
-      verify(exhibitionRepository, never()).findExhibitionsByQuery(query, true,
+      verify(exhibitionRepository, never()).findExhibitionsByQuery(null, query, true,
           PageRequest.of(0, 10));
     }
 
@@ -64,18 +64,19 @@ class ExhibitionSearchServiceTest {
           .id(11L)
           .name("고흐 전시")
           .thumbnail("http://www.culture.go.kr/upload/rdf/22/07/show_2022071411402126915.png")
+          .isLiked(false)
           .period(new Period(LocalDate.now().plusDays(1), LocalDate.now().plusDays(10)))
           .likeCount(30)
           .reviewCount(15)
           .build());
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = new PageImpl(exhibitions);
 
-      when(exhibitionRepository.findExhibitionsByQuery("고흐", true, pageRequest)).thenReturn(
-          exhibitionsPagingResult);
+      when(exhibitionRepository.findExhibitionsByQuery(null, "고흐", true, pageRequest))
+          .thenReturn(exhibitionsPagingResult);
 
-      exhibitionSearchService.getExhibitionsByQuery("고흐", true, pageRequest);
+      exhibitionSearchService.getExhibitionsByQuery(null, "고흐", true, pageRequest);
 
-      verify(exhibitionRepository).findExhibitionsByQuery("고흐", true, pageRequest);
+      verify(exhibitionRepository).findExhibitionsByQuery(null, "고흐", true, pageRequest);
     }
 
     private static Stream<Arguments> queryParameter() {
