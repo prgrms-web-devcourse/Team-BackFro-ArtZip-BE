@@ -1,6 +1,10 @@
 package com.prgrms.artzip.review.controller;
 
+import com.prgrms.artzip.comment.dto.request.CommentCreateRequest;
+import com.prgrms.artzip.comment.dto.response.CommentResponse;
+import com.prgrms.artzip.comment.service.CommentService;
 import com.prgrms.artzip.common.ApiResponse;
+import com.prgrms.artzip.common.PageResponse;
 import com.prgrms.artzip.exibition.service.ExhibitionSearchService;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
 import com.prgrms.artzip.review.dto.response.ExhibitionsResponse;
@@ -15,6 +19,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +28,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -36,6 +43,7 @@ public class ReviewController {
   private final ReviewService reviewService;
   private final ExhibitionSearchService exhibitionSearchService;
   private final ReviewLikeService reviewLikeService;
+  private final CommentService commentService;
 
   @ApiOperation(value = "후기 생성", notes = "후기 등록을 요청합니다.")
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -90,5 +98,35 @@ public class ReviewController {
             .data(response)
             .build()
         );
+  }
+  
+  //TODO 아래 두 API 테스트 작성
+
+  @ApiOperation(value = "리뷰 댓글 다건 조회", notes = "리뷰의 댓글들을 조회합니다.")
+  @GetMapping("/{reviewId}/comments")
+  public ResponseEntity<ApiResponse<PageResponse<CommentResponse>>> getComment(
+      @PathVariable Long reviewId,
+      @PageableDefault Pageable pageable
+  ) {
+    PageResponse<CommentResponse> comments =
+        new PageResponse<>(commentService.getCommentsByReviewId(reviewId, pageable));
+    ApiResponse<PageResponse<CommentResponse>> response
+        = new ApiResponse<>("댓글 다건 조회 성공", HttpStatus.OK.value(), comments);
+    return ResponseEntity.ok(response);
+  }
+
+  @ApiOperation(value = "리뷰 댓글 생성", notes = "리뷰에 댓글을 생성합니다.")
+  @PostMapping("/{reviewId}/comments")
+  public ResponseEntity<ApiResponse<CommentResponse>> createComment(
+      @PathVariable Long reviewId,
+      @RequestBody CommentCreateRequest request
+  ) {
+    //TODO 유저 아이디 수정 -> 추후 아마 유저 객체가 들어올듯
+    CommentResponse comment = commentService.createComment(request, reviewId, 0L);
+    ApiResponse<CommentResponse> response
+        = new ApiResponse<>("댓글 생성 성공", HttpStatus.OK.value(), comment);
+    return ResponseEntity
+        .created(URI.create("/api/v1/comments/" + comment.getCommentId()))
+        .body(response);
   }
 }

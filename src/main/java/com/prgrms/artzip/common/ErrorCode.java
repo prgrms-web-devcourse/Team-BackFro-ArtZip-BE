@@ -60,10 +60,12 @@ public enum ErrorCode {
   /**
    * Comment Domain
    */
-  COMMENT_NOT_FOUND(400, "C001", "댓글이 존재하지 않습니다."),
-  CONTENT_IS_REQUIRED(400, "C002", "댓글 내용은 필수입니다.(최대 500자)"),
-  CONTENT_IS_TOO_LONG(400, "C003", "댓글은 최대 500자입니다."),
-
+  COMMENT_NOT_FOUND(400, "CM001", "댓글이 존재하지 않습니다."),
+  CONTENT_IS_REQUIRED(400, "CM002", "댓글 내용은 필수입니다.(최대 500자)"),
+  CONTENT_IS_TOO_LONG(400, "CM003", "댓글은 최대 500자입니다."),
+  COMMENT_USER_IS_REQUIRED(400, "CM004", "댓글 작성 유저는 필수입니다."),
+  COMMENT_ALREADY_DELETED(400, "CM005", "댓글이 이미 삭제되었습니다."),
+  CHILD_CANT_BE_PARENT(400, "CM006", "자식 댓글은 부모 댓글이 될 수 없습니다."),
   /**
    * Review Domain
    */
