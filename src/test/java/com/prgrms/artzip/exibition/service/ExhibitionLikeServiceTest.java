@@ -127,4 +127,16 @@ class ExhibitionLikeServiceTest {
 
     assertThat(exhibitionLikeResult.getIsLiked()).isFalse();
   }
+
+  @Test
+  @DisplayName("유저가 좋아요 누른 전시회 개수 반환")
+  void testGetExhibitionLikeCountByUserId() {
+    // given
+    when(exhibitionLikeRepository.countByUserId(1L)).thenReturn(3L);
+    // when
+    Long exhibitionLikeCount = exhibitionLikeService.getExhibitionLikeCountByUserId(1L);
+    // then
+    assertThat(exhibitionLikeCount).isEqualTo(3L);
+    verify(exhibitionLikeRepository).countByUserId(1L);
+  }
 }

@@ -12,6 +12,6 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public Long getCommentCountByUserId(Long userId) {
-        return commentRepository.countByUser(userId);
+        return commentRepository.countByUserId(userId);
     }
 }
