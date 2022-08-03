@@ -11,7 +11,7 @@ public interface ExhibitionLikeRepository extends JpaRepository<ExhibitionLike, 
   @Query("SELECT COUNT(EL) from ExhibitionLike EL WHERE EL.exhibition.id = :exhibitionId")
   Long countByExhibitionId(@Param("exhibitionId") Long exhibitionId);
 
-  @Query("SELECT EL from ExhibitionLike EL WHERE EL.exhibition.id = :exhibitionId and EL.user.id = :userId")
-  Optional<ExhibitionLike> findByExhibitionIdAndUserId(@Param("exhibitionId") Long exhibitionId,
-      @Param("userId") Long userId);
+  @Query("SELECT EL from ExhibitionLike EL WHERE EL.user.id = :userId and EL.exhibition.id = :exhibitionId")
+  Optional<ExhibitionLike> findByUserIdAndExhibitionId(@Param("userId") Long userId,
+      @Param("exhibitionId") Long exhibitionId);
 }

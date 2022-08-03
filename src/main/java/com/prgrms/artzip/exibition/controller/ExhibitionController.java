@@ -88,7 +88,7 @@ public class ExhibitionController {
     ApiResponse apiResponse = ApiResponse.builder()
         .message("전시회 좋아요 수정 성공")
         .status(HttpStatus.OK.value())
-        .data(exhibitionLikeService.updateExhibitionLike(exhibitionId, null))
+        .data(exhibitionLikeService.updateExhibitionLike(null, exhibitionId))
         .build();
 
     return ResponseEntity

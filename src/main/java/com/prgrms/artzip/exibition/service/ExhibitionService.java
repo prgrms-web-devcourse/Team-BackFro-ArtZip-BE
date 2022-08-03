@@ -4,7 +4,6 @@ import static com.prgrms.artzip.common.ErrorCode.EXHB_NOT_FOUND;
 import static org.springframework.util.StringUtils.hasText;
 
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
-import com.prgrms.artzip.exibition.domain.repository.ExhibitionLikeRepository;
 import com.prgrms.artzip.exibition.domain.repository.ExhibitionRepository;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQuery;
@@ -20,15 +19,11 @@ import org.springframework.stereotype.Service;
 public class ExhibitionService {
 
   private final ExhibitionRepository exhibitionRepository;
-  private final ExhibitionLikeRepository exhibitionLikeRepository;
 
   public Page<ExhibitionInfo> getUpcomingExhibitions(Long userId, Pageable pageable) {
     Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
         .findUpcomingExhibitions(userId, pageable);
-
-    return exhibitionsPagingResult.map(
-        (ExhibitionForSimpleQuery exhibitionForSimpleQuery) -> new ExhibitionInfo(
-            exhibitionForSimpleQuery));
+    return exhibitionsPagingResult.map(ExhibitionInfo::new);
   }
 
   public Page<ExhibitionInfo> getMostLikeExhibitions(Long userId, boolean includeEnd,
@@ -37,7 +32,7 @@ public class ExhibitionService {
         .findMostLikeExhibitions(userId, includeEnd, pageable);
     return exhibitionsPagingResult.map(ExhibitionInfo::new);
   }
-  
+
   public ExhibitionDetailInfo getExhibition(Long userId, Long exhibitionId) {
     ExhibitionDetailForSimpleQuery exhibition = exhibitionRepository
         .findExhibition(userId, exhibitionId)

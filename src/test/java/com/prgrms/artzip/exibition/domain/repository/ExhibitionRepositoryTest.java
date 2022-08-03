@@ -128,10 +128,10 @@ class ExhibitionRepositoryTest {
         .build();
     em.persist(review);
 
-    em.persist(new ExhibitionLike(exhibitionAtSeoul, user1));
-    em.persist(new ExhibitionLike(exhibitionAtBusan, user1));
-    em.persist(new ExhibitionLike(exhibitionAlreadyEnd, user1));
-    em.persist(new ExhibitionLike(exhibitionAlreadyEnd, user2));
+    em.persist(new ExhibitionLike(user1, exhibitionAtSeoul));
+    em.persist(new ExhibitionLike(user1, exhibitionAtBusan));
+    em.persist(new ExhibitionLike(user1, exhibitionAlreadyEnd));
+    em.persist(new ExhibitionLike(user2, exhibitionAlreadyEnd));
 
     em.flush();
     em.clear();

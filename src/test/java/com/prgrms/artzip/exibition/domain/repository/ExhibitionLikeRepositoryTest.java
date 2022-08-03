@@ -71,9 +71,9 @@ class ExhibitionLikeRepositoryTest {
         .build();
     em.persist(exhibition);
 
-    exhibitionLikeOfUser1 = new ExhibitionLike(exhibition, user1);
+    exhibitionLikeOfUser1 = new ExhibitionLike(user1, exhibition);
     em.persist(exhibitionLikeOfUser1);
-    exhibitionLikeOfUser2 = new ExhibitionLike(exhibition, user2);
+    exhibitionLikeOfUser2 = new ExhibitionLike(user2, exhibition);
     em.persist(exhibitionLikeOfUser2);
 
     em.flush();
@@ -107,16 +107,16 @@ class ExhibitionLikeRepositoryTest {
     @Test
     @DisplayName("좋아요가 존재하지 않는 경우 테스트")
     void testLikeNotExist() {
-      Optional<ExhibitionLike> exhibitionLike = exhibitionLikeRepository.findByExhibitionIdAndUserId(
-          123L, 123L);
+      Optional<ExhibitionLike> exhibitionLike = exhibitionLikeRepository
+          .findByUserIdAndExhibitionId(123L, 123L);
       assertThat(exhibitionLike).isEmpty();
     }
 
     @Test
     @DisplayName("좋아요가 존재하는 경우 테스트")
     void testLikeExist() {
-      Optional<ExhibitionLike> exhibitionLike = exhibitionLikeRepository.findByExhibitionIdAndUserId(
-          exhibition.getId(), user1.getId());
+      Optional<ExhibitionLike> exhibitionLike = exhibitionLikeRepository
+          .findByUserIdAndExhibitionId(user1.getId(), exhibition.getId());
       assertThat(exhibitionLike).isNotEmpty();
     }
   }

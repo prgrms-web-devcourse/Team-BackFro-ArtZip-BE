@@ -38,17 +38,22 @@ public class ExhibitionLike extends BaseEntity {
   private Long id;
 
   @ManyToOne(fetch = LAZY)
-  @JoinColumn(name = "exhibition_id", referencedColumnName = "exhibition_id")
-  private Exhibition exhibition;
-
-  @ManyToOne(fetch = LAZY)
   @JoinColumn(name = "user_id", referencedColumnName = "user_id")
   private User user;
 
-  public ExhibitionLike(Exhibition exhibition, User user) {
-    validateExhibitionLikeField(exhibition, user);
-    setExhibition(exhibition);
+  @ManyToOne(fetch = LAZY)
+  @JoinColumn(name = "exhibition_id", referencedColumnName = "exhibition_id")
+  private Exhibition exhibition;
+
+
+  public ExhibitionLike(User user, Exhibition exhibition) {
+    validateExhibitionLikeField(user, exhibition);
     setUser(user);
+    setExhibition(exhibition);
+  }
+
+  private void setUser(User user) {
+    this.user = user;
   }
 
   private void setExhibition(Exhibition exhibition) {
@@ -56,11 +61,7 @@ public class ExhibitionLike extends BaseEntity {
     exhibition.getExhibitionLikes().add(this);
   }
 
-  private void setUser(User user) {
-    this.user = user;
-  }
-
-  private void validateExhibitionLikeField(Exhibition exhibition, User user) {
+  private void validateExhibitionLikeField(User user, Exhibition exhibition) {
     if (isNull(exhibition) || isNull(user)) {
       throw new InvalidRequestException(INVALID_EXHB_LIKE);
     }
