@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public class ExhibitionsResponse {
 
-  List<ExhibitionBasicInfo> exhibitions;
+  private final List<ExhibitionBasicInfo> exhibitions;
 
   public ExhibitionsResponse(List<ExhibitionBasicInfo> exhibitions) {
     this.exhibitions = exhibitions;
