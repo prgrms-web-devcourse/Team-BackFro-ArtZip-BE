@@ -92,26 +92,17 @@ public class CommentService {
   }
 
   private Review getReview(Long reviewId) {
-    Optional<Review> opt = reviewRepository.findById(reviewId);
-    if (opt.isEmpty()) {
-      throw new NotFoundException(ErrorCode.REVIEW_NOT_FOUND);
-    }
-    return opt.get();
+    return reviewRepository.findById(reviewId)
+        .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_NOT_FOUND));
   }
 
   private User getUser(Long userId) {
-    Optional<User> opt = userRepository.findById(userId);
-    if (opt.isEmpty()) {
-      throw new NotFoundException(ErrorCode.USER_NOT_FOUND);
-    }
-    return opt.get();
+    return userRepository.findById(userId).
+        orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
   }
 
   private Comment getComment(Long commentId) {
-    Optional<Comment> opt = commentRepository.findById(commentId);
-    if (opt.isEmpty()) {
-      throw new NotFoundException(ErrorCode.COMMENT_NOT_FOUND);
-    }
-    return opt.get();
+    return commentRepository.findById(commentId)
+        .orElseThrow(() -> new NotFoundException(ErrorCode.COMMENT_NOT_FOUND));
   }
 }
