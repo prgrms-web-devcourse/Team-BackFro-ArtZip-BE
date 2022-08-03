@@ -1,5 +1,6 @@
 package com.prgrms.artzip.exibition.service;
 
+import static com.prgrms.artzip.common.ErrorCode.EXHB_NOT_FOUND;
 import static com.prgrms.artzip.exibition.domain.enumType.Area.GYEONGGI;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
@@ -101,7 +102,7 @@ class ExhibitionServiceTest {
     // then
     verify(exhibitionRepository).findMostLikeExhibitions(null, true, pageRequest);
   }
-  
+
   @Nested
   @DisplayName("getExhibition() 테스트")
   class GetExhibitionTest {
@@ -180,7 +181,7 @@ class ExhibitionServiceTest {
 
       assertThatThrownBy(() -> exhibitionService.getExhibition(null, exhibitionId))
           .isInstanceOf(InvalidRequestException.class)
-          .hasMessage("존재하지 않는 전시회 입니다.");
+          .hasMessage(EXHB_NOT_FOUND.getMessage());
     }
 
     @Test

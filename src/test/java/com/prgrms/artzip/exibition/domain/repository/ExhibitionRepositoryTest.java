@@ -149,10 +149,11 @@ class ExhibitionRepositoryTest {
       ExhibitionForSimpleQuery exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);
 
       assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(2);
-      assertThat(exhibitionAtSeoul.getName()).isEqualTo("전시회 at 서울");
-      assertThat(exhibitionAtSeoul.getLikeCount()).isEqualTo(1);
-      assertThat(exhibitionAtSeoul.getIsLiked()).isEqualTo(false);
-      assertThat(exhibitionAtSeoul.getReviewCount()).isEqualTo(0);
+      assertThat(exhibitionAtSeoul)
+          .hasFieldOrPropertyWithValue("name", "전시회 at 서울")
+          .hasFieldOrPropertyWithValue("likeCount", 1L)
+          .hasFieldOrPropertyWithValue("isLiked", false)
+          .hasFieldOrPropertyWithValue("reviewCount", 0L);
     }
 
     @Test
@@ -163,10 +164,11 @@ class ExhibitionRepositoryTest {
       ExhibitionForSimpleQuery exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);
 
       assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(2);
-      assertThat(exhibitionAtSeoul.getName()).isEqualTo("전시회 at 서울");
-      assertThat(exhibitionAtSeoul.getLikeCount()).isEqualTo(1);
-      assertThat(exhibitionAtSeoul.getIsLiked()).isEqualTo(true);
-      assertThat(exhibitionAtSeoul.getReviewCount()).isEqualTo(0);
+      assertThat(exhibitionAtSeoul)
+          .hasFieldOrPropertyWithValue("name", "전시회 at 서울")
+          .hasFieldOrPropertyWithValue("likeCount", 1L)
+          .hasFieldOrPropertyWithValue("isLiked", true)
+          .hasFieldOrPropertyWithValue("reviewCount", 0L);
     }
   }
 
@@ -182,10 +184,12 @@ class ExhibitionRepositoryTest {
       ExhibitionForSimpleQuery exhibitionAtGyeonggi = exhibitionsPagingResult.getContent().get(0);
 
       assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(3);
-      assertThat(exhibitionAtGyeonggi.getIsLiked()).isEqualTo(false);
-      assertThat(exhibitionAtGyeonggi.getName()).isEqualTo("전시회 at 경기");
-      assertThat(exhibitionAtGyeonggi.getLikeCount()).isEqualTo(2);
-      assertThat(exhibitionAtGyeonggi.getReviewCount()).isEqualTo(0);
+
+      assertThat(exhibitionAtGyeonggi)
+          .hasFieldOrPropertyWithValue("name", "전시회 at 경기")
+          .hasFieldOrPropertyWithValue("likeCount", 2L)
+          .hasFieldOrPropertyWithValue("isLiked", false)
+          .hasFieldOrPropertyWithValue("reviewCount", 0L);
     }
 
     @Test
@@ -195,11 +199,11 @@ class ExhibitionRepositoryTest {
           .findMostLikeExhibitions(user1.getId(), false, PageRequest.of(0, 10));
       ExhibitionForSimpleQuery exhibitionAtBusan = exhibitionsPagingResult.getContent().get(0);
 
-      assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(2);
-      assertThat(exhibitionAtBusan.getName()).isEqualTo("전시회 at 부산");
-      assertThat(exhibitionAtBusan.getIsLiked()).isEqualTo(true);
-      assertThat(exhibitionAtBusan.getLikeCount()).isEqualTo(1);
-      assertThat(exhibitionAtBusan.getReviewCount()).isEqualTo(1);
+      assertThat(exhibitionAtBusan)
+          .hasFieldOrPropertyWithValue("name", "전시회 at 부산")
+          .hasFieldOrPropertyWithValue("likeCount", 1L)
+          .hasFieldOrPropertyWithValue("isLiked", true)
+          .hasFieldOrPropertyWithValue("reviewCount", 1L);
     }
   }
 
@@ -253,7 +257,8 @@ class ExhibitionRepositoryTest {
           .findExhibitionsByQuery(user2.getId(), "전시회", false, PageRequest.of(0, 10));
 
       assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(2);
-      assertThat(exhibitionsPagingResult.getContent().get(0).getIsLiked()).isEqualTo(false);
+      assertThat(exhibitionsPagingResult.getContent().get(0))
+          .hasFieldOrPropertyWithValue("isLiked", false);
     }
   }
 
@@ -268,9 +273,10 @@ class ExhibitionRepositoryTest {
           "부산");
 
       assertThat(exhibitions.size()).isEqualTo(1);
-      assertThat(exhibitions.get(0).getName()).isEqualTo("전시회 at 부산");
-      assertThat(exhibitions.get(0).getThumbnail()).isEqualTo(
-          "http://www.culture.go.kr/upload/rdf/22/07/show_2022072010193392447.jpg");
+      assertThat(exhibitions.get(0))
+          .hasFieldOrPropertyWithValue("name", "전시회 at 부산")
+          .hasFieldOrPropertyWithValue("thumbnail",
+              "http://www.culture.go.kr/upload/rdf/22/07/show_2022072010193392447.jpg");
     }
   }
 }

@@ -1,5 +1,7 @@
 package com.prgrms.artzip.exibition.service;
 
+import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHB_QUERY;
+import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHB_QUERY_FOR_REVIEW;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -49,7 +51,7 @@ class ExhibitionSearchServiceTest {
           () -> exhibitionSearchService.getExhibitionsByQuery(null, query, true,
               PageRequest.of(0, 10)))
           .isInstanceOf(InvalidRequestException.class)
-          .hasMessage("검색어는 필수입니다.(2 <= 검색어)");
+          .hasMessage(INVALID_EXHB_QUERY.getMessage());
 
       verify(exhibitionRepository, never()).findExhibitionsByQuery(null, query, true,
           PageRequest.of(0, 10));
@@ -100,7 +102,7 @@ class ExhibitionSearchServiceTest {
       assertThatThrownBy(
           () -> exhibitionSearchService.getExhibitionsForReview(query))
           .isInstanceOf(InvalidRequestException.class)
-          .hasMessage("검색어는 필수입니다.");
+          .hasMessage(INVALID_EXHB_QUERY_FOR_REVIEW.getMessage());
 
       verify(exhibitionRepository, never()).findExhibitionsForReview(query);
     }
