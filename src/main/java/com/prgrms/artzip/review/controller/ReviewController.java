@@ -4,7 +4,7 @@ import com.prgrms.artzip.common.ApiResponse;
 import com.prgrms.artzip.exibition.service.ExhibitionSearchService;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
 import com.prgrms.artzip.review.dto.response.ExhibitionsResponse;
-import com.prgrms.artzip.review.dto.response.ReviewCreateResponse;
+import com.prgrms.artzip.review.dto.response.ReviewIdResponse;
 import com.prgrms.artzip.review.service.ReviewService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -41,7 +41,7 @@ public class ReviewController {
       @RequestPart(value = "data") ReviewCreateRequest request,
       @RequestPart(required = false) List<MultipartFile> files) {
 
-    ReviewCreateResponse response = reviewService.createReview(userId, request, files);
+    ReviewIdResponse response = reviewService.createReview(userId, request, files);
 
     return ResponseEntity.created(URI.create("/api/v1/reviews/" + response.getReviewId()))
         .body(new ApiResponse(

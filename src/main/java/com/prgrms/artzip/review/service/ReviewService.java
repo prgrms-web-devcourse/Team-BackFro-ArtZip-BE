@@ -11,7 +11,7 @@ import com.prgrms.artzip.review.domain.ReviewPhoto;
 import com.prgrms.artzip.review.domain.repository.ReviewPhotoRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewRepository;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
-import com.prgrms.artzip.review.dto.response.ReviewCreateResponse;
+import com.prgrms.artzip.review.dto.response.ReviewIdResponse;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
 import java.io.IOException;
@@ -35,7 +35,7 @@ public class ReviewService {
   private final AmazonS3Uploader amazonS3Uploader;
 
   @Transactional
-  public ReviewCreateResponse createReview(final Long userId, final ReviewCreateRequest request,
+  public ReviewIdResponse createReview(final Long userId, final ReviewCreateRequest request,
       final List<MultipartFile> files) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
@@ -57,7 +57,7 @@ public class ReviewService {
       createReviewPhoto(savedReview, files);
     }
 
-    return new ReviewCreateResponse(savedReview.getId());
+    return new ReviewIdResponse(savedReview.getId());
   }
 
   private void createReviewPhoto(final Review review, final List<MultipartFile> files) {

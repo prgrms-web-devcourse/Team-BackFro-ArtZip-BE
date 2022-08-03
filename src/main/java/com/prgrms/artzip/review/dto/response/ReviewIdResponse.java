@@ -7,11 +7,11 @@ import lombok.Getter;
 
 @JsonInclude(NON_NULL)
 @Getter
-public class ReviewCreateResponse {
+public class ReviewIdResponse {
 
   private Long reviewId;
 
-  public ReviewCreateResponse(Long reviewId) {
+  public ReviewIdResponse(Long reviewId) {
     this.reviewId = reviewId;
   }
 }
