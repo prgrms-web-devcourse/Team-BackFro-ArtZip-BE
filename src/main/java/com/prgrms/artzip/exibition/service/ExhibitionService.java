@@ -23,17 +23,21 @@ public class ExhibitionService {
   private final ExhibitionRepository exhibitionRepository;
   private final ExhibitionLikeRepository exhibitionLikeRepository;
 
-  public Page<ExhibitionInfo> getUpcomingExhibitions(Pageable pageable) {
-    Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findUpcomingExhibitions(
-        pageable);
+  public Page<ExhibitionInfo> getUpcomingExhibitions(Long userId, Pageable pageable) {
+    Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
+        .findUpcomingExhibitions(userId, pageable);
 
-    return exhibitionsPagingResult.map(ExhibitionInfo::new);
+    return exhibitionsPagingResult.map(
+        (ExhibitionForSimpleQuery exhibitionForSimpleQuery) -> new ExhibitionInfo(
+            exhibitionForSimpleQuery));
   }
 
   public Page<ExhibitionInfo> getMostLikeExhibitions(boolean includeEnd, Pageable pageable) {
-    Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findMostLikeExhibitions(
-        includeEnd, pageable);
-    return exhibitionsPagingResult.map(ExhibitionInfo::new);
+//    Page<ExhibitionForSimpleQueryV1> exhibitionsPagingResult = exhibitionRepository.findMostLikeExhibitions(
+//        includeEnd, pageable);
+//    return exhibitionsPagingResult.map(ExhibitionInfo::new);
+
+    return null;
   }
 
   // 차후 수정 필요!

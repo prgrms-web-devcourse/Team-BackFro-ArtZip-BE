@@ -19,6 +19,7 @@ import com.prgrms.artzip.exibition.domain.vo.Location;
 import com.prgrms.artzip.exibition.domain.vo.Period;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQuery;
+import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQueryV1;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import java.time.LocalDate;
@@ -60,6 +61,7 @@ class ExhibitionServiceTest {
         .id(11L)
         .name("요리조리 MOKA Garden")
         .thumbnail("http://www.culture.go.kr/upload/rdf/22/07/show_2022071411402126915.png")
+        .isLiked(false)
         .period(new Period(LocalDate.now().plusDays(1), LocalDate.now().plusDays(10)))
         .likeCount(30)
         .reviewCount(15)
@@ -67,22 +69,22 @@ class ExhibitionServiceTest {
     Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = new PageImpl(exhibitions);
 
     // given
-    when(exhibitionRepository.findUpcomingExhibitions(pageRequest)).thenReturn(
-        exhibitionsPagingResult);
+    when(exhibitionRepository.findUpcomingExhibitions(null, pageRequest))
+        .thenReturn(exhibitionsPagingResult);
 
     // when
-    exhibitionService.getUpcomingExhibitions(pageRequest);
+    exhibitionService.getUpcomingExhibitions(null, pageRequest);
 
     // then
-    verify(exhibitionRepository).findUpcomingExhibitions(pageRequest);
+    verify(exhibitionRepository).findUpcomingExhibitions(null, pageRequest);
   }
 
   @Test
   @DisplayName("인기 많은 전시회 조회 테스트")
   void testGetMostLikeExhibitions() {
     pageRequest = PageRequest.of(0, 1);
-    List<ExhibitionForSimpleQuery> exhibitions = new ArrayList<>();
-    exhibitions.add(ExhibitionForSimpleQuery.builder()
+    List<ExhibitionForSimpleQueryV1> exhibitions = new ArrayList<>();
+    exhibitions.add(ExhibitionForSimpleQueryV1.builder()
         .id(11L)
         .name("요리조리 MOKA Garden")
         .thumbnail("http://www.culture.go.kr/upload/rdf/22/07/show_2022071411402126915.png")
@@ -90,7 +92,7 @@ class ExhibitionServiceTest {
         .likeCount(30)
         .reviewCount(15)
         .build());
-    Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = new PageImpl(exhibitions);
+    Page<ExhibitionForSimpleQueryV1> exhibitionsPagingResult = new PageImpl(exhibitions);
 
     // given
     when(exhibitionRepository.findMostLikeExhibitions(true, pageRequest)).thenReturn(
