@@ -2,9 +2,9 @@ package com.prgrms.artzip.review.controller;
 
 import com.prgrms.artzip.common.ApiResponse;
 import com.prgrms.artzip.exibition.service.ExhibitionSearchService;
-import com.prgrms.artzip.review.dto.ExhibitionsResponse;
-import com.prgrms.artzip.review.dto.ReviewCreateRequest;
-import com.prgrms.artzip.review.dto.ReviewCreateResponse;
+import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
+import com.prgrms.artzip.review.dto.response.ExhibitionsResponse;
+import com.prgrms.artzip.review.dto.response.ReviewCreateResponse;
 import com.prgrms.artzip.review.service.ReviewService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
