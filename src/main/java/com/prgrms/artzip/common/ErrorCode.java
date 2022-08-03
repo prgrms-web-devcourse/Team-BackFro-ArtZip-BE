@@ -74,7 +74,10 @@ public enum ErrorCode {
   REVIEW_LIKE_FIELD_CONTAINS_NULL_VALUE(400, "R005", "리뷰 좋아요 필드에 NULL값이 포함되어 있습니다."),
   REVIEW_PHOTO_FIELD_CONTAINS_NULL_VALUE(400, "R006", "리뷰 사진 필드에 NULL값이 포함되어 있습니다."),
   INVALID_REVIEW_PHOTO_PATH_LENGTH(400, "R007", "path는 1글자 이상 2083자 이하이어야 합니다."),
-  INVALID_REVIEW_PHOTO_COUNT(400, "R008", "리뷰 사진은 최대 9개입니다.")
+  INVALID_REVIEW_PHOTO_COUNT(400, "R008", "리뷰 사진은 최대 9개입니다."),
+  REVIEW_NOT_FOUND(400, "R009", "존재하지 않는 리뷰입니다."),
+  REVIEW_PHOTO_NOT_FOUND(400, "R010", "존재하지 않는 리뷰 사진입니다."),
+  NO_PERMISSION_TO_UPDATE_REVIEW(404, "R011", "해당 리뷰를 수정할 수 없습니다.")
   ;
 
 
