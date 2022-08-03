@@ -1,10 +1,8 @@
 package com.prgrms.artzip.review.controller;
 
 import com.prgrms.artzip.common.ApiResponse;
-import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
-import com.prgrms.artzip.review.dto.response.ReviewCreateResponse;
-import com.prgrms.artzip.review.dto.response.ReviewLikeUpdateResponse;
-import com.prgrms.artzip.review.service.ReviewLikeService;
+import com.prgrms.artzip.review.dto.ReviewCreateRequest;
+import com.prgrms.artzip.review.dto.ReviewCreateResponse;
 import com.prgrms.artzip.review.service.ReviewService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -18,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ReviewController {
 
   private final ReviewService reviewService;
+  private final ExhibitionSearchService exhibitionSearchService;
   private final ReviewLikeService reviewLikeService;
 
   @ApiOperation(value = "후기 생성", notes = "후기 등록을 요청합니다.")
@@ -51,6 +51,25 @@ public class ReviewController {
             response));
   }
 
+  @ApiOperation(value = "후기 작성 시, 전시회 검색", notes = "후기 작성 시, 전시회를 '전시회 이름'으로 검색합니다.")
+  @GetMapping("/search/exhibitions")
+  public ResponseEntity<ApiResponse> getExhibitions(
+      @ApiParam(value = "검색할 전시회 이름", required = true)
+      @RequestParam(value = "query") String query) {
+
+    ExhibitionsResponse response = new ExhibitionsResponse(
+        exhibitionSearchService.getExhibitionsForReview(query)
+    );
+
+    return ResponseEntity.ok()
+        .body(ApiResponse.builder()
+            .message("전시회 검색 성공")
+            .status(HttpStatus.OK.value())
+            .data(response)
+            .build()
+        );
+  }
+
   @PatchMapping("{reviewId}/like")
   public ResponseEntity<ApiResponse> updateReviewLike(
       @RequestParam(value = "userId") final Long userId,
@@ -60,10 +79,9 @@ public class ReviewController {
 
     return ResponseEntity.ok()
         .body(ApiResponse.builder()
-            .message("후기 좋아요 등록/해제 성공")
+            .message("후기 좋아요 등록/해제 성공")  
             .status(HttpStatus.OK.value())
             .data(response)
             .build()
         );
-  }
 }
