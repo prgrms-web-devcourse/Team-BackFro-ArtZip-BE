@@ -4,7 +4,6 @@ import static com.prgrms.artzip.common.ErrorCode.EXHB_NOT_FOUND;
 import static org.springframework.util.StringUtils.hasText;
 
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
-import com.prgrms.artzip.exibition.domain.ExhibitionLikeId;
 import com.prgrms.artzip.exibition.domain.repository.ExhibitionLikeRepository;
 import com.prgrms.artzip.exibition.domain.repository.ExhibitionRepository;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionDetailForSimpleQuery;
@@ -44,7 +43,7 @@ public class ExhibitionService {
 
     boolean isLiked = false;
     if (user != null) {
-      isLiked = exhibitionLikeRepository.findById(new ExhibitionLikeId(exhibitionId, user.getId()))
+      isLiked = exhibitionLikeRepository.findByExhibitionIdAndUserId(exhibitionId, user.getId())
           .isPresent();
     }
 

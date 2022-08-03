@@ -11,7 +11,6 @@ import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.exibition.domain.Exhibition;
 import com.prgrms.artzip.exibition.domain.ExhibitionLike;
-import com.prgrms.artzip.exibition.domain.ExhibitionLikeId;
 import com.prgrms.artzip.exibition.domain.enumType.Area;
 import com.prgrms.artzip.exibition.domain.enumType.Genre;
 import com.prgrms.artzip.exibition.domain.repository.ExhibitionLikeRepository;
@@ -198,28 +197,27 @@ class ExhibitionServiceTest {
     @Test
     @DisplayName("인증된 사용자이며 좋아요를 누른 경우")
     void testAuthorizedLike() {
-      when(exhibitionRepository.findExhibition(exhibitionId)).thenReturn(
-          Optional.of(exhibitionDetail1));
-      when(exhibitionLikeRepository.findById(
-          new ExhibitionLikeId(exhibitionId, user.getId()))).thenReturn(
-          Optional.of(exhibitionLike));
+      when(exhibitionRepository.findExhibition(exhibitionId))
+          .thenReturn(Optional.of(exhibitionDetail1));
+      when(exhibitionLikeRepository.findByExhibitionIdAndUserId(exhibitionId, user.getId()))
+          .thenReturn(Optional.of(exhibitionLike));
 
       exhibitionService.getExhibition(exhibitionId, user);
 
-      verify(exhibitionLikeRepository).findById(new ExhibitionLikeId(exhibitionId, user.getId()));
+      verify(exhibitionLikeRepository).findByExhibitionIdAndUserId(exhibitionId, user.getId());
     }
 
     @Test
     @DisplayName("인증된 사용자이며 좋아요를 누르지 않은 경우")
     void testAuthorizedNotLike() {
-      when(exhibitionRepository.findExhibition(exhibitionId)).thenReturn(
-          Optional.of(exhibitionDetail2));
-      when(exhibitionLikeRepository.findById(
-          new ExhibitionLikeId(exhibitionId, user.getId()))).thenReturn(Optional.empty());
+      when(exhibitionRepository.findExhibition(exhibitionId))
+          .thenReturn(Optional.of(exhibitionDetail2));
+      when(exhibitionLikeRepository.findByExhibitionIdAndUserId(exhibitionId, user.getId()))
+          .thenReturn(Optional.empty());
 
       exhibitionService.getExhibition(exhibitionId, user);
 
-      verify(exhibitionLikeRepository).findById(new ExhibitionLikeId(exhibitionId, user.getId()));
+      verify(exhibitionLikeRepository).findByExhibitionIdAndUserId(exhibitionId, user.getId());
     }
   }
 }
