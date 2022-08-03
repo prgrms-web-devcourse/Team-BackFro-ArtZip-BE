@@ -10,7 +10,6 @@ import com.prgrms.artzip.exibition.dto.projection.ExhibitionDetailForSimpleQuery
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.response.ExhibitionDetailInfo;
 import com.prgrms.artzip.exibition.dto.response.ExhibitionInfo;
-import com.prgrms.artzip.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,17 +37,11 @@ public class ExhibitionService {
         .findMostLikeExhibitions(userId, includeEnd, pageable);
     return exhibitionsPagingResult.map(ExhibitionInfo::new);
   }
-
-  // 차후 수정 필요!
-  public ExhibitionDetailInfo getExhibition(Long exhibitionId, User user) {
-    ExhibitionDetailForSimpleQuery exhibition = exhibitionRepository.findExhibition(exhibitionId)
+  
+  public ExhibitionDetailInfo getExhibition(Long userId, Long exhibitionId) {
+    ExhibitionDetailForSimpleQuery exhibition = exhibitionRepository
+        .findExhibition(userId, exhibitionId)
         .orElseThrow(() -> new InvalidRequestException(EXHB_NOT_FOUND));
-
-    boolean isLiked = false;
-    if (user != null) {
-      isLiked = exhibitionLikeRepository.findByExhibitionIdAndUserId(exhibitionId, user.getId())
-          .isPresent();
-    }
 
     // getReviews()
 
@@ -68,7 +61,7 @@ public class ExhibitionService {
         .placeAddress(exhibition.getLocation().getAddress())
         .lat(exhibition.getLocation().getLatitude())
         .lng(exhibition.getLocation().getLongitude())
-        .isLiked(isLiked)
+        .isLiked(exhibition.getIsLiked())
         .build();
   }
 }

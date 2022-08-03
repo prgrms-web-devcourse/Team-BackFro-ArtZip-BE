@@ -2,15 +2,12 @@ package com.prgrms.artzip.exibition.service;
 
 import static com.prgrms.artzip.exibition.domain.enumType.Area.GYEONGGI;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.exibition.domain.Exhibition;
-import com.prgrms.artzip.exibition.domain.ExhibitionLike;
 import com.prgrms.artzip.exibition.domain.enumType.Area;
 import com.prgrms.artzip.exibition.domain.enumType.Genre;
 import com.prgrms.artzip.exibition.domain.repository.ExhibitionLikeRepository;
@@ -104,8 +101,7 @@ class ExhibitionServiceTest {
     // then
     verify(exhibitionRepository).findMostLikeExhibitions(null, true, pageRequest);
   }
-
-  // 임시로 작성. 수정 필요!
+  
   @Nested
   @DisplayName("getExhibition() 테스트")
   class GetExhibitionTest {
@@ -131,8 +127,7 @@ class ExhibitionServiceTest {
         .placeUrl("https://www.place-example.com")
         .build();
 
-    private ExhibitionLike exhibitionLike = new ExhibitionLike(exhibition, user);
-
+    private Long userId = 321L;
     private Long exhibitionId = 123L;
     private ExhibitionDetailForSimpleQuery exhibitionDetail1 = ExhibitionDetailForSimpleQuery.builder()
         .id(exhibitionId)
@@ -153,6 +148,7 @@ class ExhibitionServiceTest {
         .thumbnail("http://www.culture.go.kr/upload/rdf/21/11/show_20211181717993881.jpg")
         .url("http://soma.kspo.or.kr")
         .placeUrl("http://galleryraon.com")
+        .isLiked(true)
         .likeCount(10)
         .build();
 
@@ -173,53 +169,40 @@ class ExhibitionServiceTest {
         .inquiry("010-0000-0000")
         .fee("1,000원")
         .thumbnail("http://www.culture.go.kr/upload/rdf/21/11/show_20211181717993881.jpg")
+        .isLiked(false)
         .likeCount(5)
         .build();
 
     @Test
     @DisplayName("존재하지 않는 게시물인 경우")
     void testExhibitionNotFound() {
-      when(exhibitionRepository.findExhibition(exhibitionId)).thenReturn(Optional.empty());
+      when(exhibitionRepository.findExhibition(null, exhibitionId)).thenReturn(Optional.empty());
 
-      assertThatThrownBy(() -> exhibitionService.getExhibition(exhibitionId, null))
+      assertThatThrownBy(() -> exhibitionService.getExhibition(null, exhibitionId))
           .isInstanceOf(InvalidRequestException.class)
           .hasMessage("존재하지 않는 전시회 입니다.");
     }
 
     @Test
-    @DisplayName("인증되지 않은 사용자인 경우")
-    void testNotAuthorized() {
-      when(exhibitionRepository.findExhibition(123L)).thenReturn(Optional.of(exhibitionDetail1));
-
-      exhibitionService.getExhibition(exhibitionId, null);
-
-      verify(exhibitionLikeRepository, never()).findById(any());
-    }
-
-    @Test
     @DisplayName("인증된 사용자이며 좋아요를 누른 경우")
     void testAuthorizedLike() {
-      when(exhibitionRepository.findExhibition(exhibitionId))
+      when(exhibitionRepository.findExhibition(userId, exhibitionId))
           .thenReturn(Optional.of(exhibitionDetail1));
-      when(exhibitionLikeRepository.findByExhibitionIdAndUserId(exhibitionId, user.getId()))
-          .thenReturn(Optional.of(exhibitionLike));
 
-      exhibitionService.getExhibition(exhibitionId, user);
+      exhibitionService.getExhibition(userId, exhibitionId);
 
-      verify(exhibitionLikeRepository).findByExhibitionIdAndUserId(exhibitionId, user.getId());
+      verify(exhibitionRepository).findExhibition(userId, exhibitionId);
     }
 
     @Test
     @DisplayName("인증된 사용자이며 좋아요를 누르지 않은 경우")
     void testAuthorizedNotLike() {
-      when(exhibitionRepository.findExhibition(exhibitionId))
+      when(exhibitionRepository.findExhibition(null, exhibitionId))
           .thenReturn(Optional.of(exhibitionDetail2));
-      when(exhibitionLikeRepository.findByExhibitionIdAndUserId(exhibitionId, user.getId()))
-          .thenReturn(Optional.empty());
 
-      exhibitionService.getExhibition(exhibitionId, user);
+      exhibitionService.getExhibition(null, exhibitionId);
 
-      verify(exhibitionLikeRepository).findByExhibitionIdAndUserId(exhibitionId, user.getId());
+      verify(exhibitionRepository).findExhibition(null, exhibitionId);
     }
   }
 }

@@ -66,13 +66,13 @@ public class ExhibitionController {
 
   // 수정 필요!
   @ApiOperation(value = "전시회 상세 조회", notes = "전시회를 조회합니다.")
-  // @GetMapping("/{exhibitionId}")
+  @GetMapping("/{exhibitionId}")
   public ResponseEntity<ApiResponse<ExhibitionDetailInfo>> getExhibition(
       @PathVariable Long exhibitionId) {
     ApiResponse apiResponse = ApiResponse.builder()
         .message("전시회 조회 성공")
         .status(HttpStatus.OK.value())
-        .data(exhibitionService.getExhibition(exhibitionId, null))
+        .data(exhibitionService.getExhibition(null, exhibitionId))
         .build();
 
     return ResponseEntity

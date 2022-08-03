@@ -210,24 +210,26 @@ class ExhibitionRepositoryTest {
     @Test
     @DisplayName("존재하지 않는 전시회 조회 테스트")
     void testFindEmptyExhibition() {
-      Optional<ExhibitionDetailForSimpleQuery> exhibition = exhibitionRepository.findExhibition(
-          123431L);
+      Optional<ExhibitionDetailForSimpleQuery> exhibition = exhibitionRepository
+          .findExhibition(null, 123431L);
       assertThat(exhibition).isEmpty();
     }
 
     @Test
     @DisplayName("전시회 조회 테스트")
     void testFindExhibition() {
-      Optional<ExhibitionDetailForSimpleQuery> exhibition = exhibitionRepository.findExhibition(
-          exhibitionAlreadyEnd.getId());
+      Optional<ExhibitionDetailForSimpleQuery> exhibition = exhibitionRepository
+          .findExhibition(user2.getId(), exhibitionAlreadyEnd.getId());
 
       assertThat(exhibition).isNotEmpty();
-      assertThat(exhibition.get().getSeq()).isEqualTo(34);
-      assertThat(exhibition.get().getName()).isEqualTo("전시회 at 경기");
-      assertThat(exhibition.get().getInquiry()).isEqualTo("문의처 정보");
-      assertThat(exhibition.get().getUrl()).isEqualTo("https://www.example.com");
-      assertThat(exhibition.get().getPlaceUrl()).isEqualTo("https://www.place-example.com");
-      assertThat(exhibition.get().getLikeCount()).isEqualTo(2);
+      assertThat(exhibition.get())
+          .hasFieldOrPropertyWithValue("seq", 34)
+          .hasFieldOrPropertyWithValue("name", "전시회 at 경기")
+          .hasFieldOrPropertyWithValue("inquiry", "문의처 정보")
+          .hasFieldOrPropertyWithValue("url", "https://www.example.com")
+          .hasFieldOrPropertyWithValue("placeUrl", "https://www.place-example.com")
+          .hasFieldOrPropertyWithValue("isLiked", true)
+          .hasFieldOrPropertyWithValue("likeCount", 2L);
     }
   }
 

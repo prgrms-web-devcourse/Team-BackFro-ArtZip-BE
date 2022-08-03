@@ -93,7 +93,7 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
   }
 
   @Override
-  public Optional<ExhibitionDetailForSimpleQuery> findExhibition(Long exhibitionId) {
+  public Optional<ExhibitionDetailForSimpleQuery> findExhibition(Long userId, Long exhibitionId) {
     return Optional.ofNullable(queryFactory
         .select(Projections.fields(ExhibitionDetailForSimpleQuery.class,
                 exhibition.id,
@@ -108,10 +108,16 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
                 exhibition.thumbnail,
                 exhibition.url,
                 exhibition.placeUrl,
+                new CaseBuilder()
+                    .when(exhibitionLikeUserIdEq(userId))
+                    .then(true)
+                    .otherwise(false).as("isLiked"),
                 exhibitionLike.exhibition.id.count().as("likeCount")
             )
         )
         .from(exhibition)
+        .leftJoin(exhibitionLikeForIsLiked)
+        .on(exhibitionLikeForIsLiked.exhibition.eq(exhibition), exhibitionLikeUserIdEq(userId))
         .leftJoin(exhibitionLike)
         .on(exhibitionLike.exhibition.eq(exhibition))
         .where(exhibition.id.eq(exhibitionId))
