@@ -18,8 +18,10 @@ public enum ErrorCode {
   INVALID_INPUT_VALUE(400, "C003", "적절하지 않은 값입니다."),
   NOT_FOUND(404, "C004", "해당 리소스를 찾을 수 없습니다."),
   BAD_REQUEST(400, "C005", "잘못된 요청입니다."),
-  MISSING_REQUEST_PARAMETER(400, "C005", "필수 파라미터가 누락되었습니다."),
-  INVALID_LENGTH(400, "C006", "올바르지 않은 길이입니다."),
+  MISSING_REQUEST_PARAMETER(400, "C006", "필수 파라미터가 누락되었습니다."),
+  INVALID_LENGTH(400, "C007", "올바르지 않은 길이입니다."),
+  INVALID_FILE_EXTENSION(400, "C008", "올바르지 않은 파일 확장자입니다. (png, jpg, jpeg 가능)"),
+  MAX_UPLOAD_SIZE_EXCEEDED(400, "C009", "최대 파일 크기(5MB)보다 큰 파일입니다."),
 
   /**
    * User Domain
@@ -45,22 +47,26 @@ public enum ErrorCode {
   INVALID_EXHB_AREA(400, "EX006", "전시회 지역은 필수입니다."),
   INVALID_EXHB_PLACE(400, "EX007", "전시회 장소는 필수입니다.(1 <= 전시회 장소 <= 20)"),
   INVALID_EXHB_ADDRESS(400, "EX008", "전시회 상세 주소는 필수입니다.(1 <= 전시회 주소 <= 100)"),
-  INVALID_EXHB_INQUIRY(400, "EX008", "전시회 문의처는 필수입니다.(1 <= 전시회 문의처 <= 100)"),
-  INVALID_EXHB_FEE(400, "EX009", "전시회 요금 정보는 필수입니다.(1 <= 전시회 요금 정보 <= 1000)"),
-  INVALID_EXHB_THUMBNAIL(400, "EX010", "전시회 썸네일을 필수입니다. 전시회 썸네일 저장 형태는 URL 입니다.(1 <= 전시회 썸네일 URL <= 2083)"),
-  INVALID_EXHB_URL(400, "EX011", "전시회 URL은 필수입니다.(1 <= 전시회 URL <= 2083)"),
-  INVALID_EXHB_PLACEURL(400, "EX012", "전시회 장소 URL은 필수입니다.(1 <= 전시회 장소 URL <= 2083)"),
-  INVALID_EXHB_LIKE(400, "EX013", "전시회 좋아요에는 전시회 정보와 사용자 정보가 필수입니다."),
-  EXHB_NOT_FOUND(404, "EX014",  "존재하지 않는 전시회 입니다."),
-
+  INVALID_EXHB_INQUIRY(400, "EX009", "전시회 문의처는 필수입니다.(1 <= 전시회 문의처 <= 100)"),
+  INVALID_EXHB_FEE(400, "EX010", "전시회 요금 정보는 필수입니다.(1 <= 전시회 요금 정보 <= 1000)"),
+  INVALID_EXHB_THUMBNAIL(400, "EX011",
+      "전시회 썸네일을 필수입니다. 전시회 썸네일 저장 형태는 URL 입니다.(1 <= 전시회 썸네일 URL <= 2083)"),
+  INVALID_EXHB_URL(400, "EX012", "전시회 URL은 필수입니다.(1 <= 전시회 URL <= 2083)"),
+  INVALID_EXHB_PLACEURL(400, "EX013", "전시회 장소 URL은 필수입니다.(1 <= 전시회 장소 URL <= 2083)"),
+  INVALID_EXHB_LIKE(400, "EX014", "전시회 좋아요에는 전시회 정보와 사용자 정보가 필수입니다."),
+  EXHB_NOT_FOUND(404, "EX015", "존재하지 않는 전시회 입니다."),
+  INVALID_EXHB_QUERY(400, "EX016", "검색어는 필수입니다.(2 <= 검색어)"),
+  INVALID_EXHB_QUERY_FOR_REVIEW(400, "EX017", "검색어는 필수입니다."),
 
   /**
    * Comment Domain
    */
-  COMMENT_NOT_FOUND(400, "C001", "댓글이 존재하지 않습니다."),
-  CONTENT_IS_REQUIRED(400, "C002", "댓글 내용은 필수입니다.(최대 500자)"),
-  CONTENT_IS_TOO_LONG(400, "C003", "댓글은 최대 500자입니다."),
-
+  COMMENT_NOT_FOUND(400, "CM001", "댓글이 존재하지 않습니다."),
+  CONTENT_IS_REQUIRED(400, "CM002", "댓글 내용은 필수입니다.(최대 500자)"),
+  CONTENT_IS_TOO_LONG(400, "CM003", "댓글은 최대 500자입니다."),
+  COMMENT_USER_IS_REQUIRED(400, "CM004", "댓글 작성 유저는 필수입니다."),
+  COMMENT_ALREADY_DELETED(400, "CM005", "댓글이 이미 삭제되었습니다."),
+  CHILD_CANT_BE_PARENT(400, "CM006", "자식 댓글은 부모 댓글이 될 수 없습니다."),
   /**
    * Review Domain
    */
@@ -70,7 +76,9 @@ public enum ErrorCode {
   INVALID_REVIEW_DATE(400, "R004", "방문일은 오늘 이후일 수 없습니다."),
   REVIEW_LIKE_FIELD_CONTAINS_NULL_VALUE(400, "R005", "리뷰 좋아요 필드에 NULL값이 포함되어 있습니다."),
   REVIEW_PHOTO_FIELD_CONTAINS_NULL_VALUE(400, "R006", "리뷰 사진 필드에 NULL값이 포함되어 있습니다."),
-  INVALID_REVIEW_PHOTO_PATH_LENGTH(400, "R007", "path는 1글자 이상 2083자 이하이어야 합니다.")
+  INVALID_REVIEW_PHOTO_PATH_LENGTH(400, "R007", "path는 1글자 이상 2083자 이하이어야 합니다."),
+  INVALID_REVIEW_PHOTO_COUNT(400, "R008", "리뷰 사진은 최대 9개입니다."),
+  REVIEW_NOT_FOUND(400, "R009", "리뷰가 존재하지 않습니다.")
   ;
 
 
