@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface ExhibitionLikeRepository extends JpaRepository<ExhibitionLike, ExhibitionLikeId> {
-  @Query("SELECT COUNT(EL) from ExhibitionLike EL WHERE EL.exhibitionLikeId.exhibitionId = :exhibitionId")
+
+  @Query("SELECT COUNT(EL) from ExhibitionLike EL WHERE EL.exhibition.id = :exhibitionId")
   Long countByExhibitionId(@Param("exhibitionId") Long exhibitionId);
 }
