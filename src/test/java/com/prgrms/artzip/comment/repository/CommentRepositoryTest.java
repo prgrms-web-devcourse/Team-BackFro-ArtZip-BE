@@ -118,8 +118,8 @@ class CommentRepositoryTest {
   }
 
   @Test
-  @DisplayName("자식 댓글 조회 테스트")
-  void testGetCommentsOfParent() {
+  @DisplayName("여러 부모의 자식 댓글 조회 테스트")
+  void testGetCommentsOfParents() {
     //Given
     Pageable pageable = PageRequest.of(0, 40);
     Page<Comment> comments = commentRepository.getCommentsByReviewId(review.getId(), pageable);
@@ -138,5 +138,21 @@ class CommentRepositoryTest {
       ))
           .hasSize(2);
     });
+  }
+
+  @Test
+  @DisplayName("부모의 자식 댓글 조회 테스트")
+  void testGetCommentsOfParent() {
+    //Given
+    Pageable pageable0 = PageRequest.of(0, 40);
+    Pageable pageable1 = PageRequest.of(0, 10);
+    Page<Comment> comments = commentRepository.getCommentsByReviewId(review.getId(), pageable0);
+
+    //When
+    Page<Comment> children = commentRepository
+        .getCommentsOfParent(comments.getContent().get(0).getId(), pageable1);
+
+    //Then
+    assertThat(children.getContent()).hasSize(2);
   }
 }

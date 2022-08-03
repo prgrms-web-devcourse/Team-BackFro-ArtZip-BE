@@ -77,11 +77,11 @@ public class CommentService {
     return new CommentResponse(comment, children);
   }
 
-  public List<CommentInfo> getChildren(Long commentId, Pageable pageable) {
+  public Page<CommentInfo> getChildren(Long commentId, Pageable pageable) {
     Comment parent = getComment(commentId);
     checkChild(parent);
     Page<Comment> children = commentRepository.getCommentsOfParent(commentId, pageable);
-    return children.stream().map(CommentInfo::new).toList();
+    return children.map(CommentInfo::new);
   }
 
   private void checkChild(Comment parent) {

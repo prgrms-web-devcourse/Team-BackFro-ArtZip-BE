@@ -142,12 +142,12 @@ class CommentServiceTest {
     doReturn(children).when(commentRepository).getCommentsOfParent(0L, pageable);
 
     //when
-    List<CommentInfo> response = commentService.getChildren(0L, pageable);
+    Page<CommentInfo> response = commentService.getChildren(0L, pageable);
 
     //then
     verify(commentRepository).findById(0L);
     verify(commentRepository).getCommentsOfParent(0L, pageable);
-    assertThat(response).hasSize(9);
+    assertThat(response.getContent()).hasSize(9);
   }
 
   @Test
