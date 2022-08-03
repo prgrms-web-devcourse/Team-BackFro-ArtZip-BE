@@ -21,7 +21,7 @@ import com.prgrms.artzip.review.domain.Review;
 import com.prgrms.artzip.review.domain.ReviewPhoto;
 import com.prgrms.artzip.review.domain.repository.ReviewPhotoRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewRepository;
-import com.prgrms.artzip.review.dto.ReviewCreateRequest;
+import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
