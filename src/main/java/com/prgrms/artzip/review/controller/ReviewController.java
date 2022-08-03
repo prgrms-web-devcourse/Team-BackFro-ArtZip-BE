@@ -74,9 +74,11 @@ public class ReviewController {
         );
   }
 
+  @ApiOperation(value = "후기 좋아요 등록/해제", notes = "후기 좋아요 등록/해제를 요청합니다.")
   @PatchMapping("{reviewId}/like")
   public ResponseEntity<ApiResponse> updateReviewLike(
       @RequestParam(value = "userId") final Long userId,
+      @ApiParam(value = "좋아요 등록/해제할 후기의 ID")
       @PathVariable(value = "reviewId") final Long reviewId) {
 
     ReviewLikeUpdateResponse response = reviewLikeService.updateReviewLike(userId, reviewId);
