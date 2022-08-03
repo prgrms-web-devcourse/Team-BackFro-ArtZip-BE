@@ -30,10 +30,13 @@ public class ReviewUpdateRequest {
   private List<Long> deletedPhotos;
 
   @Builder
-  public ReviewUpdateRequest(LocalDate date, String title, String content, Boolean isPublic) {
+  public ReviewUpdateRequest(LocalDate date, String title, String content, Boolean isPublic,
+      List<Long> deletedPhotos) {
     this.date = date;
     this.title = title;
     this.content = content;
     this.isPublic = isPublic;
+    this.deletedPhotos = deletedPhotos;
   }
+
 }
