@@ -176,29 +176,31 @@ class ExhibitionRepositoryTest {
   class FindMostLikeExhibitionsTest {
 
     @Test
-    @DisplayName("종료된 전시회 포함하여 인기 많은 전시회 조회 테스트")
-    void testFindMostLikeExhibitionIncludeEnd() {
-      Page<ExhibitionForSimpleQueryV1> exhibitionsPagingResult = exhibitionRepository.findMostLikeExhibitions(
-          true, PageRequest.of(0, 10));
-      ExhibitionForSimpleQueryV1 exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);
+    @DisplayName("로그인하지 않고 종료된 전시회 포함하여 인기 많은 전시회 조회 테스트")
+    void testFindMostLikeExhibitionIncludeEndWithoutAuthorization() {
+      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
+          .findMostLikeExhibitions(null, true, PageRequest.of(0, 10));
+      ExhibitionForSimpleQuery exhibitionAtGyeonggi = exhibitionsPagingResult.getContent().get(0);
 
       assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(3);
-      assertThat(exhibitionAtSeoul.getName()).isEqualTo("전시회 at 경기");
-      assertThat(exhibitionAtSeoul.getLikeCount()).isEqualTo(2);
-      assertThat(exhibitionAtSeoul.getReviewCount()).isEqualTo(0);
+      assertThat(exhibitionAtGyeonggi.getIsLiked()).isEqualTo(false);
+      assertThat(exhibitionAtGyeonggi.getName()).isEqualTo("전시회 at 경기");
+      assertThat(exhibitionAtGyeonggi.getLikeCount()).isEqualTo(2);
+      assertThat(exhibitionAtGyeonggi.getReviewCount()).isEqualTo(0);
     }
 
     @Test
-    @DisplayName("종료된 전시회 제외하고 인기 많은 전시회 조회 테스트")
-    void testFindMostLikeExhibitionExcludeEnd() {
-      Page<ExhibitionForSimpleQueryV1> exhibitionsPagingResult = exhibitionRepository.findMostLikeExhibitions(
-          false, PageRequest.of(0, 10));
-      ExhibitionForSimpleQueryV1 exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);
+    @DisplayName("로그인 하고 종료된 전시회 제외하고 인기 많은 전시회 조회 테스트")
+    void testFindMostLikeExhibitionExcludeEndWithAuthorization() {
+      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
+          .findMostLikeExhibitions(user1.getId(), false, PageRequest.of(0, 10));
+      ExhibitionForSimpleQuery exhibitionAtBusan = exhibitionsPagingResult.getContent().get(0);
 
       assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(2);
-      assertThat(exhibitionAtSeoul.getName()).isEqualTo("전시회 at 부산");
-      assertThat(exhibitionAtSeoul.getLikeCount()).isEqualTo(1);
-      assertThat(exhibitionAtSeoul.getReviewCount()).isEqualTo(1);
+      assertThat(exhibitionAtBusan.getName()).isEqualTo("전시회 at 부산");
+      assertThat(exhibitionAtBusan.getIsLiked()).isEqualTo(true);
+      assertThat(exhibitionAtBusan.getLikeCount()).isEqualTo(1);
+      assertThat(exhibitionAtBusan.getReviewCount()).isEqualTo(1);
     }
   }
 

@@ -32,12 +32,11 @@ public class ExhibitionService {
             exhibitionForSimpleQuery));
   }
 
-  public Page<ExhibitionInfo> getMostLikeExhibitions(boolean includeEnd, Pageable pageable) {
-//    Page<ExhibitionForSimpleQueryV1> exhibitionsPagingResult = exhibitionRepository.findMostLikeExhibitions(
-//        includeEnd, pageable);
-//    return exhibitionsPagingResult.map(ExhibitionInfo::new);
-
-    return null;
+  public Page<ExhibitionInfo> getMostLikeExhibitions(Long userId, boolean includeEnd,
+      Pageable pageable) {
+    Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
+        .findMostLikeExhibitions(userId, includeEnd, pageable);
+    return exhibitionsPagingResult.map(ExhibitionInfo::new);
   }
 
   // 차후 수정 필요!

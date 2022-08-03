@@ -64,22 +64,16 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
   }
 
   @Override
-  public Page<ExhibitionForSimpleQueryV1> findMostLikeExhibitions(boolean includeEnd,
+  public Page<ExhibitionForSimpleQuery> findMostLikeExhibitions(Long userId, boolean includeEnd,
       Pageable pageable) {
     BooleanBuilder mostLikeCondition = getMostLikeCondition(includeEnd);
     NumberPath<Long> likeCount = Expressions.numberPath(Long.class, "likeCount");
 
-    List<ExhibitionForSimpleQueryV1> exhibitions = queryFactory
-        .select(Projections.fields(ExhibitionForSimpleQueryV1.class,
-                exhibition.id,
-                exhibition.name,
-                exhibition.thumbnail,
-                exhibition.period,
-                exhibitionLike.exhibition.id.count().as("likeCount"),
-                review.exhibition.id.count().as("reviewCount")
-            )
-        )
+    List<ExhibitionForSimpleQuery> exhibitions = queryFactory
+        .select(getExhibitionForSimpleQueryExpression(userId))
         .from(exhibition)
+        .leftJoin(exhibitionLikeForIsLiked)
+        .on(exhibitionLikeForIsLiked.exhibition.eq(exhibition), exhibitionLikeUserIdEq(userId))
         .leftJoin(exhibitionLike)
         .on(exhibitionLike.exhibition.eq(exhibition))
         .leftJoin(review)

@@ -13,7 +13,8 @@ public interface ExhibitionCustomRepository {
 
   Page<ExhibitionForSimpleQuery> findUpcomingExhibitions(Long userId, Pageable pageable);
 
-  Page<ExhibitionForSimpleQueryV1> findMostLikeExhibitions(boolean includeEnd, Pageable pageable);
+  Page<ExhibitionForSimpleQuery> findMostLikeExhibitions(Long userId, boolean includeEnd,
+      Pageable pageable);
 
   Optional<ExhibitionDetailForSimpleQuery> findExhibition(Long exhibitionId);
 

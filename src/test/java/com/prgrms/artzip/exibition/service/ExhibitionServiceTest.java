@@ -19,7 +19,6 @@ import com.prgrms.artzip.exibition.domain.vo.Location;
 import com.prgrms.artzip.exibition.domain.vo.Period;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQuery;
-import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQueryV1;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import java.time.LocalDate;
@@ -83,26 +82,27 @@ class ExhibitionServiceTest {
   @DisplayName("인기 많은 전시회 조회 테스트")
   void testGetMostLikeExhibitions() {
     pageRequest = PageRequest.of(0, 1);
-    List<ExhibitionForSimpleQueryV1> exhibitions = new ArrayList<>();
-    exhibitions.add(ExhibitionForSimpleQueryV1.builder()
+    List<ExhibitionForSimpleQuery> exhibitions = new ArrayList<>();
+    exhibitions.add(ExhibitionForSimpleQuery.builder()
         .id(11L)
         .name("요리조리 MOKA Garden")
         .thumbnail("http://www.culture.go.kr/upload/rdf/22/07/show_2022071411402126915.png")
+        .isLiked(false)
         .period(new Period(LocalDate.now().plusDays(1), LocalDate.now().plusDays(10)))
         .likeCount(30)
         .reviewCount(15)
         .build());
-    Page<ExhibitionForSimpleQueryV1> exhibitionsPagingResult = new PageImpl(exhibitions);
+    Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = new PageImpl(exhibitions);
 
     // given
-    when(exhibitionRepository.findMostLikeExhibitions(true, pageRequest)).thenReturn(
-        exhibitionsPagingResult);
+    when(exhibitionRepository.findMostLikeExhibitions(null, true, pageRequest))
+        .thenReturn(exhibitionsPagingResult);
 
     // when
-    exhibitionService.getMostLikeExhibitions(true, pageRequest);
+    exhibitionService.getMostLikeExhibitions(null, true, pageRequest);
 
     // then
-    verify(exhibitionRepository).findMostLikeExhibitions(true, pageRequest);
+    verify(exhibitionRepository).findMostLikeExhibitions(null, true, pageRequest);
   }
 
   // 임시로 작성. 수정 필요!
