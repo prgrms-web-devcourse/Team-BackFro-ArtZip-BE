@@ -90,7 +90,7 @@ class ReviewLikeRepositoryTest {
     }
 
     @Test
-    @DisplayName("좋아요가 28개인 경우에 0을 반환")
+    @DisplayName("좋아요가 28개인 경우에 28을 반환")
     void testCountByReviewWithReviewLike() {
       int expectedLikeCount = 28;
       for (int i = 0; i < expectedLikeCount; i++) {
