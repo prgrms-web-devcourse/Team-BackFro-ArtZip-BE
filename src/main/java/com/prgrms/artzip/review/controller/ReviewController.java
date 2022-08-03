@@ -1,8 +1,12 @@
 package com.prgrms.artzip.review.controller;
 
 import com.prgrms.artzip.common.ApiResponse;
-import com.prgrms.artzip.review.dto.ReviewCreateRequest;
-import com.prgrms.artzip.review.dto.ReviewCreateResponse;
+import com.prgrms.artzip.exibition.service.ExhibitionSearchService;
+import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
+import com.prgrms.artzip.review.dto.response.ExhibitionsResponse;
+import com.prgrms.artzip.review.dto.response.ReviewCreateResponse;
+import com.prgrms.artzip.review.dto.response.ReviewLikeUpdateResponse;
+import com.prgrms.artzip.review.service.ReviewLikeService;
 import com.prgrms.artzip.review.service.ReviewService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -14,9 +18,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -79,9 +83,10 @@ public class ReviewController {
 
     return ResponseEntity.ok()
         .body(ApiResponse.builder()
-            .message("후기 좋아요 등록/해제 성공")  
+            .message("후기 좋아요 등록/해제 성공")
             .status(HttpStatus.OK.value())
             .data(response)
             .build()
         );
+  }
 }
