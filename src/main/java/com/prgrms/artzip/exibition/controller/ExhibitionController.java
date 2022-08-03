@@ -35,11 +35,11 @@ public class ExhibitionController {
   @ApiOperation(value = "다가오는 전시회 조회", notes = "다가오는 전시회를 조회합니다.")
   @GetMapping("/upcoming")
   public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfo>>> getUpcomingExhibitions(
-      @PageableDefault(page = 0, size = 10) Pageable pageable) {
+      @PageableDefault(page = 0, size = 8) Pageable pageable) {
     ApiResponse apiResponse = ApiResponse.builder()
         .message("다가오는 전시회 조회 성공")
         .status(HttpStatus.OK.value())
-        .data(new PageResponse(exhibitionService.getUpcomingExhibitions(pageable)))
+        .data(new PageResponse(exhibitionService.getUpcomingExhibitions(null, pageable)))
         .build();
 
     return ResponseEntity
@@ -51,11 +51,12 @@ public class ExhibitionController {
   @GetMapping("/mostlike")
   public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfo>>> getMostLikeExhibitions(
       @RequestParam(value = "include-end", required = false, defaultValue = "true") boolean includeEnd,
-      @PageableDefault(page = 0, size = 10) Pageable pageable) {
+      @PageableDefault(page = 0, size = 8) Pageable pageable) {
     ApiResponse apiResponse = ApiResponse.builder()
         .message("인기 많은 전시회 조회 성공")
         .status(HttpStatus.OK.value())
-        .data(new PageResponse(exhibitionService.getMostLikeExhibitions(includeEnd, pageable)))
+        .data(
+            new PageResponse(exhibitionService.getMostLikeExhibitions(null, includeEnd, pageable)))
         .build();
 
     return ResponseEntity
@@ -71,7 +72,7 @@ public class ExhibitionController {
     ApiResponse apiResponse = ApiResponse.builder()
         .message("전시회 조회 성공")
         .status(HttpStatus.OK.value())
-        .data(exhibitionService.getExhibition(exhibitionId, null))
+        .data(exhibitionService.getExhibition(null, exhibitionId))
         .build();
 
     return ResponseEntity
@@ -87,7 +88,7 @@ public class ExhibitionController {
     ApiResponse apiResponse = ApiResponse.builder()
         .message("전시회 좋아요 수정 성공")
         .status(HttpStatus.OK.value())
-        .data(exhibitionLikeService.updateExhibitionLike(exhibitionId, null))
+        .data(exhibitionLikeService.updateExhibitionLike(null, exhibitionId))
         .build();
 
     return ResponseEntity
@@ -100,13 +101,13 @@ public class ExhibitionController {
   public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfo>>> getExhibitionByQuery(
       String query,
       @RequestParam(value = "include-end", required = false, defaultValue = "true") boolean includeEnd,
-      @PageableDefault(page = 0, size = 10) Pageable pageable) {
+      @PageableDefault(page = 0, size = 8) Pageable pageable) {
 
     ApiResponse apiResponse = ApiResponse.builder()
         .message("전시회 검색 성공")
         .status(HttpStatus.OK.value())
         .data(new PageResponse(
-            exhibitionSearchService.getExhibitionsByQuery(query, includeEnd, pageable)))
+            exhibitionSearchService.getExhibitionsByQuery(null, query, includeEnd, pageable)))
         .build();
 
     return ResponseEntity

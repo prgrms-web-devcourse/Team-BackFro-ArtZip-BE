@@ -15,6 +15,7 @@ import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHB_THUMBNAIL;
 import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHB_URL;
 import static java.util.Objects.isNull;
 import static javax.persistence.EnumType.STRING;
+import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -35,7 +36,6 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -50,7 +50,7 @@ import lombok.NoArgsConstructor;
 public class Exhibition extends BaseEntity {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @GeneratedValue(strategy = IDENTITY)
   @Column(name = "exhibition_id")
   private Long id;
 

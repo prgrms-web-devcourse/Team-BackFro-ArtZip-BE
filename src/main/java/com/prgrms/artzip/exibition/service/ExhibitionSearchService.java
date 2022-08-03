@@ -21,13 +21,13 @@ public class ExhibitionSearchService {
 
   private final ExhibitionRepository exhibitionRepository;
 
-  public Page<ExhibitionInfo> getExhibitionsByQuery(String query, boolean includeEnd,
+  public Page<ExhibitionInfo> getExhibitionsByQuery(Long userId, String query, boolean includeEnd,
       Pageable pageable) {
     if (isNull(query) || query.isBlank() || query.length() < 2) {
       throw new InvalidRequestException(INVALID_EXHB_QUERY);
     }
 
-    return exhibitionRepository.findExhibitionsByQuery(query, includeEnd, pageable)
+    return exhibitionRepository.findExhibitionsByQuery(userId, query, includeEnd, pageable)
         .map(ExhibitionInfo::new);
   }
 

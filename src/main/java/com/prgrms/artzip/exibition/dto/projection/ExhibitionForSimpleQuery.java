@@ -10,6 +10,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class ExhibitionForSimpleQuery extends ExhibitionBasicForSimpleQuery {
 
+  private Boolean isLiked;
   private Period period;
   private long likeCount;
   private long reviewCount;
