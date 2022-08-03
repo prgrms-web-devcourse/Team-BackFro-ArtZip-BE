@@ -7,12 +7,14 @@ import com.prgrms.artzip.comment.service.CommentService;
 import com.prgrms.artzip.common.ApiResponse;
 import com.prgrms.artzip.common.PageResponse;
 import io.swagger.annotations.ApiOperation;
+import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,7 +30,7 @@ public class CommentController {
   private final CommentService commentService;
 
   @ApiOperation(value = "대댓글 다건 조회", notes = "부모 댓글의 자식 댓글들을 조회합니다.")
-  @GetMapping("/{commentId}")
+  @GetMapping("/{commentId}/children")
   public ResponseEntity<ApiResponse<PageResponse<CommentInfo>>> getChildren(
       @PathVariable Long commentId,
       @PageableDefault Pageable pageable
@@ -55,7 +57,7 @@ public class CommentController {
   }
 
   @ApiOperation(value = "댓글 삭제하기", notes = "댓글을 삭제합니다.")
-  @PatchMapping("/{commentId}")
+  @DeleteMapping("/{commentId}")
   public ResponseEntity<ApiResponse<CommentResponse>> deleteComment(
       @PathVariable Long commentId
   ) {

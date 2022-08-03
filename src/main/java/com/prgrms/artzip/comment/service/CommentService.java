@@ -77,6 +77,7 @@ public class CommentService {
     return new CommentResponse(comment, children);
   }
 
+  @Transactional(readOnly = true)
   public Page<CommentInfo> getChildren(Long commentId, Pageable pageable) {
     Comment parent = getComment(commentId);
     checkChild(parent);

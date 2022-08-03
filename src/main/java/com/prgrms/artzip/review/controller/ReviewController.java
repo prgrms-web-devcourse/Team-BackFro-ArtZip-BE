@@ -78,6 +78,8 @@ public class ReviewController {
         );
   }
 
+  //TODO 아래 두 API 테스트 작성
+
   @ApiOperation(value = "리뷰 댓글 다건 조회", notes = "리뷰의 댓글들을 조회합니다.")
   @GetMapping("/{reviewId}/comments")
   public ResponseEntity<ApiResponse<PageResponse<CommentResponse>>> getComment(
@@ -101,6 +103,8 @@ public class ReviewController {
     CommentResponse comment = commentService.createComment(request, reviewId, 0L);
     ApiResponse<CommentResponse> response
         = new ApiResponse<>("댓글 생성 성공", HttpStatus.OK.value(), comment);
-    return ResponseEntity.ok(response);
+    return ResponseEntity
+        .created(URI.create("/api/v1/comments/" + comment.getCommentId()))
+        .body(response);
   }
 }
