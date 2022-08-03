@@ -12,10 +12,12 @@ import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -33,16 +35,20 @@ class ExhibitionLikeRepositoryTest {
   private ExhibitionLikeRepository exhibitionLikeRepository;
 
   private Exhibition exhibition;
+  private ExhibitionLike exhibitionLikeOfUser1;
+  private ExhibitionLike exhibitionLikeOfUser2;
+  private User user1;
+  private User user2;
 
   @BeforeEach
   void setUp() {
     Role role = new Role(Authority.USER);
     em.persist(role);
 
-    User user1 = new User("test@example.com", "Emily", List.of(role));
+    user1 = new User("test@example.com", "Emily", List.of(role));
     em.persist(user1);
 
-    User user2 = new User("tes2t@example.com", "Jerry", List.of(role));
+    user2 = new User("tes2t@example.com", "Jerry", List.of(role));
     em.persist(user2);
 
     exhibition = Exhibition.builder()
@@ -65,25 +71,53 @@ class ExhibitionLikeRepositoryTest {
         .build();
     em.persist(exhibition);
 
-    em.persist(new ExhibitionLike(exhibition, user1));
-    em.persist(new ExhibitionLike(exhibition, user2));
+    exhibitionLikeOfUser1 = new ExhibitionLike(exhibition, user1);
+    em.persist(exhibitionLikeOfUser1);
+    exhibitionLikeOfUser2 = new ExhibitionLike(exhibition, user2);
+    em.persist(exhibitionLikeOfUser2);
 
     em.flush();
     em.clear();
   }
 
-  @Test
-  @DisplayName("전시회에 좋아요가 없는 경우 테스트")
-  void testExhibitionWithoutLike() {
-    Long countOfLike = exhibitionLikeRepository.countByExhibitionId(123L);
-    assertThat(countOfLike).isEqualTo(0);
+
+  @Nested
+  @DisplayName("countByExhibitionId() 테스트")
+  class CountByExhibitionIdTest {
+
+    @Test
+    @DisplayName("전시회에 좋아요가 없는 경우 테스트")
+    void testExhibitionWithoutLike() {
+      Long countOfLike = exhibitionLikeRepository.countByExhibitionId(123L);
+      assertThat(countOfLike).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("전시회 좋아요 개수 확인 테스트")
+    void testExhibitionLikeCount() {
+      Long countOfLike = exhibitionLikeRepository.countByExhibitionId(exhibition.getId());
+      assertThat(countOfLike).isEqualTo(2);
+    }
   }
 
-  @Test
-  @DisplayName("전시회 좋아요 개수 확인 테스트")
-  void testExhibitionLikeCount() {
-    Long countOfLike = exhibitionLikeRepository.countByExhibitionId(exhibition.getId());
-    assertThat(countOfLike).isEqualTo(2);
-  }
+  @Nested
+  @DisplayName("findByExhibitionIdAndUserId() 테스트")
+  class FindByExhibitionIdAndUserIdTest {
 
+    @Test
+    @DisplayName("좋아요가 존재하지 않는 경우 테스트")
+    void testLikeNotExist() {
+      Optional<ExhibitionLike> exhibitionLike = exhibitionLikeRepository.findByExhibitionIdAndUserId(
+          123L, 123L);
+      assertThat(exhibitionLike).isEmpty();
+    }
+
+    @Test
+    @DisplayName("좋아요가 존재하는 경우 테스트")
+    void testLikeExist() {
+      Optional<ExhibitionLike> exhibitionLike = exhibitionLikeRepository.findByExhibitionIdAndUserId(
+          exhibition.getId(), user1.getId());
+      assertThat(exhibitionLike).isNotEmpty();
+    }
+  }
 }
