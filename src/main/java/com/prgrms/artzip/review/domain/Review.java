@@ -125,4 +125,23 @@ public class Review extends BaseEntity {
     }
   }
 
+  public void updateContent(String content) {
+    validateContent(content);
+    this.content = content;
+  }
+
+  public void updateTitle(String title) {
+    validateTitle(title);
+    this.title = title;
+  }
+
+  public void updateDate(LocalDate date) {
+    validateDate(date);
+    this.date = date;
+  }
+
+  public void updateIsPublic(Boolean isPublic) {
+    validateIsPublic(isPublic);
+    this.isPublic = isPublic;
+  }
 }
