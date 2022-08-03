@@ -10,6 +10,7 @@ import com.prgrms.artzip.user.dto.request.UserRegisterRequest;
 import com.prgrms.artzip.user.dto.response.LoginResponse;
 import com.prgrms.artzip.user.dto.response.RegisterResponse;
 import com.prgrms.artzip.user.service.UserService;
+import io.swagger.annotations.Api;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -21,6 +22,7 @@ import java.net.URI;
 
 import static org.springframework.http.HttpStatus.*;
 
+@Api(tags = {"users"})
 @RestController
 @RequestMapping("api/v1/users")
 @SuppressWarnings({"rawtypes", "unchecked"})

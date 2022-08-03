@@ -7,6 +7,7 @@ import com.prgrms.artzip.review.service.ReviewService;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.dto.response.UserResponse;
 import com.prgrms.artzip.user.service.UserService;
+import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static org.springframework.http.HttpStatus.*;
 
+@Api(tags = {"users-me"})
 @RestController
 @RequestMapping("api/v1/users/me")
 @SuppressWarnings({"rawtypes", "unchecked"})
@@ -39,6 +41,7 @@ public class MyController {
                 .userId(user.getId())
                 .nickname(user.getNickname())
                 .profileImage(user.getProfileImage())
+                .email(user.getEmail())
                 .reviewCount(reviewService.getReviewCountByUserId(user.getId()))
                 .commentCount(commentService.getCommentCountByUserId(user.getId())).build();
         ApiResponse apiResponse = ApiResponse.builder()
