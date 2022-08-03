@@ -27,6 +27,7 @@ public class ReviewUpdateRequest {
   @NotNull
   private Boolean isPublic;
 
+  @NotNull
   private List<Long> deletedPhotos;
 
   @Builder
