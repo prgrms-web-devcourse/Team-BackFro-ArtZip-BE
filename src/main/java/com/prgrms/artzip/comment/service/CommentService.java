@@ -51,9 +51,7 @@ public class CommentService {
     Comment parent = null;
     if (Objects.nonNull(request.parentId())) {
       parent = getComment(request.parentId());
-      if (Objects.nonNull(parent.getParent())) {
-        throw new InvalidRequestException(ErrorCode.CHILD_CANT_BE_PARENT);
-      }
+      checkChild(parent);
     }
     Comment comment = commentRepository.save(Comment.builder()
         .content(request.content())
@@ -79,10 +77,17 @@ public class CommentService {
     return new CommentResponse(comment, children);
   }
 
-  public List<CommentInfo> getChildren(Long commentId) {
-    Comment comment = getComment(commentId);
-    List<Comment> children = commentRepository.getCommentsOfParents(List.of(commentId));
+  public List<CommentInfo> getChildren(Long commentId, Pageable pageable) {
+    Comment parent = getComment(commentId);
+    checkChild(parent);
+    Page<Comment> children = commentRepository.getCommentsOfParent(commentId, pageable);
     return children.stream().map(CommentInfo::new).toList();
+  }
+
+  private void checkChild(Comment parent) {
+    if (Objects.nonNull(parent.getParent())) {
+      throw new InvalidRequestException(ErrorCode.CHILD_CANT_BE_PARENT);
+    }
   }
 
   private Review getReview(Long reviewId) {

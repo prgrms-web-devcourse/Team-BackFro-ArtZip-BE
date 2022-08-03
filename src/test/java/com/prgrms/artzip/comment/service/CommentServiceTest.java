@@ -15,9 +15,9 @@ import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
-import com.prgrms.artzip.exibition.domain.Area;
 import com.prgrms.artzip.exibition.domain.Exhibition;
-import com.prgrms.artzip.exibition.domain.Genre;
+import com.prgrms.artzip.exibition.domain.enumType.Area;
+import com.prgrms.artzip.exibition.domain.enumType.Genre;
 import com.prgrms.artzip.review.domain.Review;
 import com.prgrms.artzip.review.domain.repository.ReviewRepository;
 import com.prgrms.artzip.user.domain.LocalUser;
@@ -35,6 +35,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -103,7 +104,6 @@ class CommentServiceTest {
             .content("안녕")
             .build()
     );
-
     Pageable pageable = PageRequest.of(0, 10);
     doReturn(new PageImpl(parents)).when(commentRepository)
         .getCommentsByReviewId(review.getId(), pageable);
@@ -128,23 +128,25 @@ class CommentServiceTest {
         .review(review)
         .content("안녕")
         .build();
-    List<Comment> children = new ArrayList<>();
+    List<Comment> childContent = new ArrayList<>();
     for (int i = 0; i < 9; i++) {
-      children.add(Comment.builder()
+      childContent.add(Comment.builder()
           .user(user)
           .review(review)
           .content("안녕")
           .build());
     }
+    Page<Comment> children = new PageImpl<>(childContent);
+    Pageable pageable = PageRequest.of(0, 10);
     doReturn(Optional.of(parent)).when(commentRepository).findById(0L);
-    doReturn(children).when(commentRepository).getCommentsOfParents(List.of(0L));
+    doReturn(children).when(commentRepository).getCommentsOfParent(0L, pageable);
 
     //when
-    List<CommentInfo> response = commentService.getChildren(0L);
+    List<CommentInfo> response = commentService.getChildren(0L, pageable);
 
     //then
     verify(commentRepository).findById(0L);
-    verify(commentRepository).getCommentsOfParents(List.of(0L));
+    verify(commentRepository).getCommentsOfParent(0L, pageable);
     assertThat(response).hasSize(9);
   }
 
