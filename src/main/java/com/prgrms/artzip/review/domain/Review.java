@@ -6,6 +6,8 @@ import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.exibition.domain.Exhibition;
 import com.prgrms.artzip.user.domain.User;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,6 +17,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -51,6 +54,9 @@ public class Review extends BaseEntity {
 
   @Column(name = "is_public", nullable = false)
   private Boolean isPublic;
+
+  @OneToMany(mappedBy = "review")
+  private List<ReviewLike> reviewLikes = new ArrayList<>();
 
   @Builder
   public Review(User user, Exhibition exhibition, String content, String title,

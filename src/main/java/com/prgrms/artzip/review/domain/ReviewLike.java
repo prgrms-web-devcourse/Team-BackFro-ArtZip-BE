@@ -66,4 +66,13 @@ public class ReviewLike extends BaseEntity {
     }
   }
 
+  public void setReview(Review review) {
+    validateReview(review);
+    if(Objects.nonNull(this.review)) {
+      this.review.getReviewLikes().remove(this);
+    }
+
+    this.review = review;
+    review.getReviewLikes().add(this);
+  }
 }
