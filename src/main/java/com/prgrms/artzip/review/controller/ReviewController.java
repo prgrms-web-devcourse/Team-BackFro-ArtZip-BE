@@ -3,6 +3,7 @@ package com.prgrms.artzip.review.controller;
 import com.prgrms.artzip.common.ApiResponse;
 import com.prgrms.artzip.exibition.service.ExhibitionSearchService;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
+import com.prgrms.artzip.review.dto.request.ReviewUpdateRequest;
 import com.prgrms.artzip.review.dto.response.ExhibitionsResponse;
 import com.prgrms.artzip.review.dto.response.ReviewIdResponse;
 import com.prgrms.artzip.review.service.ReviewService;
@@ -17,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -67,5 +70,22 @@ public class ReviewController {
             .data(response)
             .build()
         );
+  }
+
+  @PatchMapping(value = "/{reviewId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<ApiResponse> updateReview(
+      @RequestParam(value = "userId") Long userId,
+      @PathVariable(value = "reviewId") Long reviewId,
+      @RequestPart(value = "data") ReviewUpdateRequest request,
+      @RequestPart(required = false) List<MultipartFile> files) {
+
+    ReviewIdResponse response = reviewService.updateReview(userId, reviewId, request, files);
+
+    return ResponseEntity.ok()
+        .body(ApiResponse.builder()
+            .message("후기 수정 성공")
+            .status(HttpStatus.OK.value())
+            .data(response)
+            .build());
   }
 }
