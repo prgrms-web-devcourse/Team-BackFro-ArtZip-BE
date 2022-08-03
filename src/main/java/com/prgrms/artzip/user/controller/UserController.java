@@ -51,8 +51,8 @@ public class UserController {
             .message("로그인 성공하였습니다.")
             .status(OK.value())
             .data(LoginResponse.builder()
-                    .userId(principal.userId)
-                    .accessToken(principal.accessToken)
+                    .userId(principal.getUser().getId())
+                    .accessToken(principal.getAccessToken())
                     .refreshToken(refreshToken)
                     .build())
             .build();

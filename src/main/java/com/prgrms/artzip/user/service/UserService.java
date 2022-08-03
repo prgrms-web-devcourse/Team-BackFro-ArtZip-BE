@@ -44,8 +44,10 @@ public class UserService {
 
     @Transactional
     public User register(UserRegisterRequest request) {
-        if(userRepository.existsByEmailAndIsQuit(request.getEmail(), false)) throw new AlreadyExistsException(USER_ALREADY_EXISTS);
-        if(userRepository.existsByNicknameAndIsQuit(request.getNickname(), false)) throw new AlreadyExistsException(USER_ALREADY_EXISTS);
+        if (userRepository.existsByEmailAndIsQuit(request.getEmail(), false))
+            throw new AlreadyExistsException(USER_ALREADY_EXISTS);
+        if (userRepository.existsByNicknameAndIsQuit(request.getNickname(), false))
+            throw new AlreadyExistsException(USER_ALREADY_EXISTS);
 
         Role userRole = roleRepository.findByAuthority(Authority.USER).orElseThrow(() -> new NotFoundException(ROLE_NOT_FOUND));
         User newUser = LocalUser.builder()
@@ -55,11 +57,6 @@ public class UserService {
                 .roles(List.of(userRole))
                 .build();
         return userRepository.save(newUser);
-    }
-
-    @Transactional(readOnly = true)
-    public User getUserById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
 
 }

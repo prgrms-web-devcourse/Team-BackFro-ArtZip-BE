@@ -5,22 +5,21 @@ import com.prgrms.artzip.common.jwt.JwtAuthenticationFilter;
 import com.prgrms.artzip.common.jwt.JwtAuthenticationProvider;
 import com.prgrms.artzip.common.util.JwtService;
 import com.prgrms.artzip.user.service.UserService;
+import com.prgrms.artzip.user.service.UserUtilService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.context.SecurityContextHolderFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
 @Configuration
@@ -65,11 +64,11 @@ public class WebSecurityConfig {
         this.jwtConfig = jwtConfig;
     }
 
-    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtService jwtService) {
-        return new JwtAuthenticationFilter(jwtConfig.getAccessToken().getHeader(), jwtService);
+    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtService jwtService, UserUtilService userUtilService) {
+        return new JwtAuthenticationFilter(jwtConfig.getAccessToken().getHeader(), jwtService, userUtilService);
     }
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, JwtService jwtService) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtService jwtService, UserUtilService userUtilService) throws Exception {
         http
                 .cors()
                 .and()
@@ -79,7 +78,7 @@ public class WebSecurityConfig {
                 .authorizeRequests()
                 .antMatchers("/**").permitAll()
                 .and()
-                .addFilterAfter(jwtAuthenticationFilter(jwtService), SecurityContextHolderFilter.class);
+                .addFilterAfter(jwtAuthenticationFilter(jwtService, userUtilService), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }
