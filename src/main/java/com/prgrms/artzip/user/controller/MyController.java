@@ -3,6 +3,9 @@ package com.prgrms.artzip.user.controller;
 import com.prgrms.artzip.comment.service.CommentService;
 import com.prgrms.artzip.common.ApiResponse;
 import com.prgrms.artzip.common.entity.CurrentUser;
+import com.prgrms.artzip.exibition.service.ExhibitionLikeService;
+import com.prgrms.artzip.exibition.service.ExhibitionService;
+import com.prgrms.artzip.review.service.ReviewLikeService;
 import com.prgrms.artzip.review.service.ReviewService;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.dto.response.UserResponse;
@@ -29,10 +32,19 @@ public class MyController {
 
     private final CommentService commentService;
 
-    public MyController(UserService userService, ReviewService reviewService, CommentService commentService) {
+    private final ExhibitionService exhibitionService;
+
+    private final ExhibitionLikeService exhibitionLikeService;
+
+    private final ReviewLikeService reviewLikeService;
+
+    public MyController(UserService userService, ReviewService reviewService, CommentService commentService, ExhibitionService exhibitionService, ExhibitionLikeService exhibitionLikeService, ReviewLikeService reviewLikeService) {
         this.userService = userService;
         this.reviewService = reviewService;
         this.commentService = commentService;
+        this.exhibitionService = exhibitionService;
+        this.exhibitionLikeService = exhibitionLikeService;
+        this.reviewLikeService = reviewLikeService;
     }
 
     @GetMapping("/info")
@@ -43,6 +55,8 @@ public class MyController {
                 .profileImage(user.getProfileImage())
                 .email(user.getEmail())
                 .reviewCount(reviewService.getReviewCountByUserId(user.getId()))
+                .exhibitionLikeCount(exhibitionLikeService.getExhibitionLikeCountByUserId(user.getId()))
+                .reviewLikeCount(reviewLikeService.getReviewLikeCountByUserId(user.getId()))
                 .commentCount(commentService.getCommentCountByUserId(user.getId())).build();
         ApiResponse apiResponse = ApiResponse.builder()
                 .message("유저 정보 조회 성공하였습니다.")

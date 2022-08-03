@@ -13,6 +13,7 @@ import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.RoleRepository;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
 import com.prgrms.artzip.user.dto.request.UserRegisterRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,18 +21,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 
     private final RoleRepository roleRepository;
-
-    public UserService(PasswordEncoder passwordEncoder, UserRepository userRepository, RoleRepository roleRepository) {
-        this.passwordEncoder = passwordEncoder;
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-    }
 
     @Transactional(readOnly = true)
     public User login(String principal, String credentials){

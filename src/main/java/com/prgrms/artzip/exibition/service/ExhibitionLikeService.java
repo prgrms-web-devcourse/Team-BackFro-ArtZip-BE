@@ -42,4 +42,9 @@ public class ExhibitionLikeService {
         .isLiked(!isLiked)
         .build();
   }
+
+  @Transactional(readOnly = true)
+  public Long getExhibitionLikeCountByUserId(Long userId) {
+    return exhibitionLikeRepository.countByUserId(userId);
+  }
 }

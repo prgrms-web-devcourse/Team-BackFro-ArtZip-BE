@@ -7,5 +7,5 @@ import org.springframework.data.repository.query.Param;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT COUNT(r) from Review r WHERE r.user.id = :userId")
-    Long countByUser(@Param("userId") Long userId);
+    Long countByUserId(@Param("userId") Long userId);
 }

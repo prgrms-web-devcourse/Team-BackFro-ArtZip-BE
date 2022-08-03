@@ -12,6 +12,7 @@ public class UserResponse {
     private final String nickname;
     private final String email;
     private final Long reviewCount;
-    private final Long likeCount;
+    private final Long reviewLikeCount;
+    private final Long exhibitionLikeCount;
     private final Long commentCount;
 }
