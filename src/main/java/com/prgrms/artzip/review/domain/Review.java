@@ -55,6 +55,9 @@ public class Review extends BaseEntity {
   @Column(name = "is_public", nullable = false)
   private Boolean isPublic;
 
+  @OneToMany(mappedBy = "review")
+  private List<ReviewPhoto> reviewPhotos = new ArrayList<>();
+
   @Builder
   public Review(User user, Exhibition exhibition, String content, String title,
       LocalDate date, Boolean isPublic) {
