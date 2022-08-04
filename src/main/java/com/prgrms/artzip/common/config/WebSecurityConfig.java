@@ -118,6 +118,7 @@ public class WebSecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/swagger*/**").permitAll()
+                .antMatchers("/api/v1/comments/**/children", "/api/v1/reviews/**/comments").permitAll()
                 .antMatchers("/api/v1/users/me/**").hasAnyAuthority(USER.name(), ADMIN.name())
                 .antMatchers("/api/v1/comments/**", "/api/v1/reviews/**/comments/new").hasAnyAuthority(USER.name(), ADMIN.name())
                 .anyRequest().permitAll()
