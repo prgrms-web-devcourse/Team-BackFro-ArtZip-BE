@@ -48,7 +48,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
               .map(role -> new SimpleGrantedAuthority(role.getAuthority().name())).collect(Collectors.toList());
       String accessToken = jwtService.createAccessToken(user.getId(), user.getEmail(), authorities);
       String refreshToken = jwtService.createRefreshToken(user.getEmail());
-      JwtAuthenticationToken authenticated = new JwtAuthenticationToken(new JwtPrincipal(accessToken, user.getEmail(), user.getId()), null, authorities);
+      JwtAuthenticationToken authenticated = new JwtAuthenticationToken(new JwtPrincipal(accessToken, user), null, authorities);
       authenticated.setDetails(refreshToken);
       return authenticated;
     } catch (IllegalArgumentException e) {

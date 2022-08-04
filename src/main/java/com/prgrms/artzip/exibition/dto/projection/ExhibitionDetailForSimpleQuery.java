@@ -21,5 +21,6 @@ public class ExhibitionDetailForSimpleQuery extends ExhibitionBasicForSimpleQuer
   private String fee;
   private String url;
   private String placeUrl;
+  private Boolean isLiked;
   private long likeCount;
 }

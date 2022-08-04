@@ -4,14 +4,11 @@ import static com.prgrms.artzip.common.ErrorCode.EXHB_NOT_FOUND;
 import static org.springframework.util.StringUtils.hasText;
 
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
-import com.prgrms.artzip.exibition.domain.ExhibitionLikeId;
-import com.prgrms.artzip.exibition.domain.repository.ExhibitionLikeRepository;
 import com.prgrms.artzip.exibition.domain.repository.ExhibitionRepository;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.response.ExhibitionDetailInfo;
 import com.prgrms.artzip.exibition.dto.response.ExhibitionInfo;
-import com.prgrms.artzip.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,31 +19,24 @@ import org.springframework.stereotype.Service;
 public class ExhibitionService {
 
   private final ExhibitionRepository exhibitionRepository;
-  private final ExhibitionLikeRepository exhibitionLikeRepository;
 
-  public Page<ExhibitionInfo> getUpcomingExhibitions(Pageable pageable) {
-    Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findUpcomingExhibitions(
-        pageable);
-
+  public Page<ExhibitionInfo> getUpcomingExhibitions(Long userId, Pageable pageable) {
+    Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
+        .findUpcomingExhibitions(userId, pageable);
     return exhibitionsPagingResult.map(ExhibitionInfo::new);
   }
 
-  public Page<ExhibitionInfo> getMostLikeExhibitions(boolean includeEnd, Pageable pageable) {
-    Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findMostLikeExhibitions(
-        includeEnd, pageable);
+  public Page<ExhibitionInfo> getMostLikeExhibitions(Long userId, boolean includeEnd,
+      Pageable pageable) {
+    Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
+        .findMostLikeExhibitions(userId, includeEnd, pageable);
     return exhibitionsPagingResult.map(ExhibitionInfo::new);
   }
 
-  // 차후 수정 필요!
-  public ExhibitionDetailInfo getExhibition(Long exhibitionId, User user) {
-    ExhibitionDetailForSimpleQuery exhibition = exhibitionRepository.findExhibition(exhibitionId)
+  public ExhibitionDetailInfo getExhibition(Long userId, Long exhibitionId) {
+    ExhibitionDetailForSimpleQuery exhibition = exhibitionRepository
+        .findExhibition(userId, exhibitionId)
         .orElseThrow(() -> new InvalidRequestException(EXHB_NOT_FOUND));
-
-    boolean isLiked = false;
-    if (user != null) {
-      isLiked = exhibitionLikeRepository.findById(new ExhibitionLikeId(exhibitionId, user.getId()))
-          .isPresent();
-    }
 
     // getReviews()
 
@@ -66,7 +56,7 @@ public class ExhibitionService {
         .placeAddress(exhibition.getLocation().getAddress())
         .lat(exhibition.getLocation().getLatitude())
         .lng(exhibition.getLocation().getLongitude())
-        .isLiked(isLiked)
+        .isLiked(exhibition.getIsLiked())
         .build();
   }
 }

@@ -10,14 +10,15 @@ import org.springframework.data.domain.Pageable;
 
 public interface ExhibitionCustomRepository {
 
-  Page<ExhibitionForSimpleQuery> findUpcomingExhibitions(Pageable pageable);
+  Page<ExhibitionForSimpleQuery> findUpcomingExhibitions(Long userId, Pageable pageable);
 
-  Page<ExhibitionForSimpleQuery> findMostLikeExhibitions(boolean includeEnd, Pageable pageable);
-
-  Optional<ExhibitionDetailForSimpleQuery> findExhibition(Long exhibitionId);
-
-  Page<ExhibitionForSimpleQuery> findExhibitionsByQuery(String query, boolean includeEnd,
+  Page<ExhibitionForSimpleQuery> findMostLikeExhibitions(Long userId, boolean includeEnd,
       Pageable pageable);
+
+  Optional<ExhibitionDetailForSimpleQuery> findExhibition(Long userId, Long exhibitionId);
+
+  Page<ExhibitionForSimpleQuery> findExhibitionsByQuery(Long userId, String query,
+      boolean includeEnd, Pageable pageable);
 
   List<ExhibitionBasicForSimpleQuery> findExhibitionsForReview(String query);
 }

@@ -16,7 +16,6 @@ import com.prgrms.artzip.user.domain.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -84,6 +83,11 @@ public class CommentService {
     checkChild(parent);
     Page<Comment> children = commentRepository.getCommentsOfParent(commentId, pageable);
     return children.map(CommentInfo::new);
+  }
+
+  @Transactional(readOnly = true)
+  public Long getCommentCountByUserId(Long userId) {
+    return commentRepository.countByUserId(userId);
   }
 
   private void checkChild(Comment parent) {

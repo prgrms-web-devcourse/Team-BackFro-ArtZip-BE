@@ -300,4 +300,18 @@ class CommentServiceTest {
     assertThat(response).hasAllNullFieldsOrPropertiesExcept("createdAt", "isDeleted", "commentId",
         "children", "childrenCount");
   }
+
+  @Test
+  @DisplayName("유저가 작성한 댓글 개수 반환 테스트")
+  void testGetCommentCountByUserId() {
+    // given
+    when(commentRepository.countByUserId(1L)).thenReturn(3L);
+
+    // when
+    Long commentCount = commentService.getCommentCountByUserId(1L);
+
+    // then
+    assertThat(commentCount).isEqualTo(3L);
+    verify(commentRepository).countByUserId(1L);
+  }
 }

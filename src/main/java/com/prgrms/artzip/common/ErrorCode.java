@@ -35,6 +35,7 @@ public enum ErrorCode {
   ACCESS_TOKEN_REQUIRED(400, "U007", "access token은 필수입니다."),
   EMAIL_REQUIRED(400, "U008", "이메일은 필수입니다."),
   ROLE_NOT_FOUND(400, "U009", "역할이 존재하지 않습니다."),
+  USER_PARAM_REQUIRED(400, "U010", "유저가 누락되었습니다."),
   /**
    * Exhibition Domain
    */

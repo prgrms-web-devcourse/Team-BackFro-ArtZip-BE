@@ -1,4 +1,4 @@
-package com.prgrms.artzip.user.dto.request.response;
+package com.prgrms.artzip.user.dto.response;
 
 import lombok.Getter;
 
