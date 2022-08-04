@@ -502,6 +502,85 @@ class ReviewServiceTest {
 
     }
 
+    @Nested
+    @DisplayName("실패")
+    class Failure {
+
+      @Test
+      @DisplayName("존재하지 않는 user인 경우 NotFoundException 발생")
+      void invokeUserNotFoundExceptionTest() {
+        // given
+        ReviewUpdateRequest request = ReviewUpdateRequest.builder()
+            .date(LocalDate.of(2022, 4, 22))
+            .title("수정된 리뷰 제목입니다.")
+            .content("수정된 리뷰 내용입니다.")
+            .isPublic(false)
+            .deletedPhotos(Collections.emptyList())
+            .build();
+
+        doThrow(new NotFoundException(ErrorCode.USER_NOT_FOUND))
+            .when(userRepository).findById(any());
+
+        // when
+        // then
+        assertThatThrownBy(() -> {
+          reviewService.updateReview(user.getId(), review.getId(), request, null);
+        }).isInstanceOf(NotFoundException.class)
+            .hasMessageContaining(ErrorCode.USER_NOT_FOUND.getMessage());
+      }
+
+      @Test
+      @DisplayName("존재하지 않는 review인 경우 NotFoundException 발생")
+      void invokeReviewNotFoundExceptionTest() {
+        // given
+        ReviewUpdateRequest request = ReviewUpdateRequest.builder()
+            .date(LocalDate.of(2022, 4, 22))
+            .title("수정된 리뷰 제목입니다.")
+            .content("수정된 리뷰 내용입니다.")
+            .isPublic(false)
+            .deletedPhotos(Collections.emptyList())
+            .build();
+
+        doReturn(Optional.of(user)).when(userRepository).findById(user.getId());
+        doThrow(new NotFoundException(ErrorCode.REVIEW_NOT_FOUND))
+            .when(reviewRepository).findById(any());
+
+        // when
+        // then
+        assertThatThrownBy(() -> {
+          reviewService.updateReview(user.getId(), review.getId(), request, null);
+        }).isInstanceOf(NotFoundException.class)
+            .hasMessageContaining(ErrorCode.REVIEW_NOT_FOUND.getMessage());
+      }
+
+      @Test
+      @DisplayName("존재하지 않는 reviewPhoto를 삭제하려는 경우 NotFoundException 발생")
+      void invokeReviewPhotoNotFoundExceptionTest() {
+        // given
+        ReviewUpdateRequest request = ReviewUpdateRequest.builder()
+            .date(LocalDate.of(2022, 4, 22))
+            .title("수정된 리뷰 제목입니다.")
+            .content("수정된 리뷰 내용입니다.")
+            .isPublic(false)
+            .deletedPhotos(
+                reviewPhotosToDelete.stream().map(ReviewPhoto::getId).collect(Collectors.toList()))
+            .build();
+
+        doReturn(Optional.of(user)).when(userRepository).findById(user.getId());
+        doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
+        doThrow(new NotFoundException(ErrorCode.REVIEW_PHOTO_NOT_FOUND))
+            .when(reviewPhotoRepository).findById(any());
+
+        // when
+        // then
+        assertThatThrownBy(() -> {
+          reviewService.updateReview(user.getId(), review.getId(), request, null);
+        }).isInstanceOf(NotFoundException.class)
+            .hasMessageContaining(ErrorCode.REVIEW_PHOTO_NOT_FOUND.getMessage());
+      }
+
+    }
+
   }
 
 }
