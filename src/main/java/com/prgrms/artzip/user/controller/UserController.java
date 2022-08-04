@@ -61,7 +61,7 @@ public class UserController {
     return ResponseEntity.ok(response);
   }
 
-  @PostMapping("/sign-up")
+  @PostMapping("/signup")
   public ResponseEntity<ApiResponse<SignUpResponse>> signUp(@RequestBody @Valid
                                                             UserSignUpRequest request) {
     User newUser = userService.signUp(request);
@@ -70,6 +70,6 @@ public class UserController {
             .status(CREATED.value())
             .data(SignUpResponse.from(newUser))
             .build();
-    return ResponseEntity.created(URI.create("/register")).body(response);
+    return ResponseEntity.created(URI.create("/signup")).body(response);
   }
 }
