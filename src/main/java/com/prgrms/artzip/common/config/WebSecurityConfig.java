@@ -77,6 +77,8 @@ public class WebSecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/**").permitAll()
+                .antMatchers("/api/v1/comments/**", "/api/v1/reviews/**/comments/new").hasAnyAuthority("USER")
+                .antMatchers("/api/v1/comments/children", "/api/v1/reviews/**/comments").permitAll()
                 .and()
                 .addFilterAfter(jwtAuthenticationFilter(jwtService, userUtilService), UsernamePasswordAuthenticationFilter.class);
         return http.build();

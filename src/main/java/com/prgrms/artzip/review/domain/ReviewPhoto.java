@@ -36,27 +36,33 @@ public class ReviewPhoto extends BaseEntity {
   private String path;
 
   public ReviewPhoto(Review review, String path) {
-    validateFields(review, path);
-    this.review = review;
+    validatePath(path);
+    setReview(review);
     this.path = path;
   }
 
-  private void validateFields(Review review, String path) {
-    validateNotNull(review, path);
-    validatePath(path);
-  }
-
-  private void validateNotNull(Review review, String path) {
+  private void validateReview(Review review) {
     if (Objects.isNull(review)) {
-      throw new InvalidRequestException(ErrorCode.REVIEW_PHOTO_FIELD_CONTAINS_NULL_VALUE);
-    } else if (Objects.isNull(path)) {
       throw new InvalidRequestException(ErrorCode.REVIEW_PHOTO_FIELD_CONTAINS_NULL_VALUE);
     }
   }
 
   private void validatePath(String path) {
+    if (Objects.isNull(path)) {
+      throw new InvalidRequestException(ErrorCode.REVIEW_PHOTO_FIELD_CONTAINS_NULL_VALUE);
+    }
     if (path.isBlank() || path.length() > 2083) {
       throw new InvalidRequestException(ErrorCode.INVALID_REVIEW_PHOTO_PATH_LENGTH);
     }
+  }
+
+  public void setReview(Review review) {
+    validateReview(review);
+    if(Objects.nonNull(this.review)) {
+      this.review.getReviewPhotos().remove(this);
+    }
+
+    this.review = review;
+    review.getReviewPhotos().add(this);
   }
 }
