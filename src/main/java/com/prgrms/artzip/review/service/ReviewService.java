@@ -13,18 +13,14 @@ import com.prgrms.artzip.review.domain.ReviewPhoto;
 import com.prgrms.artzip.review.domain.repository.ReviewPhotoRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewRepository;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
-import com.prgrms.artzip.review.dto.response.ReviewCreateResponse;
-import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
 import com.prgrms.artzip.review.dto.request.ReviewUpdateRequest;
 import com.prgrms.artzip.review.dto.response.ReviewIdResponse;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,8 +30,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class ReviewService {
 
-    private static final String REVIEW_DIRECTORY_NAME = "review/";
-    private static final int REVIEW_PHOTO_COUNT = 9;
+  private static final String REVIEW_DIRECTORY_NAME = "review/";
+  private static final int REVIEW_PHOTO_COUNT = 9;
 
   private final ReviewRepository reviewRepository;
   private final ReviewPhotoRepository reviewPhotoRepository;
@@ -54,21 +50,18 @@ public class ReviewService {
     validateFileCount(files);
     validateFileExtensions(files);
 
-        Review review = Review.builder()
-                .user(user)
-                .exhibition(exhibition)
-                .content(request.getContent())
-                .title(request.getTitle())
-                .date(request.getDate())
-                .isPublic(request.getIsPublic())
-                .build();
-        Review savedReview = reviewRepository.save(review);
+    Review review = Review.builder()
+        .user(user)
+        .exhibition(exhibition)
+        .content(request.getContent())
+        .title(request.getTitle())
+        .date(request.getDate())
+        .isPublic(request.getIsPublic())
+        .build();
+    Review savedReview = reviewRepository.save(review);
 
-        if (files != null) {
-            createReviewPhoto(savedReview, files);
-        }
-
-        return new ReviewCreateResponse(savedReview.getId());
+    if (files != null) {
+      createReviewPhoto(savedReview, files);
     }
 
     return new ReviewIdResponse(savedReview.getId());
@@ -141,9 +134,11 @@ public class ReviewService {
       throw new InvalidRequestException(ErrorCode.INVALID_FILE_EXTENSION);
     }
 
-    @Transactional(readOnly = true)
-    public Long getReviewCountByUserId(Long userId) {
-        return reviewRepository.countByUserId(userId);
+  }
+
+  private void validateFileCount(List<MultipartFile> files) {
+    if (files != null && files.size() > REVIEW_PHOTO_COUNT) {
+      throw new InvalidRequestException(ErrorCode.INVALID_REVIEW_PHOTO_COUNT);
     }
   }
 
@@ -175,5 +170,10 @@ public class ReviewService {
         throw new InvalidRequestException(ErrorCode.REVIEW_PHOTO_NOT_FOUND);
       }
     });
+  }
+
+  @Transactional(readOnly = true)
+  public Long getReviewCountByUserId(Long userId) {
+    return reviewRepository.countByUserId(userId);
   }
 }
