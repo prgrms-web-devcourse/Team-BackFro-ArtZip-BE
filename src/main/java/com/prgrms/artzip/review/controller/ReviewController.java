@@ -12,6 +12,10 @@ import com.prgrms.artzip.review.dto.response.ExhibitionsResponse;
 import com.prgrms.artzip.review.dto.response.ReviewCreateResponse;
 import com.prgrms.artzip.review.dto.response.ReviewLikeUpdateResponse;
 import com.prgrms.artzip.review.service.ReviewLikeService;
+import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
+import com.prgrms.artzip.review.dto.request.ReviewUpdateRequest;
+import com.prgrms.artzip.review.dto.response.ExhibitionsResponse;
+import com.prgrms.artzip.review.dto.response.ReviewIdResponse;
 import com.prgrms.artzip.review.service.ReviewService;
 import com.prgrms.artzip.user.domain.User;
 import io.swagger.annotations.ApiOperation;
@@ -56,7 +60,7 @@ public class ReviewController {
       @RequestPart(value = "data") ReviewCreateRequest request,
       @RequestPart(required = false) List<MultipartFile> files) {
 
-    ReviewCreateResponse response = reviewService.createReview(userId, request, files);
+    ReviewIdResponse response = reviewService.createReview(userId, request, files);
 
     return ResponseEntity.created(URI.create("/api/v1/reviews/" + response.getReviewId()))
         .body(new ApiResponse(
@@ -131,5 +135,23 @@ public class ReviewController {
     return ResponseEntity
         .created(URI.create("/api/v1/comments/" + comment.getCommentId()))
         .body(response);
+  }
+
+  @ApiOperation(value = "후기 수정", notes = "후기 수정을 요청합니다.")
+  @PatchMapping(value = "/{reviewId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<ApiResponse> updateReview(
+      @RequestParam(value = "userId") Long userId,
+      @PathVariable(value = "reviewId") Long reviewId,
+      @RequestPart(value = "data") ReviewUpdateRequest request,
+      @RequestPart(required = false) List<MultipartFile> files) {
+
+    ReviewIdResponse response = reviewService.updateReview(userId, reviewId, request, files);
+
+    return ResponseEntity.ok()
+        .body(ApiResponse.builder()
+            .message("후기 수정 성공")
+            .status(HttpStatus.OK.value())
+            .data(response)
+            .build());
   }
 }

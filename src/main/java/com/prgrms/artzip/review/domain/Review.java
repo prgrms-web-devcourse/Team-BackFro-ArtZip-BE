@@ -58,6 +58,9 @@ public class Review extends BaseEntity {
   @OneToMany(mappedBy = "review")
   private List<ReviewLike> reviewLikes = new ArrayList<>();
 
+  @OneToMany(mappedBy = "review")
+  private List<ReviewPhoto> reviewPhotos = new ArrayList<>();
+
   @Builder
   public Review(User user, Exhibition exhibition, String content, String title,
       LocalDate date, Boolean isPublic) {
@@ -72,44 +75,76 @@ public class Review extends BaseEntity {
 
   private void validateFields(User user, Exhibition exhibition, String content, String title,
       LocalDate date, Boolean isPublic) {
-    validateNotNull(user, exhibition, content, title, date, isPublic);
+    validateUser(user);
+    validateExhibition(exhibition);
     validateContent(content);
     validateTitle(title);
     validateDate(date);
+    validateIsPublic(isPublic);
   }
 
-  private void validateNotNull(User user, Exhibition exhibition, String content, String title,
-      LocalDate date, Boolean isPublic) {
+  private void validateUser(User user) {
     if (Objects.isNull(user)) {
       throw new InvalidRequestException(ErrorCode.REVIEW_FIELD_CONTAINS_NULL_VALUE);
-    } else if (Objects.isNull(exhibition)) {
-      throw new InvalidRequestException(ErrorCode.REVIEW_FIELD_CONTAINS_NULL_VALUE);
-    } else if (Objects.isNull(content)) {
-      throw new InvalidRequestException(ErrorCode.REVIEW_FIELD_CONTAINS_NULL_VALUE);
-    } else if (Objects.isNull(title)) {
-      throw new InvalidRequestException(ErrorCode.REVIEW_FIELD_CONTAINS_NULL_VALUE);
-    } else if (Objects.isNull(date)) {
-      throw new InvalidRequestException(ErrorCode.REVIEW_FIELD_CONTAINS_NULL_VALUE);
-    } else if (Objects.isNull(isPublic)) {
+    }
+  }
+
+  private void validateExhibition(Exhibition exhibition) {
+    if (Objects.isNull(exhibition)) {
       throw new InvalidRequestException(ErrorCode.REVIEW_FIELD_CONTAINS_NULL_VALUE);
     }
   }
 
   private void validateContent(String content) {
+    if (Objects.isNull(content)) {
+      throw new InvalidRequestException(ErrorCode.REVIEW_FIELD_CONTAINS_NULL_VALUE);
+    }
     if (content.isBlank() || content.length() > 1000) {
       throw new InvalidRequestException(ErrorCode.INVALID_REVIEW_CONTENT_LENGTH);
     }
   }
 
   private void validateTitle(String title) {
+    if (Objects.isNull(title)) {
+      throw new InvalidRequestException(ErrorCode.REVIEW_FIELD_CONTAINS_NULL_VALUE);
+    }
     if (title.isBlank() || title.length() > 50) {
       throw new InvalidRequestException(ErrorCode.INVALID_REVIEW_TITLE_LENGTH);
     }
   }
 
   private void validateDate(LocalDate date) {
+    if (Objects.isNull(date)) {
+      throw new InvalidRequestException(ErrorCode.REVIEW_FIELD_CONTAINS_NULL_VALUE);
+    }
     if (date.compareTo(LocalDate.now()) > 0) {
       throw new InvalidRequestException(ErrorCode.INVALID_REVIEW_DATE);
     }
+  }
+
+  private void validateIsPublic(Boolean isPublic) {
+    if (Objects.isNull(isPublic)) {
+      throw new InvalidRequestException(ErrorCode.REVIEW_FIELD_CONTAINS_NULL_VALUE);
+    }
+  }
+
+  public void updateContent(String content) {
+    validateContent(content);
+    this.content = content;
+  }
+
+  public void updateTitle(String title) {
+    validateTitle(title);
+    this.title = title;
+  }
+
+  public void updateDate(LocalDate date) {
+    validateDate(date);
+    this.date = date;
+  }
+
+  public void updateIsPublic(Boolean isPublic) {
+    validateIsPublic(isPublic);
+    this.isPublic = isPublic;
   }
 }
