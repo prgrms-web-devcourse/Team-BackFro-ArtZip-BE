@@ -134,6 +134,7 @@ public class ReviewController {
         .body(response);
   }
 
+  @ApiOperation(value = "후기 수정", notes = "후기 수정을 요청합니다.")
   @PatchMapping(value = "/{reviewId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<ApiResponse> updateReview(
       @RequestParam(value = "userId") Long userId,
