@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.prgrms.artzip.comment.domain.Comment;
 import com.prgrms.artzip.comment.dto.request.CommentCreateRequest;
@@ -52,6 +53,9 @@ class CommentServiceTest {
 
   @Mock
   private ReviewRepository reviewRepository;
+
+  @Mock
+  private CommentUtilService commentUtilService;
 
   @InjectMocks
   private CommentService commentService;
@@ -138,14 +142,14 @@ class CommentServiceTest {
     }
     Page<Comment> children = new PageImpl<>(childContent);
     Pageable pageable = PageRequest.of(0, 10);
-    doReturn(Optional.of(parent)).when(commentRepository).findById(0L);
+    doReturn(parent).when(commentUtilService).getComment(0L);
     doReturn(children).when(commentRepository).getCommentsOfParent(0L, pageable);
 
     //when
     Page<CommentInfo> response = commentService.getChildren(0L, pageable);
 
     //then
-    verify(commentRepository).findById(0L);
+    verify(commentUtilService).getComment(0L);
     verify(commentRepository).getCommentsOfParent(0L, pageable);
     assertThat(response.getContent()).hasSize(9);
   }
@@ -213,7 +217,8 @@ class CommentServiceTest {
     //given
     doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
     doReturn(Optional.of(user)).when(userRepository).findById(user.getId());
-    doReturn(Optional.empty()).when(commentRepository).findById(9999L);
+    when(commentUtilService.getComment(9999L))
+        .thenThrow(new NotFoundException(ErrorCode.COMMENT_NOT_FOUND));
 
     //when //then
     assertThatThrownBy(() -> commentService.createComment(
@@ -241,7 +246,7 @@ class CommentServiceTest {
         .build();
     doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
     doReturn(Optional.of(user)).when(userRepository).findById(user.getId());
-    doReturn(Optional.of(child)).when(commentRepository).findById(0L);
+    doReturn(child).when(commentUtilService).getComment(0L);
 
     //when //then
     assertThatThrownBy(() -> commentService.createComment(
@@ -261,14 +266,14 @@ class CommentServiceTest {
         .review(review)
         .content("안녕")
         .build();
-    doReturn(Optional.of(comment)).when(commentRepository).findById(0L);
+    doReturn(comment).when(commentUtilService).getComment(0L);
     doReturn(new ArrayList<>()).when(commentRepository).getCommentsOfParents(List.of(0L));
 
     //when
     CommentResponse response = commentService.updateComment(new CommentUpdateRequest("반가워"), 0L);
 
     //then
-    verify(commentRepository).findById(0L);
+    verify(commentUtilService).getComment(0L);
     verify(commentRepository).getCommentsOfParents(List.of(0L));
     assertThat(response).hasFieldOrPropertyWithValue("content", "반가워");
   }
@@ -282,14 +287,14 @@ class CommentServiceTest {
         .review(review)
         .content("안녕")
         .build();
-    doReturn(Optional.of(comment)).when(commentRepository).findById(0L);
+    doReturn(comment).when(commentUtilService).getComment(0L);
     doReturn(new ArrayList<>()).when(commentRepository).getCommentsOfParents(List.of(0L));
 
     //when
     CommentResponse response = commentService.deleteComment(0L);
 
     //then
-    verify(commentRepository).findById(0L);
+    verify(commentUtilService).getComment(0L);
     verify(commentRepository).getCommentsOfParents(List.of(0L));
     assertThat(response).hasFieldOrPropertyWithValue("isDeleted", true);
     assertThat(response).hasAllNullFieldsOrPropertiesExcept("createdAt", "isDeleted", "commentId",

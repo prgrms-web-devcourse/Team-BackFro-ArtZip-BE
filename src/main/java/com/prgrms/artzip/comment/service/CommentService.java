@@ -30,6 +30,7 @@ public class CommentService {
   private final CommentRepository commentRepository;
   private final ReviewRepository reviewRepository;
   private final UserRepository userRepository;
+  private final CommentUtilService commentUtilService;
 
   @Transactional(readOnly = true)
   public Page<CommentResponse> getCommentsByReviewId(Long reviewId, Pageable pageable) {
@@ -50,7 +51,7 @@ public class CommentService {
     User user = getUser(userId);
     Comment parent = null;
     if (Objects.nonNull(request.parentId())) {
-      parent = getComment(request.parentId());
+      parent = commentUtilService.getComment(request.parentId());
       checkChild(parent);
     }
     Comment comment = commentRepository.save(Comment.builder()
@@ -64,14 +65,14 @@ public class CommentService {
   }
 
   public CommentResponse updateComment(CommentUpdateRequest request, Long commentId) {
-    Comment comment = getComment(commentId);
+    Comment comment = commentUtilService.getComment(commentId);
     comment.setContent(request.content());
     List<Comment> children = commentRepository.getCommentsOfParents(List.of(commentId));
     return new CommentResponse(comment, children);
   }
 
   public CommentResponse deleteComment(Long commentId) {
-    Comment comment = getComment(commentId);
+    Comment comment = commentUtilService.getComment(commentId);
     comment.softDelete();
     List<Comment> children = commentRepository.getCommentsOfParents(List.of(commentId));
     return new CommentResponse(comment, children);
@@ -79,7 +80,7 @@ public class CommentService {
 
   @Transactional(readOnly = true)
   public Page<CommentInfo> getChildren(Long commentId, Pageable pageable) {
-    Comment parent = getComment(commentId);
+    Comment parent = commentUtilService.getComment(commentId);
     checkChild(parent);
     Page<Comment> children = commentRepository.getCommentsOfParent(commentId, pageable);
     return children.map(CommentInfo::new);
@@ -99,10 +100,5 @@ public class CommentService {
   private User getUser(Long userId) {
     return userRepository.findById(userId).
         orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
-  }
-
-  private Comment getComment(Long commentId) {
-    return commentRepository.findById(commentId)
-        .orElseThrow(() -> new NotFoundException(ErrorCode.COMMENT_NOT_FOUND));
   }
 }
