@@ -1,5 +1,6 @@
 package com.prgrms.artzip.review.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -12,6 +13,7 @@ import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
+import com.prgrms.artzip.common.util.AmazonS3Remover;
 import com.prgrms.artzip.common.util.AmazonS3Uploader;
 import com.prgrms.artzip.exibition.domain.Exhibition;
 import com.prgrms.artzip.exibition.domain.enumType.Area;
@@ -22,13 +24,17 @@ import com.prgrms.artzip.review.domain.ReviewPhoto;
 import com.prgrms.artzip.review.domain.repository.ReviewPhotoRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewRepository;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
+import com.prgrms.artzip.review.dto.request.ReviewUpdateRequest;
+import com.prgrms.artzip.review.dto.response.ReviewIdResponse;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -61,6 +67,9 @@ class ReviewServiceTest {
   @Mock
   AmazonS3Uploader amazonS3Uploader;
 
+  @Mock
+  AmazonS3Remover amazonS3Remover;
+
   private User user = new User("test@example.com", "Emily", List.of(new Role(Authority.USER)));
   private Exhibition exhibition = Exhibition.builder()
       .seq(32)
@@ -88,18 +97,18 @@ class ReviewServiceTest {
       .date(LocalDate.now())
       .isPublic(true)
       .build();
-  
-  ReviewCreateRequest request = ReviewCreateRequest.builder()
-      .exhibitionId(1L)
-      .date(LocalDate.of(2022, 4, 11))
-      .title("리뷰 제목입니다.")
-      .content("리뷰 내용입니다.")
-      .isPublic(true)
-      .build();
 
   @Nested
   @DisplayName("리뷰 생성")
   class ReviewCreationTest {
+
+    ReviewCreateRequest request = ReviewCreateRequest.builder()
+        .exhibitionId(1L)
+        .date(LocalDate.of(2022, 4, 11))
+        .title("리뷰 제목입니다.")
+        .content("리뷰 내용입니다.")
+        .isPublic(true)
+        .build();
 
     List<MultipartFile> files = List.of(
         new MockMultipartFile(
@@ -295,6 +304,204 @@ class ReviewServiceTest {
             .isInstanceOf(InvalidRequestException.class);
       }
     }
+  }
+
+  @Nested
+  @DisplayName("후기 수정")
+  class ReviewUpdateTest {
+
+    List<MultipartFile> filesToAdd = List.of(
+        new MockMultipartFile(
+            "test1",
+            "test1.png",
+            MediaType.MULTIPART_FORM_DATA_VALUE,
+            "test1".getBytes()),
+        new MockMultipartFile(
+            "test2",
+            "test2.jpeg",
+            MediaType.MULTIPART_FORM_DATA_VALUE,
+            "test2".getBytes()),
+        new MockMultipartFile(
+            "test3",
+            "test3.png",
+            MediaType.MULTIPART_FORM_DATA_VALUE,
+            "test3".getBytes())
+    );
+
+    List<ReviewPhoto> reviewPhotosBeforeUpdate = List.of(
+        new ReviewPhoto(review, "https://s3-review-photo.png"),
+        new ReviewPhoto(review, "https://s3-review-photo.jpeg"),
+        new ReviewPhoto(review, "https://s3-review-photo.png"),
+        new ReviewPhoto(review, "https://s3-review-photo.png")
+    );
+
+    List<ReviewPhoto> reviewPhotosToDelete = reviewPhotosBeforeUpdate.subList(0, 2);
+
+    @Nested
+    @DisplayName("성공")
+    class Success {
+
+      @Test
+      @DisplayName("후기 사진 변경(삭제, 추가)이 없이 날짜, 제목, 내용, 공개 여부만 수정하는 경우 후기 수정이 정상적으로 작동")
+      void testReviewUpdateWithoutPhotoChanges() {
+
+        ReviewUpdateRequest request = ReviewUpdateRequest.builder()
+            .date(LocalDate.of(2022, 4, 22))
+            .title("수정된 리뷰 제목입니다.")
+            .content("수정된 리뷰 내용입니다.")
+            .isPublic(false)
+            .deletedPhotos(Collections.emptyList())
+            .build();
+
+        doReturn(Optional.of(user)).when(userRepository).findById(user.getId());
+        doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
+
+        ReviewIdResponse response = reviewService.updateReview(user.getId(),
+            review.getId(), request, null);
+
+        assertThat(response.getReviewId()).isEqualTo(review.getId());
+        Optional<Review> maybeReview = reviewRepository.findById(response.getReviewId());
+        assertThat(maybeReview.isPresent()).isTrue();
+        assertThat(maybeReview.get().getContent()).isEqualTo(request.getContent());
+        assertThat(maybeReview.get().getDate()).isEqualTo(request.getDate());
+        assertThat(maybeReview.get().getTitle()).isEqualTo(request.getTitle());
+        assertThat(maybeReview.get().getIsPublic()).isEqualTo(request.getIsPublic());
+      }
+
+      @Test
+      @DisplayName("후기 사진 삭제와 날짜, 제목, 내용, 공개 여부 수정하는 경우 후기 수정이 정상적으로 작동")
+      void testReviewUpdateWithPhotoDeletion() {
+        // given
+        ReviewUpdateRequest request = ReviewUpdateRequest.builder()
+            .date(LocalDate.of(2022, 4, 22))
+            .title("수정된 리뷰 제목입니다.")
+            .content("수정된 리뷰 내용입니다.")
+            .isPublic(false)
+            .deletedPhotos(
+                reviewPhotosToDelete.stream().map(ReviewPhoto::getId).collect(Collectors.toList()))
+            .build();
+
+        doReturn(Optional.of(user)).when(userRepository).findById(user.getId());
+        doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
+        doReturn(Optional.of(reviewPhotosToDelete.get(0)), Optional.of(reviewPhotosToDelete.get(1)))
+            .when(reviewPhotoRepository).findById(any());
+
+        // when
+        ReviewIdResponse response = reviewService.updateReview(user.getId(),
+            review.getId(), request, null);
+
+        // then
+        verify(amazonS3Remover, times(2)).removeFile(any(), any());
+        verify(reviewPhotoRepository, times(2)).delete(any());
+
+        assertThat(response.getReviewId()).isEqualTo(review.getId());
+        Optional<Review> maybeReview = reviewRepository.findById(response.getReviewId());
+        assertThat(maybeReview.isPresent()).isTrue();
+        assertThat(maybeReview.get().getContent()).isEqualTo(request.getContent());
+        assertThat(maybeReview.get().getDate()).isEqualTo(request.getDate());
+        assertThat(maybeReview.get().getTitle()).isEqualTo(request.getTitle());
+        assertThat(maybeReview.get().getIsPublic()).isEqualTo(request.getIsPublic());
+      }
+
+      @Test
+      @DisplayName("후기 사진 추가와 날짜, 제목, 내용, 공개 여부 수정하는 경우 후기 수정이 정상적으로 작동")
+      void testReviewUpdateWithPhotoAddition() throws IOException {
+        // given
+        ReviewUpdateRequest request = ReviewUpdateRequest.builder()
+            .date(LocalDate.of(2022, 4, 22))
+            .title("수정된 리뷰 제목입니다.")
+            .content("수정된 리뷰 내용입니다.")
+            .isPublic(false)
+            .deletedPhotos(Collections.emptyList())
+            .build();
+
+        ReviewPhoto reviewPhotoToAdd1 = mock(ReviewPhoto.class);
+        ReviewPhoto reviewPhotoToAdd2 = mock(ReviewPhoto.class);
+        ReviewPhoto reviewPhotoToAdd3 = mock(ReviewPhoto.class);
+
+        String url1 = "https://www.example1.com";
+        String url2 = "https://www.example2.com";
+        String url3 = "https://www.example3.com";
+
+        doReturn(Optional.of(user)).when(userRepository).findById(user.getId());
+        doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
+
+        doReturn(url1, url2, url3)
+            .when(amazonS3Uploader).upload(any(), any());
+        doReturn(reviewPhotoToAdd1, reviewPhotoToAdd2, reviewPhotoToAdd3)
+            .when(reviewPhotoRepository).save(any());
+
+        // when
+        ReviewIdResponse response = reviewService.updateReview(user.getId(), review.getId(),
+            request, filesToAdd);
+
+        // then
+        verify(amazonS3Uploader, times(3)).upload(any(), any());
+        verify(reviewPhotoRepository, times(3)).save(any());
+
+        assertThat(response.getReviewId()).isEqualTo(review.getId());
+        Optional<Review> maybeReview = reviewRepository.findById(response.getReviewId());
+        assertThat(maybeReview.isPresent()).isTrue();
+        assertThat(maybeReview.get().getContent()).isEqualTo(request.getContent());
+        assertThat(maybeReview.get().getDate()).isEqualTo(request.getDate());
+        assertThat(maybeReview.get().getTitle()).isEqualTo(request.getTitle());
+        assertThat(maybeReview.get().getIsPublic()).isEqualTo(request.getIsPublic());
+      }
+
+      @Test
+      @DisplayName("후기 사진 삭제/추가와 날짜, 제목, 내용, 공개 여부 수정하는 경우 후기 수정이 정상적으로 작동")
+      void testReviewUpdateWithPhotoChanges() throws IOException {
+
+        ReviewUpdateRequest request = ReviewUpdateRequest.builder()
+            .date(LocalDate.of(2022, 4, 22))
+            .title("수정된 리뷰 제목입니다.")
+            .content("수정된 리뷰 내용입니다.")
+            .isPublic(false)
+            .deletedPhotos(
+                reviewPhotosToDelete.stream().map(ReviewPhoto::getId).collect(Collectors.toList()))
+            .build();
+
+        ReviewPhoto reviewPhotoToAdd1 = mock(ReviewPhoto.class);
+        ReviewPhoto reviewPhotoToAdd2 = mock(ReviewPhoto.class);
+        ReviewPhoto reviewPhotoToAdd3 = mock(ReviewPhoto.class);
+
+        String url1 = "https://www.example1.com";
+        String url2 = "https://www.example2.com";
+        String url3 = "https://www.example3.com";
+
+        doReturn(Optional.of(user)).when(userRepository).findById(user.getId());
+        doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
+
+        doReturn(Optional.of(reviewPhotosToDelete.get(0)), Optional.of(reviewPhotosToDelete.get(1)))
+            .when(reviewPhotoRepository).findById(any());
+
+        doReturn(url1, url2, url3)
+            .when(amazonS3Uploader).upload(any(), any());
+        doReturn(reviewPhotoToAdd1, reviewPhotoToAdd2, reviewPhotoToAdd3)
+            .when(reviewPhotoRepository).save(any());
+
+        // when
+        ReviewIdResponse response = reviewService.updateReview(user.getId(),
+            review.getId(), request, filesToAdd);
+
+        // then
+        verify(amazonS3Remover, times(2)).removeFile(any(), any());
+        verify(reviewPhotoRepository, times(2)).delete(any());
+
+        verify(amazonS3Uploader, times(3)).upload(any(), any());
+        verify(reviewPhotoRepository, times(3)).save(any());
+
+        assertThat(response.getReviewId()).isEqualTo(review.getId());
+        Optional<Review> maybeReview = reviewRepository.findById(response.getReviewId());
+        assertThat(maybeReview.isPresent()).isTrue();
+        assertThat(maybeReview.get().getContent()).isEqualTo(request.getContent());
+        assertThat(maybeReview.get().getDate()).isEqualTo(request.getDate());
+        assertThat(maybeReview.get().getTitle()).isEqualTo(request.getTitle());
+        assertThat(maybeReview.get().getIsPublic()).isEqualTo(request.getIsPublic());
+      }
+
+    }
+
   }
 
 }
