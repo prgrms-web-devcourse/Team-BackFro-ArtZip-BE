@@ -2,9 +2,7 @@ package com.prgrms.artzip.common.config;
 
 import static com.prgrms.artzip.common.Authority.*;
 
-import com.fasterxml.jackson.core.json.JsonWriteFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.ErrorResponse;
 import com.prgrms.artzip.common.filter.ExceptionHandlerFilter;
