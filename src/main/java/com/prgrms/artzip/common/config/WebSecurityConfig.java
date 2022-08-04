@@ -24,63 +24,74 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @Configuration
 public class WebSecurityConfig {
-    private final Logger log = LoggerFactory.getLogger(getClass());
-    private final JwtConfig jwtConfig;
 
-    @Bean
-    @Qualifier("accessJwt")
-    public Jwt accessJwt() {
-        return new Jwt(
-                jwtConfig.getIssuer(),
-                jwtConfig.getClientSecret(),
-                jwtConfig.getAccessToken().getExpirySeconds());
-    }
+  private final Logger log = LoggerFactory.getLogger(getClass());
+  private final JwtConfig jwtConfig;
 
-    @Bean
-    @Qualifier("refreshJwt")
-    public Jwt refreshJwt() {
-        return new Jwt(
-                jwtConfig.getIssuer(),
-                jwtConfig.getClientSecret(),
-                jwtConfig.getRefreshToken().getExpirySeconds());
-    }
+  @Bean
+  @Qualifier("accessJwt")
+  public Jwt accessJwt() {
+    return new Jwt(
+        jwtConfig.getIssuer(),
+        jwtConfig.getClientSecret(),
+        jwtConfig.getAccessToken().getExpirySeconds());
+  }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+  @Bean
+  @Qualifier("refreshJwt")
+  public Jwt refreshJwt() {
+    return new Jwt(
+        jwtConfig.getIssuer(),
+        jwtConfig.getClientSecret(),
+        jwtConfig.getRefreshToken().getExpirySeconds());
+  }
 
-    @Bean
-    public JwtAuthenticationProvider jwtAuthenticationProvider(JwtService jwtService, UserService userService) {
-        return new JwtAuthenticationProvider(jwtService, userService);
-    }
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
+  @Bean
+  public JwtAuthenticationProvider jwtAuthenticationProvider(JwtService jwtService,
+      UserService userService) {
+    return new JwtAuthenticationProvider(jwtService, userService);
+  }
 
-    public WebSecurityConfig(JwtConfig jwtConfig) {
-        this.jwtConfig = jwtConfig;
-    }
+  @Bean
+  public AuthenticationManager authenticationManager(
+      AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    return authenticationConfiguration.getAuthenticationManager();
+  }
 
-    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtService jwtService, UserUtilService userUtilService) {
-        return new JwtAuthenticationFilter(jwtConfig.getAccessToken().getHeader(), jwtService, userUtilService);
-    }
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, JwtService jwtService, UserUtilService userUtilService) throws Exception {
-        http
-                .cors()
-                .and()
-                .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeRequests()
-                .antMatchers("/**").permitAll()
-                .antMatchers("/api/v1/comments/**", "/api/v1/reviews/**/comments/new").hasAnyAuthority("USER")
-                .antMatchers("/api/v1/comments/children", "/api/v1/reviews/**/comments").permitAll()
-                .and()
-                .addFilterAfter(jwtAuthenticationFilter(jwtService, userUtilService), UsernamePasswordAuthenticationFilter.class);
-        return http.build();
-    }
+  public WebSecurityConfig(JwtConfig jwtConfig) {
+    this.jwtConfig = jwtConfig;
+  }
+
+  public JwtAuthenticationFilter jwtAuthenticationFilter(JwtService jwtService,
+      UserUtilService userUtilService) {
+    return new JwtAuthenticationFilter(jwtConfig.getAccessToken().getHeader(), jwtService,
+        userUtilService);
+  }
+
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http, JwtService jwtService,
+      UserUtilService userUtilService) throws Exception {
+    http
+        .cors()
+        .and()
+        .csrf().disable()
+        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        .and()
+        .authorizeRequests()
+        .antMatchers("/api/v1/comments/**/children", "/api/v1/reviews/**/comments").permitAll()
+        .antMatchers(
+            "/api/v1/comments/**",
+            "/api/v1/reviews/**/comments/new",
+            "/api/v1/exhibitions/**/likes")
+        .hasAnyAuthority("USER")
+        .and()
+        .addFilterAfter(jwtAuthenticationFilter(jwtService, userUtilService),
+            UsernamePasswordAuthenticationFilter.class);
+    return http.build();
+  }
 }
