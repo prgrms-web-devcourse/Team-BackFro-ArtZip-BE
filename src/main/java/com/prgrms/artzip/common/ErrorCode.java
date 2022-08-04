@@ -78,7 +78,7 @@ public enum ErrorCode {
   REVIEW_PHOTO_FIELD_CONTAINS_NULL_VALUE(400, "R006", "리뷰 사진 필드에 NULL값이 포함되어 있습니다."),
   INVALID_REVIEW_PHOTO_PATH_LENGTH(400, "R007", "path는 1글자 이상 2083자 이하이어야 합니다."),
   INVALID_REVIEW_PHOTO_COUNT(400, "R008", "리뷰 사진은 최대 9개입니다."),
-  REVIEW_NOT_FOUND(400, "R009", "리뷰가 존재하지 않습니다.")
+  REVIEW_NOT_FOUND(400, "R009", "존재하지 않는 리뷰입니다.")
   ;
 
 

@@ -50,10 +50,29 @@ public class ReviewLike extends BaseEntity {
   }
 
   private void validateFields(Review review, User user) {
+    validateReview(review);
+    validateUser(user);
+  }
+
+  private void validateReview(Review review) {
     if (Objects.isNull(review)) {
       throw new InvalidRequestException(ErrorCode.REVIEW_LIKE_FIELD_CONTAINS_NULL_VALUE);
-    } else if (Objects.isNull(user)) {
+    }
+  }
+
+  private void validateUser(User user) {
+    if (Objects.isNull(user)) {
       throw new InvalidRequestException(ErrorCode.REVIEW_LIKE_FIELD_CONTAINS_NULL_VALUE);
     }
+  }
+
+  public void setReview(Review review) {
+    validateReview(review);
+    if(Objects.nonNull(this.review)) {
+      this.review.getReviewLikes().remove(this);
+    }
+
+    this.review = review;
+    review.getReviewLikes().add(this);
   }
 }
