@@ -45,7 +45,7 @@ public class ReviewLike extends BaseEntity {
   public ReviewLike(Review review, User user) {
     validateFields(review, user);
     this.reviewLikeId = new ReviewLikeId(review.getId(), user.getId());
-    this.review = review;
+    setReview(review);
     this.user = user;
   }
 
