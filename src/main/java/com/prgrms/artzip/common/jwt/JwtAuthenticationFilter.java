@@ -3,12 +3,19 @@ package com.prgrms.artzip.common.jwt;
 import static java.util.Objects.*;
 import static org.springframework.util.StringUtils.*;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.prgrms.artzip.common.ErrorCode;
+import com.prgrms.artzip.common.ErrorResponse;
 import com.prgrms.artzip.common.jwt.claims.AccessClaim;
 import com.prgrms.artzip.common.util.JwtService;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.service.UserUtilService;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,6 +27,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -27,6 +35,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private final Logger log = LoggerFactory.getLogger(getClass());
@@ -37,21 +46,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private final UserUtilService userUtilService;
 
-  public JwtAuthenticationFilter(String accessHeaderKey,
-                                 JwtService jwtService, UserUtilService userUtilService) {
-    this.accessHeaderKey = accessHeaderKey;
-    this.jwtService = jwtService;
-    this.userUtilService = userUtilService;
-  }
+  private final ObjectMapper objectMapper;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain chain) throws ServletException, IOException {
     if (SecurityContextHolder.getContext().getAuthentication() == null) {
       String token = getAccessToken(request);
-      log.info("filter enter");
       if (nonNull(token)) {
-        log.info("token is not null : {}", token);
         try {
           AccessClaim claims = jwtService.verifyAccessToken(token);
           Long userId = claims.getUserId();
@@ -62,8 +64,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
           }
+        } catch (TokenExpiredException e) {
+          log.warn("토큰이 만료된 요청입니다. token: {}", token);
+          throw e;
         } catch (Exception e) {
-          log.warn("Jwt 처리 실패: {}", e.getMessage());
+          log.warn("Jwt 처리 실패: {}, class: {}", e.getMessage(), e.getClass());
+          throw e;
         }
       }
     } else {

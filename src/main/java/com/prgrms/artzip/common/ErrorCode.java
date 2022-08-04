@@ -25,6 +25,8 @@ public enum ErrorCode {
 
   ACCESS_DENIED(403, "C010", "요청 권한이 없습니다."),
 
+  UNAUTHENTICATED_USER(401, "C011", "인증되지 않은 사용자입니다."),
+
   /**
    * User Domain
    */

@@ -49,7 +49,6 @@ public class MyController {
     }
 
     @GetMapping("/info")
-    @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<ApiResponse<UserResponse>> getUserInfo (@CurrentUser User user) {
         UserResponse userResponse = UserResponse.builder()
                 .userId(user.getId())
