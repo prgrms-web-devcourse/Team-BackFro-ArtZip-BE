@@ -56,6 +56,9 @@ public class Review extends BaseEntity {
   private Boolean isPublic;
 
   @OneToMany(mappedBy = "review")
+  private List<ReviewLike> reviewLikes = new ArrayList<>();
+
+  @OneToMany(mappedBy = "review")
   private List<ReviewPhoto> reviewPhotos = new ArrayList<>();
 
   @Builder
