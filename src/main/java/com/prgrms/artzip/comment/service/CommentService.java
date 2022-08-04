@@ -103,7 +103,7 @@ public class CommentService {
   }
 
   private void checkOwner(Comment comment, User user) {
-    if (comment.getUser() != user) {
+    if (!Objects.equals(comment.getUser().getId(), user.getId())) {
       throw new AuthErrorException(ErrorCode.RESOURCE_PERMISSION_DENIED);
     }
   }
