@@ -171,6 +171,40 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
         .fetch();
   }
 
+  @Override
+  public Page<ExhibitionForSimpleQuery> findUserLikeExhibitions(Long userId,
+      Long exhibitionLikeUserId, Pageable pageable) {
+    // userId : 로그인 유저
+    // exhibitionLikeUserId : 조회 대상
+    QExhibitionLike exhibitionLikeForExhibitionLikeUser = new QExhibitionLike(
+        "exhibitionLikeForExhibitionLikeUser");
+
+    List<ExhibitionForSimpleQuery> exhibitions = queryFactory
+        .select(getExhibitionForSimpleQueryExpression(userId))
+        .from(exhibition)
+        .leftJoin(exhibitionLikeForIsLiked)
+        .on(exhibitionLikeForIsLiked.exhibition.eq(exhibition), exhibitionLikeUserIdEq(userId))
+        .join(exhibition.exhibitionLikes, exhibitionLikeForExhibitionLikeUser)
+        .leftJoin(exhibitionLike)
+        .on(exhibitionLike.exhibition.eq(exhibition))
+        .leftJoin(review)
+        .on(review.exhibition.eq(exhibition))
+        .where(exhibitionLikeForExhibitionLikeUser.user.id.eq(exhibitionLikeUserId))
+        .offset(pageable.getOffset())
+        .limit(pageable.getPageSize())
+        .groupBy(exhibition.id, exhibitionLikeForExhibitionLikeUser.createdAt)
+        .orderBy(exhibitionLikeForExhibitionLikeUser.createdAt.desc())
+        .fetch();
+
+    JPAQuery<Long> countQuery = queryFactory
+        .select(exhibition.count())
+        .from(exhibition)
+        .join(exhibition.exhibitionLikes, exhibitionLikeForExhibitionLikeUser)
+        .where(exhibitionLikeForExhibitionLikeUser.user.id.eq(exhibitionLikeUserId));
+
+    return PageableExecutionUtils.getPage(exhibitions, pageable, countQuery::fetchOne);
+  }
+
   private BooleanBuilder getMostLikeCondition(boolean includeEnd) {
     BooleanBuilder mostLikeCondition = new BooleanBuilder();
 

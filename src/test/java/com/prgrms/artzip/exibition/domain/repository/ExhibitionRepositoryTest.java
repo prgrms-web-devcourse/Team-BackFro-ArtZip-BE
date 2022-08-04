@@ -279,4 +279,45 @@ class ExhibitionRepositoryTest {
               "http://www.culture.go.kr/upload/rdf/22/07/show_2022072010193392447.jpg");
     }
   }
+
+  @Nested
+  @DisplayName("findUserLikeExhibitions() 테스트")
+  class FindUserLikeExhibitionsTest {
+
+    @Test
+    @DisplayName("로그인 유저와 조회 대상인 유저가 일치하지 않는 경우")
+    void testDifferentUser() {
+      // user2 : 로그인 유저
+      // user1 : 조회 대상
+      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
+          .findUserLikeExhibitions(user2.getId(), user1.getId(), PageRequest.of(0, 8));
+
+      List<ExhibitionForSimpleQuery> contents = exhibitionsPagingResult.getContent();
+      assertThat(contents.size()).isEqualTo(3);
+
+      assertThat(contents.get(0))
+          .hasFieldOrPropertyWithValue("name", "전시회 at 경기")
+          .hasFieldOrPropertyWithValue("isLiked", true);
+
+      assertThat(contents.get(1))
+          .hasFieldOrPropertyWithValue("name", "전시회 at 부산")
+          .hasFieldOrPropertyWithValue("isLiked", false);
+    }
+
+    @Test
+    @DisplayName("로그인 유저와 조회 대상인 유저가 일치하는 경우")
+    void testSameUser() {
+      // user1 : 로그인 유저, 조회 대상
+      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
+          .findUserLikeExhibitions(user1.getId(), user1.getId(), PageRequest.of(0, 8));
+
+      List<ExhibitionForSimpleQuery> contents = exhibitionsPagingResult.getContent();
+      assertThat(contents.size()).isEqualTo(3);
+
+      for (ExhibitionBasicForSimpleQuery exhibition : contents) {
+        assertThat(exhibition).hasFieldOrPropertyWithValue("isLiked", true);
+      }
+    }
+  }
+
 }
