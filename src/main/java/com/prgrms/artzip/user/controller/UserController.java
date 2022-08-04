@@ -6,9 +6,9 @@ import com.prgrms.artzip.common.jwt.JwtPrincipal;
 import com.prgrms.artzip.common.util.JwtService;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.dto.request.UserLocalLoginRequest;
-import com.prgrms.artzip.user.dto.request.UserRegisterRequest;
+import com.prgrms.artzip.user.dto.request.UserSignUpRequest;
 import com.prgrms.artzip.user.dto.response.LoginResponse;
-import com.prgrms.artzip.user.dto.response.RegisterResponse;
+import com.prgrms.artzip.user.dto.response.SignUpResponse;
 import com.prgrms.artzip.user.service.UserService;
 import io.swagger.annotations.Api;
 import org.springframework.http.ResponseEntity;
@@ -61,14 +61,14 @@ public class UserController {
     return ResponseEntity.ok(response);
   }
 
-  @PostMapping("/register")
-  public ResponseEntity<ApiResponse<RegisterResponse>> register(@RequestBody @Valid
-      UserRegisterRequest request) {
-    User newUser = userService.register(request);
+  @PostMapping("/sign-up")
+  public ResponseEntity<ApiResponse<SignUpResponse>> signUp(@RequestBody @Valid
+                                                            UserSignUpRequest request) {
+    User newUser = userService.signUp(request);
     ApiResponse response = ApiResponse.builder()
             .message("회원가입 성공하였습니다.")
             .status(CREATED.value())
-            .data(RegisterResponse.from(newUser))
+            .data(SignUpResponse.from(newUser))
             .build();
     return ResponseEntity.created(URI.create("/register")).body(response);
   }
