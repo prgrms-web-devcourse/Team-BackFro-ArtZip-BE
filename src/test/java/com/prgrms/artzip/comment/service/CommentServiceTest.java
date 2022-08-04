@@ -267,7 +267,7 @@ class CommentServiceTest {
     doReturn(new ArrayList<>()).when(commentRepository).getCommentsOfParents(List.of(0L));
 
     //when
-    CommentResponse response = commentService.updateComment(new CommentUpdateRequest("반가워"), 0L);
+    CommentResponse response = commentService.updateComment(new CommentUpdateRequest("반가워"), 0L, user);
 
     //then
     verify(commentUtilService).getComment(0L);
@@ -288,7 +288,7 @@ class CommentServiceTest {
     doReturn(new ArrayList<>()).when(commentRepository).getCommentsOfParents(List.of(0L));
 
     //when
-    CommentResponse response = commentService.deleteComment(0L);
+    CommentResponse response = commentService.deleteComment(0L, user);
 
     //then
     verify(commentUtilService).getComment(0L);

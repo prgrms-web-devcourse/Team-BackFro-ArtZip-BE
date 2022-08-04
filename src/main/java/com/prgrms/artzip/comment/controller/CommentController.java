@@ -6,6 +6,8 @@ import com.prgrms.artzip.comment.dto.response.CommentResponse;
 import com.prgrms.artzip.comment.service.CommentService;
 import com.prgrms.artzip.common.ApiResponse;
 import com.prgrms.artzip.common.PageResponse;
+import com.prgrms.artzip.common.entity.CurrentUser;
+import com.prgrms.artzip.user.domain.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.net.URI;
@@ -49,9 +51,10 @@ public class CommentController {
   @PatchMapping("/{commentId}")
   public ResponseEntity<ApiResponse<CommentResponse>> updateComment(
       @PathVariable Long commentId,
-      @RequestBody CommentUpdateRequest request
+      @RequestBody CommentUpdateRequest request,
+      @CurrentUser User currentUser
   ) {
-    CommentResponse comment = commentService.updateComment(request, commentId);
+    CommentResponse comment = commentService.updateComment(request, commentId, currentUser);
     ApiResponse<CommentResponse> response =
         new ApiResponse<>("댓글 수정 성공", HttpStatus.OK.value(), comment);
     return ResponseEntity
@@ -61,9 +64,10 @@ public class CommentController {
   @ApiOperation(value = "댓글 삭제하기", notes = "댓글을 삭제합니다.")
   @DeleteMapping("/{commentId}")
   public ResponseEntity<ApiResponse<CommentResponse>> deleteComment(
-      @PathVariable Long commentId
+      @PathVariable Long commentId,
+      @CurrentUser User currentUser
   ) {
-    CommentResponse comment = commentService.deleteComment(commentId);
+    CommentResponse comment = commentService.deleteComment(commentId, currentUser);
     ApiResponse<CommentResponse> response =
         new ApiResponse<>("댓글 삭제 성공", HttpStatus.OK.value(), comment);
     return ResponseEntity

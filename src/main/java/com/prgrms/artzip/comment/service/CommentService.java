@@ -7,6 +7,7 @@ import com.prgrms.artzip.comment.dto.response.CommentInfo;
 import com.prgrms.artzip.comment.dto.response.CommentResponse;
 import com.prgrms.artzip.comment.repository.CommentRepository;
 import com.prgrms.artzip.common.ErrorCode;
+import com.prgrms.artzip.common.error.exception.AuthErrorException;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
 import com.prgrms.artzip.review.domain.Review;
@@ -28,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentService {
   private final CommentRepository commentRepository;
   private final ReviewRepository reviewRepository;
-  private final UserRepository userRepository;
   private final CommentUtilService commentUtilService;
 
   @Transactional(readOnly = true)
@@ -62,15 +62,17 @@ public class CommentService {
     return new CommentResponse(comment, new ArrayList<>());
   }
 
-  public CommentResponse updateComment(CommentUpdateRequest request, Long commentId) {
+  public CommentResponse updateComment(CommentUpdateRequest request, Long commentId, User user) {
     Comment comment = commentUtilService.getComment(commentId);
+    checkOwner(comment, user);
     comment.setContent(request.content());
     List<Comment> children = commentRepository.getCommentsOfParents(List.of(commentId));
     return new CommentResponse(comment, children);
   }
 
-  public CommentResponse deleteComment(Long commentId) {
+  public CommentResponse deleteComment(Long commentId, User user) {
     Comment comment = commentUtilService.getComment(commentId);
+    checkOwner(comment, user);
     comment.softDelete();
     List<Comment> children = commentRepository.getCommentsOfParents(List.of(commentId));
     return new CommentResponse(comment, children);
@@ -98,5 +100,11 @@ public class CommentService {
   private Review getReview(Long reviewId) {
     return reviewRepository.findById(reviewId)
         .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_NOT_FOUND));
+  }
+
+  private void checkOwner(Comment comment, User user) {
+    if (comment.getUser() != user) {
+      throw new AuthErrorException(ErrorCode.RESOURCE_PERMISSION_DENIED);
+    }
   }
 }

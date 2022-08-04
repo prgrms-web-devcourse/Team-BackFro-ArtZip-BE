@@ -22,6 +22,7 @@ public enum ErrorCode {
   INVALID_LENGTH(400, "C007", "올바르지 않은 길이입니다."),
   INVALID_FILE_EXTENSION(400, "C008", "올바르지 않은 파일 확장자입니다. (png, jpg, jpeg 가능)"),
   MAX_UPLOAD_SIZE_EXCEEDED(400, "C009", "최대 파일 크기(5MB)보다 큰 파일입니다."),
+  RESOURCE_PERMISSION_DENIED(400, "C010", "해당 리소스에 대한 작업 권한이 없습니다."),
 
   /**
    * User Domain
