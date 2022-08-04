@@ -147,6 +147,7 @@ public class ReviewController {
       @RequestParam(value = "userId") Long userId,
       @ApiParam(value = "수정할 후기의 ID")
       @PathVariable(value = "reviewId") Long reviewId,
+      @Parameter(name = "data", schema = @Schema(type = "string", format = "binary"))
       @RequestPart(value = "data") ReviewUpdateRequest request,
       @RequestPart(required = false) List<MultipartFile> files) {
 
