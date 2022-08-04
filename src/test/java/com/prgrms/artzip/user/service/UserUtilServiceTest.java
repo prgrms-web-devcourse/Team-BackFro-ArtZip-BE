@@ -59,7 +59,7 @@ class UserUtilServiceTest {
         // when
         User userResult = utilService.getUserById(1L);
         // then
-        assertThat(userResult.getEmail()).isEqualTo(testUser.getEmail());
+        assertThat(userResult).hasFieldOrPropertyWithValue("email", testUser.getEmail());
     }
 
     @Test
