@@ -5,6 +5,8 @@ import static org.springframework.util.StringUtils.*;
 
 import com.prgrms.artzip.common.jwt.claims.AccessClaim;
 import com.prgrms.artzip.common.util.JwtService;
+import com.prgrms.artzip.user.domain.User;
+import com.prgrms.artzip.user.service.UserUtilService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
@@ -33,10 +35,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private final JwtService jwtService;
 
+  private final UserUtilService userUtilService;
+
   public JwtAuthenticationFilter(String accessHeaderKey,
-      JwtService jwtService) {
+                                 JwtService jwtService, UserUtilService userUtilService) {
     this.accessHeaderKey = accessHeaderKey;
     this.jwtService = jwtService;
+    this.userUtilService = userUtilService;
   }
 
   @Override
@@ -47,12 +52,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       if (nonNull(token)) {
         try {
           AccessClaim claims = jwtService.verifyAccessToken(token);
-          String email = claims.getEmail();
           Long userId = claims.getUserId();
           List<GrantedAuthority> authorities = getAuthorities(claims);
-
+          User currentUser = userUtilService.getUserById(userId);
           if (!isNull(userId) && authorities.size() > 0) {
-            JwtAuthenticationToken authentication = new JwtAuthenticationToken(new JwtPrincipal(token, email, userId), null, authorities);
+            JwtAuthenticationToken authentication = new JwtAuthenticationToken(new JwtPrincipal(token, currentUser), null, authorities);
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
           }
