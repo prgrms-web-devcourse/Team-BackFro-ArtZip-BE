@@ -4,9 +4,6 @@ import static java.util.Objects.*;
 import static org.springframework.util.StringUtils.*;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.prgrms.artzip.common.ErrorCode;
-import com.prgrms.artzip.common.ErrorResponse;
 import com.prgrms.artzip.common.jwt.claims.AccessClaim;
 import com.prgrms.artzip.common.util.JwtService;
 import com.prgrms.artzip.user.domain.User;
@@ -14,8 +11,6 @@ import com.prgrms.artzip.user.service.UserUtilService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,7 +22,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -45,8 +39,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private final JwtService jwtService;
 
   private final UserUtilService userUtilService;
-
-  private final ObjectMapper objectMapper;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,

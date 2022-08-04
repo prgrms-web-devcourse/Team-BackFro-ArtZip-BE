@@ -1,4 +1,4 @@
-package com.prgrms.artzip.comment.domain.repository;
+package com.prgrms.artzip.comment.repository;
 
 import com.prgrms.artzip.comment.domain.Comment;
 import org.springframework.data.domain.Page;

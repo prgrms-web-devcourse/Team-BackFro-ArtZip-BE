@@ -22,6 +22,7 @@ public enum ErrorCode {
   INVALID_LENGTH(400, "C007", "올바르지 않은 길이입니다."),
   INVALID_FILE_EXTENSION(400, "C008", "올바르지 않은 파일 확장자입니다. (png, jpg, jpeg 가능)"),
   MAX_UPLOAD_SIZE_EXCEEDED(400, "C009", "최대 파일 크기(5MB)보다 큰 파일입니다."),
+  RESOURCE_PERMISSION_DENIED(400, "C010", "해당 리소스에 대한 작업 권한이 없습니다."),
 
   ACCESS_DENIED(403, "C010", "요청 권한이 없습니다."),
 
@@ -82,7 +83,9 @@ public enum ErrorCode {
   REVIEW_PHOTO_FIELD_CONTAINS_NULL_VALUE(400, "R006", "리뷰 사진 필드에 NULL값이 포함되어 있습니다."),
   INVALID_REVIEW_PHOTO_PATH_LENGTH(400, "R007", "path는 1글자 이상 2083자 이하이어야 합니다."),
   INVALID_REVIEW_PHOTO_COUNT(400, "R008", "리뷰 사진은 최대 9개입니다."),
-  REVIEW_NOT_FOUND(400, "R009", "존재하지 않는 리뷰입니다.")
+  REVIEW_NOT_FOUND(400, "R009", "존재하지 않는 리뷰입니다."),
+  REVIEW_PHOTO_NOT_FOUND(400, "R010", "존재하지 않는 리뷰 사진입니다."),
+  NO_PERMISSION_TO_UPDATE_REVIEW(404, "R011", "해당 리뷰를 수정할 수 없습니다.")
   ;
 
 

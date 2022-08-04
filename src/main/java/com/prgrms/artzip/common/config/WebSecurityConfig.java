@@ -42,14 +42,6 @@ public class WebSecurityConfig {
     private final JwtConfig jwtConfig;
 
     @Bean
-    public ObjectMapper objectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.getFactory().configure(JsonWriteFeature.ESCAPE_NON_ASCII.mappedFeature(), true);
-        objectMapper.registerModule(new JavaTimeModule());
-        return objectMapper;
-    }
-
-    @Bean
     @Qualifier("accessJwt")
     public Jwt accessJwt() {
         return new Jwt(
@@ -115,8 +107,8 @@ public class WebSecurityConfig {
         this.jwtConfig = jwtConfig;
     }
 
-    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtService jwtService, UserUtilService userUtilService, ObjectMapper objectMapper) {
-        return new JwtAuthenticationFilter(jwtConfig.getAccessToken().getHeader(), jwtService, userUtilService, objectMapper);
+    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtService jwtService, UserUtilService userUtilService) {
+        return new JwtAuthenticationFilter(jwtConfig.getAccessToken().getHeader(), jwtService, userUtilService);
     }
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JwtService jwtService, UserUtilService userUtilService, ObjectMapper objectMapper, ExceptionHandlerFilter exceptionHandlerFilter) throws Exception {
@@ -129,13 +121,14 @@ public class WebSecurityConfig {
                 .authorizeRequests()
                 .antMatchers("/swagger*/**").permitAll()
                 .antMatchers("/api/v1/users/me/**").hasAnyAuthority(USER.name(), ADMIN.name())
+                .antMatchers("/api/v1/comments/**", "/api/v1/reviews/**/comments/new").hasAnyAuthority(USER.name(), ADMIN.name())
                 .anyRequest().permitAll()
                 .and()
                 .exceptionHandling()
                 .accessDeniedHandler(accessDeniedHandler(objectMapper))
                 .authenticationEntryPoint(authenticationEntryPoint(objectMapper))
                 .and()
-                .addFilterBefore(jwtAuthenticationFilter(jwtService, userUtilService, objectMapper), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter(jwtService, userUtilService), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(exceptionHandlerFilter, JwtAuthenticationFilter.class);
         return http.build();
     }

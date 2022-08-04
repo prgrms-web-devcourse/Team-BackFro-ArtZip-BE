@@ -2,10 +2,12 @@ package com.prgrms.artzip.common.config;
 
 import com.fasterxml.classmate.TypeResolver;
 import com.prgrms.artzip.common.util.MyPageable;
+import com.prgrms.artzip.user.domain.User;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -27,6 +29,7 @@ public class SwaggerConfig {
   public Docket apiV1() {
     return new Docket(DocumentationType.SWAGGER_2)
         .apiInfo(apiInfo())
+        .ignoredParameterTypes(User.class)
         .securitySchemes(List.of(accessToken(), refreshToken()))
         .securityContexts(List.of(securityContext()))
         .alternateTypeRules(
