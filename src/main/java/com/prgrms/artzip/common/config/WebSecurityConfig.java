@@ -1,5 +1,6 @@
 package com.prgrms.artzip.common.config;
 
+import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.jwt.Jwt;
 import com.prgrms.artzip.common.jwt.JwtAuthenticationFilter;
 import com.prgrms.artzip.common.jwt.JwtAuthenticationProvider;
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -23,6 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @EnableWebSecurity
 @Configuration
+@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 public class WebSecurityConfig {
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final JwtConfig jwtConfig;
@@ -76,7 +79,9 @@ public class WebSecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/**").permitAll()
+                .antMatchers("/swagger*/**").permitAll()
+                .antMatchers("/api/**").permitAll()
+                .antMatchers("/api/v1/me/**").hasAuthority(Authority.USER.name())
                 .and()
                 .addFilterAfter(jwtAuthenticationFilter(jwtService, userUtilService), UsernamePasswordAuthenticationFilter.class);
         return http.build();

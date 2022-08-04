@@ -14,6 +14,7 @@ import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,6 +49,7 @@ public class MyController {
     }
 
     @GetMapping("/info")
+    @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<ApiResponse<UserResponse>> getUserInfo (@CurrentUser User user) {
         UserResponse userResponse = UserResponse.builder()
                 .userId(user.getId())

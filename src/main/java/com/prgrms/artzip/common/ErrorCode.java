@@ -23,6 +23,8 @@ public enum ErrorCode {
   INVALID_FILE_EXTENSION(400, "C008", "올바르지 않은 파일 확장자입니다. (png, jpg, jpeg 가능)"),
   MAX_UPLOAD_SIZE_EXCEEDED(400, "C009", "최대 파일 크기(5MB)보다 큰 파일입니다."),
 
+  ACCESS_DENIED(403, "C010", "요청 권한이 없습니다."),
+
   /**
    * User Domain
    */
