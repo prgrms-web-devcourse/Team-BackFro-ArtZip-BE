@@ -45,7 +45,7 @@ class UserServiceTest {
     private UserService userService;
 
     @Spy
-    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     private Role userRole;
 

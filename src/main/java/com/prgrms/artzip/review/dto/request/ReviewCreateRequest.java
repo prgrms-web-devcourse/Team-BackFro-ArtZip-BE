@@ -1,4 +1,4 @@
-package com.prgrms.artzip.review.dto;
+package com.prgrms.artzip.review.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
