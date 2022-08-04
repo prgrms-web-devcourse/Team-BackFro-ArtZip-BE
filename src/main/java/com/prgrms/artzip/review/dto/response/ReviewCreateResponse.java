@@ -1,4 +1,4 @@
-package com.prgrms.artzip.review.dto;
+package com.prgrms.artzip.review.dto.response;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
