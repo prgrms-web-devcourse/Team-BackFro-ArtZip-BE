@@ -12,9 +12,7 @@ import com.prgrms.artzip.review.dto.response.ExhibitionsResponse;
 import com.prgrms.artzip.review.dto.response.ReviewCreateResponse;
 import com.prgrms.artzip.review.dto.response.ReviewLikeUpdateResponse;
 import com.prgrms.artzip.review.service.ReviewLikeService;
-import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
 import com.prgrms.artzip.review.dto.request.ReviewUpdateRequest;
-import com.prgrms.artzip.review.dto.response.ExhibitionsResponse;
 import com.prgrms.artzip.review.dto.response.ReviewIdResponse;
 import com.prgrms.artzip.review.service.ReviewService;
 import io.swagger.annotations.Api;
@@ -147,6 +145,7 @@ public class ReviewController {
   @PatchMapping(value = "/{reviewId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<ApiResponse> updateReview(
       @RequestParam(value = "userId") Long userId,
+      @ApiParam(value = "수정할 후기의 ID")
       @PathVariable(value = "reviewId") Long reviewId,
       @RequestPart(value = "data") ReviewUpdateRequest request,
       @RequestPart(required = false) List<MultipartFile> files) {
