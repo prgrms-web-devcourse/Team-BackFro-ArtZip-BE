@@ -144,8 +144,10 @@ public class ReviewService {
   private void validateFileCount(Review review, List<Long> deletedPhotos,
       List<MultipartFile> files) {
     Long reviewPhotoCount = reviewPhotoRepository.countByReview(review);
-    if (files != null
-        && reviewPhotoCount - deletedPhotos.size() + files.size() > REVIEW_PHOTO_COUNT) {
+    int deletedPhotosCount = Objects.isNull(deletedPhotos) ? 0 : deletedPhotos.size();
+    int filesCount = Objects.isNull(files) ? 0 : files.size();
+
+    if (reviewPhotoCount - deletedPhotosCount + filesCount > REVIEW_PHOTO_COUNT) {
       throw new InvalidRequestException(ErrorCode.INVALID_REVIEW_PHOTO_COUNT);
     }
   }
