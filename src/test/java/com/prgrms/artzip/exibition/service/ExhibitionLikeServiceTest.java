@@ -137,7 +137,7 @@ class ExhibitionLikeServiceTest {
   }
 
   @Test
-  @DisplayName("좊아요 삭제")
+  @DisplayName("좋아요 삭제")
   void testRemoveLike() {
     ExhibitionLike exhibitionLike = new ExhibitionLike(user, exhibition);
 
