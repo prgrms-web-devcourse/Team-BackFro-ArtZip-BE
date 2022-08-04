@@ -165,19 +165,17 @@ class CommentServiceTest {
         .build();
     doReturn(comment).when(commentRepository).save(Mockito.any(Comment.class));
     doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
-    doReturn(Optional.of(user)).when(userRepository).findById(user.getId());
 
     //when
     commentService.createComment(
         new CommentCreateRequest("안녕", null),
         review.getId(),
-        user.getId()
+        user
     );
 
     //then
     verify(commentRepository).save(Mockito.any(Comment.class));
     verify(reviewRepository).findById(review.getId());
-    verify(userRepository).findById(user.getId());
   }
 
   @Test
@@ -190,33 +188,33 @@ class CommentServiceTest {
     assertThatThrownBy(() -> commentService.createComment(
         new CommentCreateRequest("안녕", null),
         9999L,
-        user.getId()
+        user
     )).isInstanceOf(NotFoundException.class)
         .hasMessage(ErrorCode.REVIEW_NOT_FOUND.getMessage());
   }
 
-  @Test
-  @DisplayName("잘못된 유저의 댓글 생성 테스트")
-  void testCreateCommentWithInvalidUser() {
-    //given
-    doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
-    doReturn(Optional.empty()).when(userRepository).findById(9999L);
-
-    //when //then
-    assertThatThrownBy(() -> commentService.createComment(
-        new CommentCreateRequest("안녕", null),
-        review.getId(),
-        9999L
-    )).isInstanceOf(NotFoundException.class)
-        .hasMessage(ErrorCode.USER_NOT_FOUND.getMessage());
-  }
+  // 로그인한 유저를 알아서 받아오게 함으로써 주석화
+//  @Test
+//  @DisplayName("잘못된 유저의 댓글 생성 테스트")
+//  void testCreateCommentWithInvalidUser() {
+//    //given
+//    doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
+//    doReturn(Optional.empty()).when(userRepository).findById(9999L);
+//
+//    //when //then
+//    assertThatThrownBy(() -> commentService.createComment(
+//        new CommentCreateRequest("안녕", null),
+//        review.getId(),
+//        user
+//    )).isInstanceOf(NotFoundException.class)
+//        .hasMessage(ErrorCode.USER_NOT_FOUND.getMessage());
+//  }
 
   @Test
   @DisplayName("잘못된 부모 댓글의 자식 댓글 생성 테스트")
   void testCreateCommentWithInvalidParent() {
     //given
     doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
-    doReturn(Optional.of(user)).when(userRepository).findById(user.getId());
     when(commentUtilService.getComment(9999L))
         .thenThrow(new NotFoundException(ErrorCode.COMMENT_NOT_FOUND));
 
@@ -224,7 +222,7 @@ class CommentServiceTest {
     assertThatThrownBy(() -> commentService.createComment(
         new CommentCreateRequest("안녕", 9999L),
         review.getId(),
-        user.getId()
+        user
     )).isInstanceOf(NotFoundException.class)
         .hasMessage(ErrorCode.COMMENT_NOT_FOUND.getMessage());
   }
@@ -245,14 +243,13 @@ class CommentServiceTest {
         .parent(parent)
         .build();
     doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
-    doReturn(Optional.of(user)).when(userRepository).findById(user.getId());
     doReturn(child).when(commentUtilService).getComment(0L);
 
     //when //then
     assertThatThrownBy(() -> commentService.createComment(
         new CommentCreateRequest("안녕", 0L),
         review.getId(),
-        user.getId()
+        user
     )).isInstanceOf(InvalidRequestException.class)
         .hasMessage(ErrorCode.CHILD_CANT_BE_PARENT.getMessage());
   }

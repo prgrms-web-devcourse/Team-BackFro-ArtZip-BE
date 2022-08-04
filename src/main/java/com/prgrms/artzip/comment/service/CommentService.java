@@ -45,9 +45,8 @@ public class CommentService {
     );
   }
 
-  public CommentResponse createComment(CommentCreateRequest request, Long reviewId, Long userId) {
+  public CommentResponse createComment(CommentCreateRequest request, Long reviewId, User currentUser) {
     Review review = getReview(reviewId);
-    User user = getUser(userId);
     Comment parent = null;
     if (Objects.nonNull(request.parentId())) {
       parent = commentUtilService.getComment(request.parentId());
@@ -55,7 +54,7 @@ public class CommentService {
     }
     Comment comment = commentRepository.save(Comment.builder()
         .content(request.content())
-        .user(user)
+        .user(currentUser)
         .review(review)
         .parent(parent)
         .build()
@@ -99,10 +98,5 @@ public class CommentService {
   private Review getReview(Long reviewId) {
     return reviewRepository.findById(reviewId)
         .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_NOT_FOUND));
-  }
-
-  private User getUser(Long userId) {
-    return userRepository.findById(userId).
-        orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
   }
 }
