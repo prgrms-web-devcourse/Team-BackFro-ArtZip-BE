@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.prgrms.artzip.QueryDslTestConfig;
 import com.prgrms.artzip.comment.domain.Comment;
-import com.prgrms.artzip.comment.domain.repository.CommentRepository;
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.exibition.domain.Exhibition;
 import com.prgrms.artzip.exibition.domain.enumType.Area;

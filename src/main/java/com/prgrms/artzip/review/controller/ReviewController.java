@@ -5,6 +5,7 @@ import com.prgrms.artzip.comment.dto.response.CommentResponse;
 import com.prgrms.artzip.comment.service.CommentService;
 import com.prgrms.artzip.common.ApiResponse;
 import com.prgrms.artzip.common.PageResponse;
+import com.prgrms.artzip.common.entity.CurrentUser;
 import com.prgrms.artzip.exibition.service.ExhibitionSearchService;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
 import com.prgrms.artzip.review.dto.response.ExhibitionsResponse;
@@ -12,6 +13,7 @@ import com.prgrms.artzip.review.dto.response.ReviewCreateResponse;
 import com.prgrms.artzip.review.dto.response.ReviewLikeUpdateResponse;
 import com.prgrms.artzip.review.service.ReviewLikeService;
 import com.prgrms.artzip.review.service.ReviewService;
+import com.prgrms.artzip.user.domain.User;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -116,13 +118,14 @@ public class ReviewController {
   }
 
   @ApiOperation(value = "리뷰 댓글 생성", notes = "리뷰에 댓글을 생성합니다.")
-  @PostMapping("/{reviewId}/comments")
+  @PostMapping("/{reviewId}/comments/new")
   public ResponseEntity<ApiResponse<CommentResponse>> createComment(
       @PathVariable Long reviewId,
-      @RequestBody CommentCreateRequest request
+      @RequestBody CommentCreateRequest request,
+      @CurrentUser User user
   ) {
     //TODO 유저 아이디 수정 -> 추후 아마 유저 객체가 들어올듯
-    CommentResponse comment = commentService.createComment(request, reviewId, 0L);
+    CommentResponse comment = commentService.createComment(request, reviewId, user);
     ApiResponse<CommentResponse> response
         = new ApiResponse<>("댓글 생성 성공", HttpStatus.OK.value(), comment);
     return ResponseEntity

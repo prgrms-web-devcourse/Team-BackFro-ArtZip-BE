@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prgrms.artzip.comment.domain.Comment;
 import com.prgrms.artzip.comment.dto.request.CommentUpdateRequest;
 import com.prgrms.artzip.common.Authority;
+import com.prgrms.artzip.common.util.JwtService;
 import com.prgrms.artzip.exibition.domain.Exhibition;
 import com.prgrms.artzip.exibition.domain.enumType.Area;
 import com.prgrms.artzip.exibition.domain.enumType.Genre;
@@ -19,6 +20,7 @@ import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,12 +43,15 @@ class CommentControllerTest {
   @Autowired
   private EntityManager em;
   @Autowired
-  ObjectMapper objectMapper;
+  private ObjectMapper objectMapper;
+  @Autowired
+  private JwtService jwtService;
 
   private User user;
   private Exhibition exhibition;
   private Review review;
   private Comment comment;
+  private String accessToken;
 
   @BeforeEach
   void setUp() {
@@ -101,6 +107,15 @@ class CommentControllerTest {
           .build();
       em.persist(child);
     }
+    accessToken = jwtService.createAccessToken(
+        user.getId(),
+        user.getEmail(),
+        user.getRoles()
+            .stream()
+            .map(Role::getAuthority)
+            .map(a -> new SimpleGrantedAuthority(a.toString()))
+            .collect(Collectors.toList())
+    );
   }
 
   @Test
@@ -108,7 +123,7 @@ class CommentControllerTest {
   void testGetChildren() throws Exception {
     //Given //When //Then
     mockMvc.perform(get("/api/v1/comments/{commentId}/children", comment.getId())
-        .contentType(MediaType.APPLICATION_JSON))
+            .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andDo(print());
   }
@@ -121,8 +136,9 @@ class CommentControllerTest {
 
     //When //Then
     mockMvc.perform(patch("/api/v1/comments/{commentId}", comment.getId())
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsString(request)))
+            .header("accessToken", accessToken)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isOk())
         .andDo(print());
   }
@@ -135,6 +151,7 @@ class CommentControllerTest {
 
     //When //Then
     mockMvc.perform(patch("/api/v1/comments/{commentId}", 9999L)
+            .header("accessToken", accessToken)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isBadRequest())
@@ -149,6 +166,7 @@ class CommentControllerTest {
 
     //When //Then
     mockMvc.perform(patch("/api/v1/comments/{commentId}", comment.getId())
+            .header("accessToken", accessToken)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isBadRequest())
@@ -163,6 +181,7 @@ class CommentControllerTest {
 
     //When //Then
     mockMvc.perform(patch("/api/v1/comments/{commentId}", comment.getId())
+            .header("accessToken", accessToken)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isBadRequest())
@@ -174,6 +193,7 @@ class CommentControllerTest {
   void testDeleteComment() throws Exception {
     //Given //When //Then
     mockMvc.perform(delete("/api/v1/comments/{commentId}", comment.getId())
+            .header("accessToken", accessToken)
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andDo(print());
@@ -184,6 +204,7 @@ class CommentControllerTest {
   void testDeleteInvalidComment() throws Exception {
     //Given //When //Then
     mockMvc.perform(delete("/api/v1/comments/{commentId}", 9999L)
+            .header("accessToken", accessToken)
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isBadRequest())
         .andDo(print());
@@ -194,10 +215,12 @@ class CommentControllerTest {
   void testDeleteCommentTwice() throws Exception {
     //Given //When //Then
     mockMvc.perform(delete("/api/v1/comments/{commentId}", comment.getId())
+            .header("accessToken", accessToken)
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andDo(print());
     mockMvc.perform(delete("/api/v1/comments/{commentId}", comment.getId())
+            .header("accessToken", accessToken)
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isBadRequest())
         .andDo(print());
