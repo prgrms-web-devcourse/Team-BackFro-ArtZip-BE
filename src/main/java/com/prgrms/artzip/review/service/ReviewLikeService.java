@@ -18,35 +18,39 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ReviewLikeService {
 
-  private final ReviewRepository reviewRepository;
-  private final ReviewLikeRepository reviewLikeRepository;
-  private final UserRepository userRepository;
+    private final ReviewRepository reviewRepository;
+    private final ReviewLikeRepository reviewLikeRepository;
+    private final UserRepository userRepository;
 
-  @Transactional
-  public ReviewLikeUpdateResponse updateReviewLike(final Long userId, final Long reviewId) {
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
-    Review review = reviewRepository.findById(reviewId)
-        .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_NOT_FOUND));
+    @Transactional
+    public ReviewLikeUpdateResponse updateReviewLike(final Long userId, final Long reviewId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_NOT_FOUND));
 
-    boolean isLiked = isLiked(user, review);
-    if (isLiked) {
-      reviewLikeRepository.deleteById(new ReviewLikeId(review.getId(), user.getId()));
-    } else {
-      reviewLikeRepository.save(new ReviewLike(review, user));
+        boolean isLiked = isLiked(user, review);
+        if (isLiked) {
+            reviewLikeRepository.deleteById(new ReviewLikeId(review.getId(), user.getId()));
+        } else {
+            reviewLikeRepository.save(new ReviewLike(review, user));
+        }
+
+        Long likeCount = reviewLikeRepository.countByReview(review);
+
+        return ReviewLikeUpdateResponse.builder()
+                .reviewId(review.getId())
+                .likeCount(likeCount)
+                .isLiked(!isLiked)
+                .build();
     }
 
-    Long likeCount = reviewLikeRepository.countByReview(review);
+    private boolean isLiked(User user, Review review) {
+        return reviewLikeRepository.existsById(new ReviewLikeId(review.getId(), user.getId()));
+    }
 
-    return ReviewLikeUpdateResponse.builder()
-        .reviewId(review.getId())
-        .likeCount(likeCount)
-        .isLiked(!isLiked)
-        .build();
-  }
-
-  private boolean isLiked(User user, Review review) {
-    return reviewLikeRepository.existsById(new ReviewLikeId(review.getId(), user.getId()));
-  }
-
+    @Transactional(readOnly = true)
+    public Long getReviewLikeCountByUserId(Long userId) {
+        return reviewLikeRepository.countByUserId(userId);
+    }
 }

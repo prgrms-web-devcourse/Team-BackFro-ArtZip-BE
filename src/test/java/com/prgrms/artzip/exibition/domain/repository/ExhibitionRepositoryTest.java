@@ -40,6 +40,9 @@ class ExhibitionRepositoryTest {
   @Autowired
   private ExhibitionRepository exhibitionRepository;
 
+  private User user1;
+  private User user2;
+
   private Exhibition exhibitionAtBusan;
   private Exhibition exhibitionAtSeoul;
   private Exhibition exhibitionAlreadyEnd;
@@ -49,10 +52,10 @@ class ExhibitionRepositoryTest {
     Role role = new Role(Authority.USER);
     em.persist(role);
 
-    User user1 = new User("test@example.com", "Emily", List.of(role));
+    user1 = new User("test@example.com", "Emily", List.of(role));
     em.persist(user1);
 
-    User user2 = new User("tes2t@example.com", "Jerry", List.of(role));
+    user2 = new User("tes2t@example.com", "Jerry", List.of(role));
     em.persist(user2);
 
     exhibitionAtBusan = Exhibition.builder()
@@ -125,9 +128,10 @@ class ExhibitionRepositoryTest {
         .build();
     em.persist(review);
 
-    em.persist(new ExhibitionLike(exhibitionAtBusan, user1));
-    em.persist(new ExhibitionLike(exhibitionAlreadyEnd, user1));
-    em.persist(new ExhibitionLike(exhibitionAlreadyEnd, user2));
+    em.persist(new ExhibitionLike(user1, exhibitionAtSeoul));
+    em.persist(new ExhibitionLike(user1, exhibitionAtBusan));
+    em.persist(new ExhibitionLike(user1, exhibitionAlreadyEnd));
+    em.persist(new ExhibitionLike(user2, exhibitionAlreadyEnd));
 
     em.flush();
     em.clear();
@@ -138,16 +142,33 @@ class ExhibitionRepositoryTest {
   class FindUpcomingExhibitionsTest {
 
     @Test
-    @DisplayName("실제로 시작일이 빠른 전시회가 먼저 오는지 확인하는 테스트")
-    void testFindUpcomingExhibition() {
-      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findUpcomingExhibitions(
-          PageRequest.of(0, 10));
+    @DisplayName("로그인하지 않은 상태에서 실제로 시작일이 빠른 전시회가 먼저 오는지 확인하는 테스트")
+    void testFindUpcomingExhibitionWithoutAuthorization() {
+      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
+          .findUpcomingExhibitions(null, PageRequest.of(0, 10));
       ExhibitionForSimpleQuery exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);
 
       assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(2);
-      assertThat(exhibitionAtSeoul.getName()).isEqualTo("전시회 at 서울");
-      assertThat(exhibitionAtSeoul.getLikeCount()).isEqualTo(0);
-      assertThat(exhibitionAtSeoul.getReviewCount()).isEqualTo(0);
+      assertThat(exhibitionAtSeoul)
+          .hasFieldOrPropertyWithValue("name", "전시회 at 서울")
+          .hasFieldOrPropertyWithValue("likeCount", 1L)
+          .hasFieldOrPropertyWithValue("isLiked", false)
+          .hasFieldOrPropertyWithValue("reviewCount", 0L);
+    }
+
+    @Test
+    @DisplayName("로그인한 상태에서 실제로 시작일이 빠른 전시회가 먼저 오는지 확인하는 테스트")
+    void testFindUpcomingExhibitionWithAuthorization() {
+      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
+          .findUpcomingExhibitions(user1.getId(), PageRequest.of(0, 10));
+      ExhibitionForSimpleQuery exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);
+
+      assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(2);
+      assertThat(exhibitionAtSeoul)
+          .hasFieldOrPropertyWithValue("name", "전시회 at 서울")
+          .hasFieldOrPropertyWithValue("likeCount", 1L)
+          .hasFieldOrPropertyWithValue("isLiked", true)
+          .hasFieldOrPropertyWithValue("reviewCount", 0L);
     }
   }
 
@@ -156,29 +177,33 @@ class ExhibitionRepositoryTest {
   class FindMostLikeExhibitionsTest {
 
     @Test
-    @DisplayName("종료된 전시회 포함하여 인기 많은 전시회 조회 테스트")
-    void testFindMostLikeExhibitionIncludeEnd() {
-      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findMostLikeExhibitions(
-          true, PageRequest.of(0, 10));
-      ExhibitionForSimpleQuery exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);
+    @DisplayName("로그인하지 않고 종료된 전시회 포함하여 인기 많은 전시회 조회 테스트")
+    void testFindMostLikeExhibitionIncludeEndWithoutAuthorization() {
+      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
+          .findMostLikeExhibitions(null, true, PageRequest.of(0, 10));
+      ExhibitionForSimpleQuery exhibitionAtGyeonggi = exhibitionsPagingResult.getContent().get(0);
 
       assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(3);
-      assertThat(exhibitionAtSeoul.getName()).isEqualTo("전시회 at 경기");
-      assertThat(exhibitionAtSeoul.getLikeCount()).isEqualTo(2);
-      assertThat(exhibitionAtSeoul.getReviewCount()).isEqualTo(0);
+
+      assertThat(exhibitionAtGyeonggi)
+          .hasFieldOrPropertyWithValue("name", "전시회 at 경기")
+          .hasFieldOrPropertyWithValue("likeCount", 2L)
+          .hasFieldOrPropertyWithValue("isLiked", false)
+          .hasFieldOrPropertyWithValue("reviewCount", 0L);
     }
 
     @Test
-    @DisplayName("종료된 전시회 제외하고 인기 많은 전시회 조회 테스트")
-    void testFindMostLikeExhibitionExcludeEnd() {
-      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findMostLikeExhibitions(
-          false, PageRequest.of(0, 10));
-      ExhibitionForSimpleQuery exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);
+    @DisplayName("로그인 하고 종료된 전시회 제외하고 인기 많은 전시회 조회 테스트")
+    void testFindMostLikeExhibitionExcludeEndWithAuthorization() {
+      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
+          .findMostLikeExhibitions(user1.getId(), false, PageRequest.of(0, 10));
+      ExhibitionForSimpleQuery exhibitionAtBusan = exhibitionsPagingResult.getContent().get(0);
 
-      assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(2);
-      assertThat(exhibitionAtSeoul.getName()).isEqualTo("전시회 at 부산");
-      assertThat(exhibitionAtSeoul.getLikeCount()).isEqualTo(1);
-      assertThat(exhibitionAtSeoul.getReviewCount()).isEqualTo(1);
+      assertThat(exhibitionAtBusan)
+          .hasFieldOrPropertyWithValue("name", "전시회 at 부산")
+          .hasFieldOrPropertyWithValue("likeCount", 1L)
+          .hasFieldOrPropertyWithValue("isLiked", true)
+          .hasFieldOrPropertyWithValue("reviewCount", 1L);
     }
   }
 
@@ -189,24 +214,26 @@ class ExhibitionRepositoryTest {
     @Test
     @DisplayName("존재하지 않는 전시회 조회 테스트")
     void testFindEmptyExhibition() {
-      Optional<ExhibitionDetailForSimpleQuery> exhibition = exhibitionRepository.findExhibition(
-          123431L);
+      Optional<ExhibitionDetailForSimpleQuery> exhibition = exhibitionRepository
+          .findExhibition(null, 123431L);
       assertThat(exhibition).isEmpty();
     }
 
     @Test
     @DisplayName("전시회 조회 테스트")
     void testFindExhibition() {
-      Optional<ExhibitionDetailForSimpleQuery> exhibition = exhibitionRepository.findExhibition(
-          exhibitionAlreadyEnd.getId());
+      Optional<ExhibitionDetailForSimpleQuery> exhibition = exhibitionRepository
+          .findExhibition(user2.getId(), exhibitionAlreadyEnd.getId());
 
       assertThat(exhibition).isNotEmpty();
-      assertThat(exhibition.get().getSeq()).isEqualTo(34);
-      assertThat(exhibition.get().getName()).isEqualTo("전시회 at 경기");
-      assertThat(exhibition.get().getInquiry()).isEqualTo("문의처 정보");
-      assertThat(exhibition.get().getUrl()).isEqualTo("https://www.example.com");
-      assertThat(exhibition.get().getPlaceUrl()).isEqualTo("https://www.place-example.com");
-      assertThat(exhibition.get().getLikeCount()).isEqualTo(2);
+      assertThat(exhibition.get())
+          .hasFieldOrPropertyWithValue("seq", 34)
+          .hasFieldOrPropertyWithValue("name", "전시회 at 경기")
+          .hasFieldOrPropertyWithValue("inquiry", "문의처 정보")
+          .hasFieldOrPropertyWithValue("url", "https://www.example.com")
+          .hasFieldOrPropertyWithValue("placeUrl", "https://www.place-example.com")
+          .hasFieldOrPropertyWithValue("isLiked", true)
+          .hasFieldOrPropertyWithValue("likeCount", 2L);
     }
   }
 
@@ -215,21 +242,23 @@ class ExhibitionRepositoryTest {
   class FindExhibitionsByQueryTest {
 
     @Test
-    @DisplayName("끝난 전시회 제외 하지 않는 경우 태스트")
+    @DisplayName("로그인 하지 않고 끝난 전시회 제외 하지 않고 검색 경우 태스트")
     void testWithEndExhibition() {
-      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findExhibitionsByQuery(
-          "부산", true, PageRequest.of(0, 10));
+      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
+          .findExhibitionsByQuery(null, "부산", true, PageRequest.of(0, 10));
 
       assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(1);
     }
 
     @Test
-    @DisplayName("끝난 전시회 제외 하는 경우 태스트")
+    @DisplayName("로그인 하고 끝난 전시회 제외하고 검색 경우 태스트")
     void testWithOutEndExhibition() {
-      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findExhibitionsByQuery(
-          "전시회", false, PageRequest.of(0, 10));
+      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
+          .findExhibitionsByQuery(user2.getId(), "전시회", false, PageRequest.of(0, 10));
 
       assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(2);
+      assertThat(exhibitionsPagingResult.getContent().get(0))
+          .hasFieldOrPropertyWithValue("isLiked", false);
     }
   }
 
@@ -244,9 +273,10 @@ class ExhibitionRepositoryTest {
           "부산");
 
       assertThat(exhibitions.size()).isEqualTo(1);
-      assertThat(exhibitions.get(0).getName()).isEqualTo("전시회 at 부산");
-      assertThat(exhibitions.get(0).getThumbnail()).isEqualTo(
-          "http://www.culture.go.kr/upload/rdf/22/07/show_2022072010193392447.jpg");
+      assertThat(exhibitions.get(0))
+          .hasFieldOrPropertyWithValue("name", "전시회 at 부산")
+          .hasFieldOrPropertyWithValue("thumbnail",
+              "http://www.culture.go.kr/upload/rdf/22/07/show_2022072010193392447.jpg");
     }
   }
 }

@@ -1,11 +1,9 @@
 package com.prgrms.artzip.review.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.ErrorCode;
@@ -147,5 +145,17 @@ class ReviewLikeServiceTest {
       }
 
     }
+  }
+
+  @Test
+  @DisplayName("유저가 좋아요 누른 리뷰 개수 반환 테스트")
+  void testGetReviewLikeCountByUserId() {
+    // given
+    when(reviewLikeRepository.countByUserId(1L)).thenReturn(3L);
+    // when
+    Long reviewLikeCount = reviewLikeService.getReviewLikeCountByUserId(1L);
+    // then
+    assertThat(reviewLikeCount).isEqualTo(3L);
+    verify(reviewLikeRepository).countByUserId(1L);
   }
 }

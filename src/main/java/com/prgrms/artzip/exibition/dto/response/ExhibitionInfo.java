@@ -13,6 +13,7 @@ public class ExhibitionInfo extends ExhibitionBasicInfo {
 
   private LocalDate startDate;
   private LocalDate endDate;
+  private Boolean isLiked;
   private long likeCount;
   private long reviewCount;
   private Double lat;
@@ -23,6 +24,7 @@ public class ExhibitionInfo extends ExhibitionBasicInfo {
         exhibitionForSimpleQuery.getThumbnail());
     this.startDate = exhibitionForSimpleQuery.getPeriod().getStartDate();
     this.endDate = exhibitionForSimpleQuery.getPeriod().getEndDate();
+    this.isLiked = exhibitionForSimpleQuery.getIsLiked();
     this.likeCount = exhibitionForSimpleQuery.getLikeCount();
     this.reviewCount = exhibitionForSimpleQuery.getReviewCount();
   }
