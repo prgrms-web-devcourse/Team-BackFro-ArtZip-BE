@@ -1,5 +1,6 @@
 package com.prgrms.artzip.exibition.domain;
 
+import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHB_LIKE;
 import static com.prgrms.artzip.exibition.domain.enumType.Area.GYEONGGI;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -35,16 +36,16 @@ class ExhibitionLikeTest {
   @Test
   @DisplayName("전시회 정보가 null인 경우 테스트")
   void testExhibitionNull() {
-    assertThatThrownBy(() -> new ExhibitionLike(null, user))
+    assertThatThrownBy(() -> new ExhibitionLike(user, null))
         .isInstanceOf(InvalidRequestException.class)
-        .hasMessage("전시회 좋아요에는 전시회 정보와 사용자 정보가 필수입니다.");
+        .hasMessage(INVALID_EXHB_LIKE.getMessage());
   }
 
   @Test
   @DisplayName("사용자 정보가 null인 경우 테스트")
   void testUserNull() {
-    assertThatThrownBy(() -> new ExhibitionLike(exhibition, null))
+    assertThatThrownBy(() -> new ExhibitionLike(null, exhibition))
         .isInstanceOf(InvalidRequestException.class)
-        .hasMessage("전시회 좋아요에는 전시회 정보와 사용자 정보가 필수입니다.");
+        .hasMessage(INVALID_EXHB_LIKE.getMessage());
   }
 }

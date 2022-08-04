@@ -13,6 +13,7 @@ import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.RoleRepository;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
 import com.prgrms.artzip.user.dto.request.UserRegisterRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,18 +21,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 
     private final RoleRepository roleRepository;
-
-    public UserService(PasswordEncoder passwordEncoder, UserRepository userRepository, RoleRepository roleRepository) {
-        this.passwordEncoder = passwordEncoder;
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-    }
 
     @Transactional(readOnly = true)
     public User login(String principal, String credentials){
@@ -44,8 +40,10 @@ public class UserService {
 
     @Transactional
     public User register(UserRegisterRequest request) {
-        if(userRepository.existsByEmailAndIsQuit(request.getEmail(), false)) throw new AlreadyExistsException(USER_ALREADY_EXISTS);
-        if(userRepository.existsByNicknameAndIsQuit(request.getNickname(), false)) throw new AlreadyExistsException(USER_ALREADY_EXISTS);
+        if (userRepository.existsByEmailAndIsQuit(request.getEmail(), false))
+            throw new AlreadyExistsException(USER_ALREADY_EXISTS);
+        if (userRepository.existsByNicknameAndIsQuit(request.getNickname(), false))
+            throw new AlreadyExistsException(USER_ALREADY_EXISTS);
 
         Role userRole = roleRepository.findByAuthority(Authority.USER).orElseThrow(() -> new NotFoundException(ROLE_NOT_FOUND));
         User newUser = LocalUser.builder()
@@ -56,6 +54,5 @@ public class UserService {
                 .build();
         return userRepository.save(newUser);
     }
-
 
 }
