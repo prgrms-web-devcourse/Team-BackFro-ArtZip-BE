@@ -118,7 +118,7 @@ public class ReviewController {
   }
 
   @ApiOperation(value = "리뷰 댓글 생성", notes = "리뷰에 댓글을 생성합니다.")
-  @PostMapping("/{reviewId}/comments")
+  @PostMapping("/{reviewId}/comments/new")
   public ResponseEntity<ApiResponse<CommentResponse>> createComment(
       @PathVariable Long reviewId,
       @RequestBody CommentCreateRequest request,
