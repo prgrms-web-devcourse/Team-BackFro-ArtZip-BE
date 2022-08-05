@@ -30,6 +30,8 @@ public class User extends BaseEntity {
   private static final int MAX_NICKNAME_LENGTH = 10;
   private static final int MAX_PROFILEIMAGE_LENGTH = 300;
 
+  private static final String defaultProfileImage = "https://devcourse-backfro-s3.s3.ap-northeast-2.amazonaws.com/profileImage/default/anonymous-user.jpg";
+
   // TODO: max 값 erd 보고 확인
   // TODO: 기본 프사 이미지 s3에 올리고 링크 디폴트로 설정.
 
@@ -82,6 +84,22 @@ public class User extends BaseEntity {
 
   public void addRole(Role role) {
     roles.add(role);
+  }
+
+  public void setNickname(String nickname) {
+    if (!hasText(nickname)) {
+      throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
+    }
+    validateNickname(nickname);
+    this.nickname = nickname;
+  }
+
+  public void setProfileImage(String profileImage) {
+    if (!hasText(profileImage)) {
+      throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
+    }
+    validateProfileImage(profileImage);
+    this.profileImage = profileImage;
   }
 
   private static void validateNickname(String nickname) {
