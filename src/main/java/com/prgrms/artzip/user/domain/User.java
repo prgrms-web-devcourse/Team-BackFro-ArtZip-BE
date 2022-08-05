@@ -23,6 +23,7 @@ import lombok.NoArgsConstructor;
 @DiscriminatorColumn
 @Getter
 public class User extends BaseEntity {
+
   private static final String EMAIL_REGEX = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
   private static final String NICKNAME_REGEX = "[a-zA-Z가-힣0-9]+( [a-zA-Z가-힣0-9]+)*";
   private static final int MAX_EMAIL_LENGTH = 100;
@@ -48,11 +49,11 @@ public class User extends BaseEntity {
 
   @ManyToMany
   @JoinTable(
-          name = "user_role",
-          joinColumns = @JoinColumn(
-                  name = "user_id"),
-          inverseJoinColumns = @JoinColumn(
-                  name = "role_id")
+      name = "user_role",
+      joinColumns = @JoinColumn(
+          name = "user_id"),
+      inverseJoinColumns = @JoinColumn(
+          name = "role_id")
   )
   private List<Role> roles = new ArrayList<>();
 
@@ -60,8 +61,12 @@ public class User extends BaseEntity {
   private Boolean isQuit = false;
 
   public User(String email, String nickname, List<Role> roles) {
-    if(!hasText(email)) throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
-    if(!hasText(nickname)) throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
+    if (!hasText(email)) {
+      throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
+    }
+    if (!hasText(nickname)) {
+      throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
+    }
 
     validateEmail(email);
     validateNickname(nickname);
@@ -80,19 +85,19 @@ public class User extends BaseEntity {
   }
 
   private static void validateNickname(String nickname) {
-    if(nickname.length() > MAX_NICKNAME_LENGTH) {
+    if (nickname.length() > MAX_NICKNAME_LENGTH) {
       throw new InvalidRequestException(INVALID_LENGTH);
     }
-    if(!Pattern.matches(NICKNAME_REGEX, nickname)) {
+    if (!Pattern.matches(NICKNAME_REGEX, nickname)) {
       throw new InvalidRequestException(INVALID_INPUT_VALUE);
     }
   }
 
   private static void validateEmail(String email) {
-    if(email.length() > MAX_EMAIL_LENGTH) {
+    if (email.length() > MAX_EMAIL_LENGTH) {
       throw new InvalidRequestException(INVALID_LENGTH);
     }
-    if(!Pattern.matches(EMAIL_REGEX, email)) {
+    if (!Pattern.matches(EMAIL_REGEX, email)) {
       throw new InvalidRequestException(INVALID_INPUT_VALUE);
     }
   }

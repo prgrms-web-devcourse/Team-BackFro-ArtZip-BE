@@ -16,20 +16,22 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Role {
 
-    private static final int MAX_AUTHORITY = 10;
+  private static final int MAX_AUTHORITY = 10;
 
-    @Id
-    @Column(name = "role_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @Column(name = "role_id")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "authority", unique = true, nullable = false, length = 10)
-    private Authority authority;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "authority", unique = true, nullable = false, length = 10)
+  private Authority authority;
 
-    public Role(Authority authority) {
-        if(isNull(authority)) throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
-        this.authority = authority;
-    }
+  public Role(Authority authority) {
+      if (isNull(authority)) {
+          throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
+      }
+    this.authority = authority;
+  }
 
 }

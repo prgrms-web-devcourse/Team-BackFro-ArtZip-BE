@@ -27,51 +27,53 @@ import org.springframework.context.annotation.Import;
 @Import({QueryDslTestConfig.class})
 class UserRepositoryTest {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
+  private final Logger log = LoggerFactory.getLogger(getClass());
 
-    @Autowired
-    UserRepository userRepository;
+  @Autowired
+  UserRepository userRepository;
 
-    @Autowired
-    RoleRepository roleRepository;
+  @Autowired
+  RoleRepository roleRepository;
 
-    private Role userRole = new Role(Authority.USER);
+  private Role userRole = new Role(Authority.USER);
 
-    private Role adminRole = new Role(Authority.ADMIN);
+  private Role adminRole = new Role(Authority.ADMIN);
 
-    @BeforeEach
-    void setUp() {
-        roleRepository.save(userRole);
-        roleRepository.save(adminRole);
-    }
+  @BeforeEach
+  void setUp() {
+    roleRepository.save(userRole);
+    roleRepository.save(adminRole);
+  }
 
-    @Test
-    @DisplayName("user entity 생성 테스트")
-    @Transactional
-    void testUserCreation() {
-        User localUser = LocalUser.builder()
-                .email("test@gmail.com")
-                .nickname("공공")
-                .roles(List.of(userRole))
-                .password("test1234!")
-                .build();
-        User oauthUser = OAuthUser.builder()
-                .email("test2@gmail.com")
-                .nickname("공공2")
-                .roles(List.of(userRole, adminRole))
-                .provider("kakao")
-                .providerId("kakaoId")
-                .build();
+  @Test
+  @DisplayName("user entity 생성 테스트")
+  @Transactional
+  void testUserCreation() {
+    User localUser = LocalUser.builder()
+        .email("test@gmail.com")
+        .nickname("공공")
+        .roles(List.of(userRole))
+        .password("test1234!")
+        .build();
+    User oauthUser = OAuthUser.builder()
+        .email("test2@gmail.com")
+        .nickname("공공2")
+        .roles(List.of(userRole, adminRole))
+        .provider("kakao")
+        .providerId("kakaoId")
+        .build();
 
-        userRepository.save(localUser);
-        userRepository.save(oauthUser);
+    userRepository.save(localUser);
+    userRepository.save(oauthUser);
 
-        User userResult = userRepository.findByNicknameAndIsQuit("공공", false).orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
-        User adminResult = userRepository.findByNicknameAndIsQuit("공공2", false).orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+    User userResult = userRepository.findByNicknameAndIsQuit("공공", false)
+        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+    User adminResult = userRepository.findByNicknameAndIsQuit("공공2", false)
+        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
-        assertThat(userResult.getNickname()).isEqualTo(localUser.getNickname());
-        assertThat(userResult.getRoles()).contains(userRole);
-        assertThat(adminResult.getNickname()).isEqualTo(oauthUser.getNickname());
-        assertThat(oauthUser.getRoles()).containsExactly(userRole, adminRole);
-    }
+    assertThat(userResult.getNickname()).isEqualTo(localUser.getNickname());
+    assertThat(userResult.getRoles()).contains(userRole);
+    assertThat(adminResult.getNickname()).isEqualTo(oauthUser.getNickname());
+    assertThat(oauthUser.getRoles()).containsExactly(userRole, adminRole);
+  }
 }

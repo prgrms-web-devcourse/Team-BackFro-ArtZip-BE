@@ -24,35 +24,41 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final PasswordEncoder passwordEncoder;
-    private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
+  private final UserRepository userRepository;
 
-    private final RoleRepository roleRepository;
+  private final RoleRepository roleRepository;
 
-    @Transactional(readOnly = true)
-    public User login(String principal, String credentials){
-        if(!hasText(principal) || !hasText(credentials)) throw new InvalidRequestException(LOGIN_PARAM_REQUIRED);
+  @Transactional(readOnly = true)
+  public User login(String principal, String credentials) {
+      if (!hasText(principal) || !hasText(credentials)) {
+          throw new InvalidRequestException(LOGIN_PARAM_REQUIRED);
+      }
 
-        LocalUser user = (LocalUser) userRepository.findByEmailAndIsQuit(principal, false).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
-        user.checkPassword(passwordEncoder, credentials);
-        return user;
-    }
+    LocalUser user = (LocalUser) userRepository.findByEmailAndIsQuit(principal, false)
+        .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+    user.checkPassword(passwordEncoder, credentials);
+    return user;
+  }
 
-    @Transactional
-    public User signUp(UserSignUpRequest request) {
-        if (userRepository.existsByEmailAndIsQuit(request.getEmail(), false))
-            throw new AlreadyExistsException(USER_ALREADY_EXISTS);
-        if (userRepository.existsByNicknameAndIsQuit(request.getNickname(), false))
-            throw new AlreadyExistsException(USER_ALREADY_EXISTS);
+  @Transactional
+  public User signUp(UserSignUpRequest request) {
+      if (userRepository.existsByEmailAndIsQuit(request.getEmail(), false)) {
+          throw new AlreadyExistsException(USER_ALREADY_EXISTS);
+      }
+      if (userRepository.existsByNicknameAndIsQuit(request.getNickname(), false)) {
+          throw new AlreadyExistsException(USER_ALREADY_EXISTS);
+      }
 
-        Role userRole = roleRepository.findByAuthority(Authority.USER).orElseThrow(() -> new NotFoundException(ROLE_NOT_FOUND));
-        User newUser = LocalUser.builder()
-                .nickname(request.getNickname())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .roles(List.of(userRole))
-                .build();
-        return userRepository.save(newUser);
-    }
+    Role userRole = roleRepository.findByAuthority(Authority.USER)
+        .orElseThrow(() -> new NotFoundException(ROLE_NOT_FOUND));
+    User newUser = LocalUser.builder()
+        .nickname(request.getNickname())
+        .email(request.getEmail())
+        .password(passwordEncoder.encode(request.getPassword()))
+        .roles(List.of(userRole))
+        .build();
+    return userRepository.save(newUser);
+  }
 
 }

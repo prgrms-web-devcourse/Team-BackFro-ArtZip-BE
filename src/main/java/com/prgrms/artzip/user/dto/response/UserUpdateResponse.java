@@ -6,8 +6,9 @@ import lombok.Getter;
 @Getter
 @Builder
 public class UserUpdateResponse {
-    private final Long userId;
-    private final String profileImage;
-    private final String nickname;
-    private final String email;
+
+  private final Long userId;
+  private final String profileImage;
+  private final String nickname;
+  private final String email;
 }

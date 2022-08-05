@@ -12,18 +12,19 @@ import java.util.List;
 @Entity
 @DiscriminatorValue("OAUTH")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class OAuthUser extends User{
+public class OAuthUser extends User {
 
-    @Column(name = "provider")
-    private String provider;
+  @Column(name = "provider")
+  private String provider;
 
-    @Column(name = "provider_id")
-    private String providerId;
+  @Column(name = "provider_id")
+  private String providerId;
 
-    @Builder
-    public OAuthUser(String email, String nickname, String provider, String providerId, List<Role> roles) {
-        super(email, nickname, roles);
-        this.provider = provider;
-        this.providerId = providerId;
-    }
+  @Builder
+  public OAuthUser(String email, String nickname, String provider, String providerId,
+      List<Role> roles) {
+    super(email, nickname, roles);
+    this.provider = provider;
+    this.providerId = providerId;
+  }
 }
