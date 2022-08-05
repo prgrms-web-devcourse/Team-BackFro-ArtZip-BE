@@ -29,6 +29,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -156,6 +157,21 @@ public class ReviewController {
     return ResponseEntity.ok()
         .body(ApiResponse.builder()
             .message("후기 수정 성공")
+            .status(HttpStatus.OK.value())
+            .data(response)
+            .build());
+  }
+
+  @DeleteMapping("/{reviewId}")
+  public ResponseEntity<ApiResponse<ReviewIdResponse>> removeReview(
+      @CurrentUser User user,
+      @PathVariable(value = "reviewId") Long reviewId) {
+
+    ReviewIdResponse response = reviewService.removeReview(user, reviewId);
+
+    return ResponseEntity.ok()
+        .body(ApiResponse.<ReviewIdResponse>builder()
+            .message("후기 삭제 성공")
             .status(HttpStatus.OK.value())
             .data(response)
             .build());
