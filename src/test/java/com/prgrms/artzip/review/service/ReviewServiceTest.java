@@ -9,6 +9,7 @@ import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
+import com.prgrms.artzip.common.error.exception.PermissionDeniedException;
 import com.prgrms.artzip.common.util.AmazonS3Remover;
 import com.prgrms.artzip.common.util.AmazonS3Uploader;
 import com.prgrms.artzip.exibition.domain.Exhibition;
@@ -575,6 +576,68 @@ class ReviewServiceTest {
           reviewService.updateReview(user.getId(), review.getId(), request, null);
         }).isInstanceOf(NotFoundException.class)
             .hasMessageContaining(ErrorCode.REVIEW_PHOTO_NOT_FOUND.getMessage());
+      }
+
+    }
+
+  }
+
+  @Nested
+  @DisplayName("후기 삭제")
+  class ReviewDeletionTest {
+
+    @Nested
+    @DisplayName("성공")
+    class Success {
+
+      @Test
+      @DisplayName("후기 삭제 정상 작동")
+      void testReviewSoftDeletion() {
+        // given
+        doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
+
+        // when
+        ReviewIdResponse response = reviewService.removeReview(user, review.getId());
+
+        // then
+        assertThat(response.getReviewId()).isEqualTo(review.getId());
+        Optional<Review> maybeReview = reviewRepository.findById(response.getReviewId());
+        assertThat(maybeReview.isPresent()).isTrue();
+        assertThat(maybeReview.get().getIsDeleted()).isEqualTo(true);
+      }
+    }
+
+    @Nested
+    @DisplayName("실패")
+    class Failure {
+
+      @Test
+      @DisplayName("존재하지 않는 review인 경우 NotFoundException 발생")
+      void invokeReviewNotFoundExceptionTest() {
+        // given
+        doThrow(new NotFoundException(ErrorCode.REVIEW_NOT_FOUND))
+            .when(reviewRepository).findById(any());
+
+        // when
+        // then
+        assertThatThrownBy(() -> {
+          reviewService.removeReview(user, review.getId());
+        }).isInstanceOf(NotFoundException.class)
+            .hasMessageContaining(ErrorCode.REVIEW_NOT_FOUND.getMessage());
+      }
+
+      @Test
+      @DisplayName("user == null인 경우 PermissionDeniedException 발생")
+      void invokeUserPermissionDeniedExceptionTest() {
+        // given
+        doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
+
+        // when
+        // then
+        assertThatThrownBy(() -> {
+          reviewService.removeReview(null, review.getId());
+        }).isInstanceOf(PermissionDeniedException.class)
+            .hasMessageContaining(ErrorCode.UNAUTHENTICATED_USER.getMessage());
       }
 
     }
