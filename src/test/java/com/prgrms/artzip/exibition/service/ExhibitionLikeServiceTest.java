@@ -1,7 +1,6 @@
 package com.prgrms.artzip.exibition.service;
 
 import static com.prgrms.artzip.common.ErrorCode.EXHB_NOT_FOUND;
-import static com.prgrms.artzip.common.ErrorCode.USER_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -11,7 +10,6 @@ import static org.mockito.Mockito.when;
 
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
-import com.prgrms.artzip.common.error.exception.NotFoundException;
 import com.prgrms.artzip.exibition.domain.Exhibition;
 import com.prgrms.artzip.exibition.domain.ExhibitionLike;
 import com.prgrms.artzip.exibition.domain.enumType.Area;
@@ -21,7 +19,6 @@ import com.prgrms.artzip.exibition.domain.repository.ExhibitionRepository;
 import com.prgrms.artzip.exibition.dto.response.ExhibitionLikeResult;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
-import com.prgrms.artzip.user.domain.repository.UserRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -41,9 +38,6 @@ class ExhibitionLikeServiceTest {
 
   @Mock
   private ExhibitionLikeRepository exhibitionLikeRepository;
-
-  @Mock
-  private UserRepository userRepository;
 
   @InjectMocks
   private ExhibitionLikeService exhibitionLikeService;
@@ -72,38 +66,17 @@ class ExhibitionLikeServiceTest {
       .build();
 
   @Test
-  @DisplayName("좋아요 토글시 사용자를 찾을 수 없는 경우")
-  void testUserNotFound() {
-    when(userRepository.findById(userId))
-        .thenThrow(new NotFoundException(USER_NOT_FOUND));
-
-    assertThatThrownBy(() -> exhibitionLikeService.updateExhibitionLike(userId, exhibitionId))
-        .isInstanceOf(NotFoundException.class)
-        .hasMessage(USER_NOT_FOUND.getMessage());
-
-    verify(userRepository).findById(userId);
-
-    verify(exhibitionLikeRepository, never()).findByUserIdAndExhibitionId(userId, exhibitionId);
-    verify(exhibitionLikeRepository, never()).delete(any());
-    verify(exhibitionRepository, never()).findById(exhibitionId);
-    verify(exhibitionLikeRepository, never()).save(any());
-    verify(exhibitionLikeRepository, never()).countByExhibitionId(exhibitionId);
-  }
-
-  @Test
   @DisplayName("좋아요 추가시 전시회가 없는 경우 테스트")
   void testAddLikeExhibitionNotFound() {
-    when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-    when(exhibitionLikeRepository.findByUserIdAndExhibitionId(userId, exhibitionId))
+    when(exhibitionLikeRepository.findByUserIdAndExhibitionId(user.getId(), exhibitionId))
         .thenReturn(Optional.empty());
     when(exhibitionRepository.findById(exhibitionId)).thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> exhibitionLikeService.updateExhibitionLike(userId, exhibitionId))
+    assertThatThrownBy(() -> exhibitionLikeService.updateExhibitionLike(user, exhibitionId))
         .isInstanceOf(InvalidRequestException.class)
         .hasMessage(EXHB_NOT_FOUND.getMessage());
 
-    verify(userRepository).findById(userId);
-    verify(exhibitionLikeRepository).findByUserIdAndExhibitionId(userId, exhibitionId);
+    verify(exhibitionLikeRepository).findByUserIdAndExhibitionId(user.getId(), exhibitionId);
     verify(exhibitionRepository).findById(exhibitionId);
 
     verify(exhibitionLikeRepository, never()).delete(any());
@@ -114,8 +87,7 @@ class ExhibitionLikeServiceTest {
   @Test
   @DisplayName("좋아요 추가 테스트")
   void testAddLike() {
-    when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-    when(exhibitionLikeRepository.findByUserIdAndExhibitionId(userId, exhibitionId))
+    when(exhibitionLikeRepository.findByUserIdAndExhibitionId(user.getId(), exhibitionId))
         .thenReturn(Optional.empty());
     when(exhibitionRepository.findById(exhibitionId))
         .thenReturn(Optional.of(exhibition));
@@ -123,12 +95,11 @@ class ExhibitionLikeServiceTest {
         .thenReturn(100L);
 
     ExhibitionLikeResult exhibitionLikeResult = exhibitionLikeService
-        .updateExhibitionLike(userId, exhibitionId);
+        .updateExhibitionLike(user, exhibitionId);
 
     assertThat(exhibitionLikeResult.getIsLiked()).isTrue();
 
-    verify(userRepository).findById(userId);
-    verify(exhibitionLikeRepository).findByUserIdAndExhibitionId(userId, exhibitionId);
+    verify(exhibitionLikeRepository).findByUserIdAndExhibitionId(user.getId(), exhibitionId);
     verify(exhibitionRepository).findById(exhibitionId);
     verify(exhibitionLikeRepository).save(any());
     verify(exhibitionLikeRepository).countByExhibitionId(exhibitionId);
@@ -141,17 +112,15 @@ class ExhibitionLikeServiceTest {
   void testRemoveLike() {
     ExhibitionLike exhibitionLike = new ExhibitionLike(user, exhibition);
 
-    when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-    when(exhibitionLikeRepository.findByUserIdAndExhibitionId(userId, exhibitionId))
+    when(exhibitionLikeRepository.findByUserIdAndExhibitionId(user.getId(), exhibitionId))
         .thenReturn(Optional.of(exhibitionLike));
     when(exhibitionLikeRepository.countByExhibitionId(exhibitionId))
         .thenReturn(100L);
 
     ExhibitionLikeResult exhibitionLikeResult = exhibitionLikeService
-        .updateExhibitionLike(userId, exhibitionId);
+        .updateExhibitionLike(user, exhibitionId);
 
-    verify(userRepository).findById(userId);
-    verify(exhibitionLikeRepository).findByUserIdAndExhibitionId(userId, exhibitionId);
+    verify(exhibitionLikeRepository).findByUserIdAndExhibitionId(user.getId(), exhibitionId);
     verify(exhibitionLikeRepository).delete(exhibitionLike);
     verify(exhibitionLikeRepository).countByExhibitionId(exhibitionId);
 

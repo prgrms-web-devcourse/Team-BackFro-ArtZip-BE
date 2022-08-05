@@ -36,6 +36,7 @@ import java.io.PrintWriter;
 @EnableWebSecurity
 @Configuration
 public class WebSecurityConfig {
+
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final JwtConfig jwtConfig;
 
@@ -63,12 +64,14 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public JwtAuthenticationProvider jwtAuthenticationProvider(JwtService jwtService, UserService userService) {
+    public JwtAuthenticationProvider jwtAuthenticationProvider(JwtService jwtService,
+                                                               UserService userService) {
         return new JwtAuthenticationProvider(jwtService, userService);
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
@@ -117,11 +120,12 @@ public class WebSecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/swagger*/**").permitAll()
                 .antMatchers("/api/v1/comments/**/children", "/api/v1/reviews/**/comments").permitAll()
-                .antMatchers("/api/v1/users/me/**").hasAnyAuthority(USER.name(), ADMIN.name())
-                .antMatchers("/api/v1/users/**/info").hasAnyAuthority(USER.name(), ADMIN.name())
-                .antMatchers("/api/v1/comments/**", "/api/v1/reviews/**/comments/new").hasAnyAuthority(USER.name(), ADMIN.name())
+                .antMatchers(
+                        "/api/v1/users/me/**",
+                        "/api/v1/comments/**",
+                        "/api/v1/reviews/**/comments/new",
+                        "/api/v1/exhibitions/**/likes").hasAnyAuthority(USER.name(), ADMIN.name())
                 .anyRequest().permitAll()
                 .and()
                 .exceptionHandling()
