@@ -79,7 +79,7 @@ public class ReviewService {
     validateFileCount(review, request.getDeletedPhotos(), files);
     validateFileExtensions(files);
 
-    removeReviewPhotos(request.getDeletedPhotos());
+    removeReviewPhotosById(request.getDeletedPhotos());
 
     if (files != null) {
       createReviewPhoto(review, files);
@@ -93,10 +93,29 @@ public class ReviewService {
     return new ReviewIdResponse(review.getId());
   }
 
-  private void removeReviewPhotos(List<Long> reviewPhotoIds) {
+  @Transactional
+  public ReviewIdResponse removeReview(final User user, final Long reviewId) {
+    Review review = reviewRepository.findById(reviewId)
+        .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_NOT_FOUND));
+    validateUser(user);
+    validateUserAuthority(user, review);
+
+    review.updateIdDeleted(true);
+    removeReviewPhotos(review.getReviewPhotos());
+
+    return new ReviewIdResponse(review.getId());
+  }
+
+  private void removeReviewPhotosById(List<Long> reviewPhotoIds) {
     reviewPhotoIds.forEach(photoId -> {
       ReviewPhoto reviewPhoto = reviewPhotoRepository.findById(photoId)
           .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_PHOTO_NOT_FOUND));
+      removeReviewPhoto(reviewPhoto);
+    });
+  }
+
+  private void removeReviewPhotos(List<ReviewPhoto> reviewPhotos) {
+    reviewPhotos.forEach(reviewPhoto -> {
       removeReviewPhoto(reviewPhoto);
     });
   }
@@ -150,6 +169,12 @@ public class ReviewService {
 
     if (reviewPhotoCount - deletedPhotosCount + filesCount > REVIEW_PHOTO_COUNT) {
       throw new InvalidRequestException(ErrorCode.INVALID_REVIEW_PHOTO_COUNT);
+    }
+  }
+
+  private void validateUser(User user) {
+    if (Objects.isNull(user)) {
+      throw new PermissionDeniedException(ErrorCode.UNAUTHENTICATED_USER);
     }
   }
 
