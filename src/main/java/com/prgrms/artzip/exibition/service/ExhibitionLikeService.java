@@ -7,7 +7,7 @@ import com.prgrms.artzip.exibition.domain.Exhibition;
 import com.prgrms.artzip.exibition.domain.ExhibitionLike;
 import com.prgrms.artzip.exibition.domain.repository.ExhibitionLikeRepository;
 import com.prgrms.artzip.exibition.domain.repository.ExhibitionRepository;
-import com.prgrms.artzip.exibition.dto.response.ExhibitionLikeResult;
+import com.prgrms.artzip.exibition.dto.response.ExhibitionLikeResponse;
 import com.prgrms.artzip.user.domain.User;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class ExhibitionLikeService {
   private final ExhibitionLikeRepository exhibitionLikeRepository;
 
   @Transactional
-  public ExhibitionLikeResult updateExhibitionLike(User user, Long exhibitionId) {
+  public ExhibitionLikeResponse updateExhibitionLike(User user, Long exhibitionId) {
     Optional<ExhibitionLike> optionalExhibitionLike = exhibitionLikeRepository
         .findByUserIdAndExhibitionId(user.getId(), exhibitionId);
 
@@ -34,10 +34,10 @@ public class ExhibitionLikeService {
           .orElseThrow(() -> new InvalidRequestException(EXHB_NOT_FOUND));
       exhibitionLikeRepository.save(new ExhibitionLike(user, exhibition));
     });
-    
+
     Long likeCount = exhibitionLikeRepository.countByExhibitionId(exhibitionId);
 
-    return ExhibitionLikeResult.builder()
+    return ExhibitionLikeResponse.builder()
         .exhibitionId(exhibitionId)
         .likeCount(likeCount)
         .isLiked(!isLiked)

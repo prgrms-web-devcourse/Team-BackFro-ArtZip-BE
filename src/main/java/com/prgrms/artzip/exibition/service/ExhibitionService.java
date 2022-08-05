@@ -7,8 +7,8 @@ import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.exibition.domain.repository.ExhibitionRepository;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQuery;
-import com.prgrms.artzip.exibition.dto.response.ExhibitionDetailInfo;
-import com.prgrms.artzip.exibition.dto.response.ExhibitionInfo;
+import com.prgrms.artzip.exibition.dto.response.ExhibitionDetailInfoResponseResponse;
+import com.prgrms.artzip.exibition.dto.response.ExhibitionInfoResponseResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,27 +20,29 @@ public class ExhibitionService {
 
   private final ExhibitionRepository exhibitionRepository;
 
-  public Page<ExhibitionInfo> getUpcomingExhibitions(Long userId, Pageable pageable) {
+  public Page<ExhibitionInfoResponseResponse> getUpcomingExhibitions(Long userId,
+      Pageable pageable) {
     Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
         .findUpcomingExhibitions(userId, pageable);
-    return exhibitionsPagingResult.map(ExhibitionInfo::new);
+    return exhibitionsPagingResult.map(ExhibitionInfoResponseResponse::new);
   }
 
-  public Page<ExhibitionInfo> getMostLikeExhibitions(Long userId, boolean includeEnd,
+  public Page<ExhibitionInfoResponseResponse> getMostLikeExhibitions(Long userId,
+      boolean includeEnd,
       Pageable pageable) {
     Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
         .findMostLikeExhibitions(userId, includeEnd, pageable);
-    return exhibitionsPagingResult.map(ExhibitionInfo::new);
+    return exhibitionsPagingResult.map(ExhibitionInfoResponseResponse::new);
   }
 
-  public ExhibitionDetailInfo getExhibition(Long userId, Long exhibitionId) {
+  public ExhibitionDetailInfoResponseResponse getExhibition(Long userId, Long exhibitionId) {
     ExhibitionDetailForSimpleQuery exhibition = exhibitionRepository
         .findExhibition(userId, exhibitionId)
         .orElseThrow(() -> new InvalidRequestException(EXHB_NOT_FOUND));
 
     // getReviews()
 
-    return ExhibitionDetailInfo.builder()
+    return ExhibitionDetailInfoResponseResponse.builder()
         .exhibitionId(exhibition.getId())
         .name(exhibition.getName())
         .thumbnail(exhibition.getThumbnail())
@@ -60,11 +62,12 @@ public class ExhibitionService {
         .build();
   }
 
-  public Page<ExhibitionInfo> getUserLikeExhibitions(Long userId, Long exhibitionLikeUserId,
+  public Page<ExhibitionInfoResponseResponse> getUserLikeExhibitions(Long userId,
+      Long exhibitionLikeUserId,
       Pageable pageable) {
     Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
         .findUserLikeExhibitions(userId, exhibitionLikeUserId, pageable);
 
-    return exhibitionsPagingResult.map(ExhibitionInfo::new);
+    return exhibitionsPagingResult.map(ExhibitionInfoResponseResponse::new);
   }
 }

@@ -5,9 +5,9 @@ import static java.util.Objects.isNull;
 import com.prgrms.artzip.common.ApiResponse;
 import com.prgrms.artzip.common.PageResponse;
 import com.prgrms.artzip.common.entity.CurrentUser;
-import com.prgrms.artzip.exibition.dto.response.ExhibitionDetailInfo;
-import com.prgrms.artzip.exibition.dto.response.ExhibitionInfo;
-import com.prgrms.artzip.exibition.dto.response.ExhibitionLikeResult;
+import com.prgrms.artzip.exibition.dto.response.ExhibitionDetailInfoResponseResponse;
+import com.prgrms.artzip.exibition.dto.response.ExhibitionInfoResponseResponse;
+import com.prgrms.artzip.exibition.dto.response.ExhibitionLikeResponse;
 import com.prgrms.artzip.exibition.service.ExhibitionLikeService;
 import com.prgrms.artzip.exibition.service.ExhibitionSearchService;
 import com.prgrms.artzip.exibition.service.ExhibitionService;
@@ -39,7 +39,7 @@ public class ExhibitionController {
 
   @ApiOperation(value = "다가오는 전시회 조회", notes = "다가오는 전시회를 조회합니다.")
   @GetMapping("/upcoming")
-  public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfo>>> getUpcomingExhibitions(
+  public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfoResponseResponse>>> getUpcomingExhibitions(
       @CurrentUser User user,
       @PageableDefault(page = 0, size = 8) Pageable pageable) {
     ApiResponse apiResponse = ApiResponse.builder()
@@ -56,7 +56,7 @@ public class ExhibitionController {
 
   @ApiOperation(value = "인기 많은 전시회 조회", notes = "인기 많은 전시회를 조회합니다.")
   @GetMapping("/mostlike")
-  public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfo>>> getMostLikeExhibitions(
+  public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfoResponseResponse>>> getMostLikeExhibitions(
       @CurrentUser User user,
       @RequestParam(value = "include-end", required = false, defaultValue = "true") boolean includeEnd,
       @PageableDefault(page = 0, size = 8) Pageable pageable) {
@@ -76,7 +76,8 @@ public class ExhibitionController {
 
   @ApiOperation(value = "전시회 상세 조회", notes = "전시회를 조회합니다.")
   @GetMapping("/{exhibitionId}")
-  public ResponseEntity<ApiResponse<ExhibitionDetailInfo>> getExhibition(@CurrentUser User user,
+  public ResponseEntity<ApiResponse<ExhibitionDetailInfoResponseResponse>> getExhibition(
+      @CurrentUser User user,
       @PathVariable Long exhibitionId) {
     ApiResponse apiResponse = ApiResponse.builder()
         .message("전시회 조회 성공")
@@ -91,7 +92,7 @@ public class ExhibitionController {
 
   @ApiOperation(value = "전시회 좋아요 수정", notes = "전시회에 대한 좋아요를 추가 또는 삭제합니다.")
   @PatchMapping("/{exhibitionId}/likes")
-  public ResponseEntity<ApiResponse<ExhibitionLikeResult>> updateExhibitionLike(
+  public ResponseEntity<ApiResponse<ExhibitionLikeResponse>> updateExhibitionLike(
       @CurrentUser User user, @PathVariable Long exhibitionId) {
 
     ApiResponse apiResponse = ApiResponse.builder()
@@ -107,7 +108,7 @@ public class ExhibitionController {
 
   @ApiOperation(value = "전시회 검색", notes = "전시회를 이름으로 검색합니다.")
   @GetMapping
-  public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfo>>> getExhibitionByQuery(
+  public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfoResponseResponse>>> getExhibitionByQuery(
       @CurrentUser User user,
       String query,
       @RequestParam(value = "include-end", required = false, defaultValue = "true") boolean includeEnd,

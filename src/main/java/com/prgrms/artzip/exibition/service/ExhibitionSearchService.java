@@ -6,8 +6,8 @@ import static java.util.Objects.isNull;
 
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.exibition.domain.repository.ExhibitionRepository;
-import com.prgrms.artzip.exibition.dto.response.ExhibitionBasicInfo;
-import com.prgrms.artzip.exibition.dto.response.ExhibitionInfo;
+import com.prgrms.artzip.exibition.dto.response.ExhibitionBasicInfoResponse;
+import com.prgrms.artzip.exibition.dto.response.ExhibitionInfoResponseResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -21,23 +21,24 @@ public class ExhibitionSearchService {
 
   private final ExhibitionRepository exhibitionRepository;
 
-  public Page<ExhibitionInfo> getExhibitionsByQuery(Long userId, String query, boolean includeEnd,
+  public Page<ExhibitionInfoResponseResponse> getExhibitionsByQuery(Long userId, String query,
+      boolean includeEnd,
       Pageable pageable) {
     if (isNull(query) || query.isBlank() || query.length() < 2) {
       throw new InvalidRequestException(INVALID_EXHB_QUERY);
     }
 
     return exhibitionRepository.findExhibitionsByQuery(userId, query, includeEnd, pageable)
-        .map(ExhibitionInfo::new);
+        .map(ExhibitionInfoResponseResponse::new);
   }
 
-  public List<ExhibitionBasicInfo> getExhibitionsForReview(String query) {
+  public List<ExhibitionBasicInfoResponse> getExhibitionsForReview(String query) {
     if (isNull(query) || query.isBlank()) {
       throw new InvalidRequestException(INVALID_EXHB_QUERY_FOR_REVIEW);
     }
 
     return exhibitionRepository.findExhibitionsForReview(query).stream()
-        .map(exhibitionBasicForSimpleQuery -> ExhibitionBasicInfo.builder()
+        .map(exhibitionBasicForSimpleQuery -> ExhibitionBasicInfoResponse.builder()
             .exhibitionId(exhibitionBasicForSimpleQuery.getId())
             .name(exhibitionBasicForSimpleQuery.getName())
             .thumbnail(exhibitionBasicForSimpleQuery.getThumbnail())
