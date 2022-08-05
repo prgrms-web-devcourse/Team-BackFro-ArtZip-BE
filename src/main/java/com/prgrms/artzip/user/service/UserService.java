@@ -12,7 +12,7 @@ import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.RoleRepository;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
-import com.prgrms.artzip.user.dto.request.UserRegisterRequest;
+import com.prgrms.artzip.user.dto.request.UserSignUpRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -39,7 +39,7 @@ public class UserService {
     }
 
     @Transactional
-    public User register(UserRegisterRequest request) {
+    public User signUp(UserSignUpRequest request) {
         if (userRepository.existsByEmailAndIsQuit(request.getEmail(), false))
             throw new AlreadyExistsException(USER_ALREADY_EXISTS);
         if (userRepository.existsByNicknameAndIsQuit(request.getNickname(), false))

@@ -14,7 +14,7 @@ import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.RoleRepository;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
 import com.prgrms.artzip.user.dto.request.UserLocalLoginRequest;
-import com.prgrms.artzip.user.dto.request.UserRegisterRequest;
+import com.prgrms.artzip.user.dto.request.UserSignUpRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -68,19 +68,19 @@ class UserServiceTest {
 
     @Test
     @DisplayName("정상 회원가입 테스트")
-    void testRegister() {
-        UserRegisterRequest registerRequest = UserRegisterRequest.builder()
+    void testSignUp() {
+        UserSignUpRequest signUpRequest = UserSignUpRequest.builder()
                 .email(newUser.getEmail())
                 .nickname(newUser.getNickname())
                 .password(testPassword).build();
         // given
-        when(userRepository.existsByEmailAndIsQuit(registerRequest.getEmail(), false)).thenReturn(false);
-        when(userRepository.existsByNicknameAndIsQuit(registerRequest.getNickname(), false)).thenReturn(false);
+        when(userRepository.existsByEmailAndIsQuit(signUpRequest.getEmail(), false)).thenReturn(false);
+        when(userRepository.existsByNicknameAndIsQuit(signUpRequest.getNickname(), false)).thenReturn(false);
         when(roleRepository.findByAuthority(Authority.USER)).thenReturn(Optional.of(userRole));
         when(userRepository.save(any())).thenReturn(newUser);
 
         //when
-        User userResult = userService.register(registerRequest);
+        User userResult = userService.signUp(signUpRequest);
 
         //then
         assertThat(userResult.getEmail()).isEqualTo(newUser.getEmail());
@@ -92,30 +92,30 @@ class UserServiceTest {
 
     @Test
     @DisplayName("회원가입 시 이메일이 이미 존재하는 경우 테스트")
-    void testEmailExistRegister() {
-        UserRegisterRequest registerRequest = UserRegisterRequest.builder()
+    void testEmailExistSignUp() {
+        UserSignUpRequest signUpRequest = UserSignUpRequest.builder()
                 .email(newUser.getEmail())
                 .nickname(newUser.getNickname())
                 .password(testPassword).build();
         // given
-        when(userRepository.existsByEmailAndIsQuit(registerRequest.getEmail(), false)).thenReturn(true);
+        when(userRepository.existsByEmailAndIsQuit(signUpRequest.getEmail(), false)).thenReturn(true);
 
-        assertThatThrownBy(() -> userService.register(registerRequest))
+        assertThatThrownBy(() -> userService.signUp(signUpRequest))
                 .isInstanceOf(AlreadyExistsException.class)
                 .hasMessage(USER_ALREADY_EXISTS.getMessage());
     }
 
     @Test
     @DisplayName("회원가입 시 닉네임이 이미 존재하는 경우 테스트")
-    void testNicknameExistRegister() {
-        UserRegisterRequest registerRequest = UserRegisterRequest.builder()
+    void testNicknameExistSignUp() {
+        UserSignUpRequest signUpRequest = UserSignUpRequest.builder()
                 .email(newUser.getEmail())
                 .nickname(newUser.getNickname())
                 .password(testPassword).build();
         // given
-        when(userRepository.existsByNicknameAndIsQuit(registerRequest.getNickname(), false)).thenReturn(true);
+        when(userRepository.existsByNicknameAndIsQuit(signUpRequest.getNickname(), false)).thenReturn(true);
 
-        assertThatThrownBy(() -> userService.register(registerRequest))
+        assertThatThrownBy(() -> userService.signUp(signUpRequest))
                 .isInstanceOf(AlreadyExistsException.class)
                 .hasMessage(USER_ALREADY_EXISTS.getMessage());
     }
@@ -167,15 +167,15 @@ class UserServiceTest {
 
     @Test
     @DisplayName("회원가입 시 user role 에러 테스트")
-    void testAuthorityRegister() {
+    void testAuthoritySignUp() {
         //given
-        UserRegisterRequest registerRequest = UserRegisterRequest.builder()
+        UserSignUpRequest signUpRequest = UserSignUpRequest.builder()
                 .email(newUser.getEmail())
                 .nickname(newUser.getNickname())
                 .password(testPassword).build();
         when(roleRepository.findByAuthority(Authority.USER)).thenReturn(Optional.empty());
         //when then
-        assertThatThrownBy(() -> userService.register(registerRequest))
+        assertThatThrownBy(() -> userService.signUp(signUpRequest))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage(ROLE_NOT_FOUND.getMessage());
     }
