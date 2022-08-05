@@ -55,6 +55,9 @@ public class Review extends BaseEntity {
   @Column(name = "is_public", nullable = false)
   private Boolean isPublic;
 
+  @Column(name = "is_deleted", nullable = false)
+  private Boolean isDeleted;
+
   @OneToMany(mappedBy = "review")
   private List<ReviewLike> reviewLikes = new ArrayList<>();
 
@@ -71,6 +74,7 @@ public class Review extends BaseEntity {
     this.title = title;
     this.date = date;
     this.isPublic = isPublic;
+    this.isDeleted = false;
   }
 
   private void validateFields(User user, Exhibition exhibition, String content, String title,
@@ -128,6 +132,12 @@ public class Review extends BaseEntity {
     }
   }
 
+  private void validateIsDeleted(Boolean isDeleted) {
+    if (Objects.isNull(isDeleted)) {
+      throw new InvalidRequestException(ErrorCode.REVIEW_FIELD_CONTAINS_NULL_VALUE);
+    }
+  }
+
   public void updateContent(String content) {
     validateContent(content);
     this.content = content;
@@ -146,5 +156,10 @@ public class Review extends BaseEntity {
   public void updateIsPublic(Boolean isPublic) {
     validateIsPublic(isPublic);
     this.isPublic = isPublic;
+  }
+
+  public void updateIdDeleted(Boolean isDeleted) {
+    validateIsDeleted(isDeleted);
+    this.isDeleted = isDeleted;
   }
 }
