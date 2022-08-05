@@ -21,4 +21,8 @@ public interface ExhibitionCustomRepository {
       boolean includeEnd, Pageable pageable);
 
   List<ExhibitionBasicForSimpleQuery> findExhibitionsForReview(String query);
+
+  Page<ExhibitionForSimpleQuery> findUserLikeExhibitions(Long userId,
+      Long exhibitionLikeUserId,
+      Pageable pageable);
 }

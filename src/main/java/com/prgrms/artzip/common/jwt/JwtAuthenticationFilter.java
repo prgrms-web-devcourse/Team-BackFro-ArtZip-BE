@@ -3,10 +3,12 @@ package com.prgrms.artzip.common.jwt;
 import static java.util.Objects.*;
 import static org.springframework.util.StringUtils.*;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.prgrms.artzip.common.jwt.claims.AccessClaim;
 import com.prgrms.artzip.common.util.JwtService;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.service.UserUtilService;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private final Logger log = LoggerFactory.getLogger(getClass());
@@ -36,13 +39,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private final JwtService jwtService;
 
   private final UserUtilService userUtilService;
-
-  public JwtAuthenticationFilter(String accessHeaderKey,
-                                 JwtService jwtService, UserUtilService userUtilService) {
-    this.accessHeaderKey = accessHeaderKey;
-    this.jwtService = jwtService;
-    this.userUtilService = userUtilService;
-  }
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -60,8 +56,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
           }
+        } catch (TokenExpiredException e) {
+          log.warn("토큰이 만료된 요청입니다. token: {}", token);
+          throw e;
         } catch (Exception e) {
-          log.warn("Jwt 처리 실패: {}", e.getMessage());
+          log.warn("Jwt 처리 실패: {}, class: {}", e.getMessage(), e.getClass());
+          throw e;
         }
       }
     } else {

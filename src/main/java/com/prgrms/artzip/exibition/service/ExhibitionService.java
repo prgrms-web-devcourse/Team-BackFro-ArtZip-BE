@@ -59,4 +59,12 @@ public class ExhibitionService {
         .isLiked(exhibition.getIsLiked())
         .build();
   }
+
+  public Page<ExhibitionInfo> getUserLikeExhibitions(Long userId, Long exhibitionLikeUserId,
+      Pageable pageable) {
+    Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
+        .findUserLikeExhibitions(userId, exhibitionLikeUserId, pageable);
+
+    return exhibitionsPagingResult.map(ExhibitionInfo::new);
+  }
 }

@@ -6,15 +6,15 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class RegisterResponse {
+public class SignUpResponse {
   private final Long userId;
 
   private final String email;
 
   private final String nickname;
 
-  public static RegisterResponse from(User user) {
-    return RegisterResponse.builder()
+  public static SignUpResponse from(User user) {
+    return SignUpResponse.builder()
         .userId(user.getId())
         .email(user.getEmail())
         .nickname(user.getNickname())
