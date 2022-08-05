@@ -8,15 +8,17 @@ import com.prgrms.artzip.exibition.service.ExhibitionService;
 import com.prgrms.artzip.review.service.ReviewLikeService;
 import com.prgrms.artzip.review.service.ReviewService;
 import com.prgrms.artzip.user.domain.User;
+import com.prgrms.artzip.user.dto.request.UserUpdateRequest;
 import com.prgrms.artzip.user.dto.response.UserResponse;
+import com.prgrms.artzip.user.dto.response.UserUpdateResponse;
 import com.prgrms.artzip.user.service.UserService;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -64,5 +66,10 @@ public class MyController {
                 .data(userResponse)
                 .build();
         return ResponseEntity.ok(apiResponse);
+    }
+
+    @PatchMapping("/info")
+    public ResponseEntity<ApiResponse<UserUpdateResponse>> updateUserInfo(@CurrentUser User user, @RequestBody @Valid UserUpdateRequest updateRequest) {
+        return null;
     }
 }
