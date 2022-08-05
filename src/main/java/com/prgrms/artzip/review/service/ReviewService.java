@@ -9,7 +9,9 @@ import com.prgrms.artzip.common.util.AmazonS3Uploader;
 import com.prgrms.artzip.exibition.domain.Exhibition;
 import com.prgrms.artzip.exibition.domain.repository.ExhibitionRepository;
 import com.prgrms.artzip.review.domain.Review;
+import com.prgrms.artzip.review.domain.ReviewLike;
 import com.prgrms.artzip.review.domain.ReviewPhoto;
+import com.prgrms.artzip.review.domain.repository.ReviewLikeRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewPhotoRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewRepository;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
@@ -35,6 +37,7 @@ public class ReviewService {
 
   private final ReviewRepository reviewRepository;
   private final ReviewPhotoRepository reviewPhotoRepository;
+  private final ReviewLikeRepository reviewLikeRepository;
   private final UserRepository userRepository;
   private final ExhibitionRepository exhibitionRepository;
   private final AmazonS3Uploader amazonS3Uploader;
@@ -102,8 +105,13 @@ public class ReviewService {
 
     review.updateIdDeleted(true);
     removeReviewPhotos(review.getReviewPhotos());
+    removeReviewLikes(review.getReviewLikes());
 
     return new ReviewIdResponse(review.getId());
+  }
+
+  private void removeReviewLikes(List<ReviewLike> reviewLikes) {
+    reviewLikeRepository.deleteAllInBatch(reviewLikes);
   }
 
   private void removeReviewPhotosById(List<Long> reviewPhotoIds) {
