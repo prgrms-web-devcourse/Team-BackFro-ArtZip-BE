@@ -28,7 +28,7 @@ public class AmazonS3Uploader {
   }
 
   @Value("${cloud.aws.s3.bucket}")
-  public String bucket;
+  private String bucket;
 
   @Value("${cloud.aws.s3.default-profile-image}")
   private String defaultProfileImage;

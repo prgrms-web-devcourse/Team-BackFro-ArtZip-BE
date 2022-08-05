@@ -11,7 +11,6 @@ import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
 import com.prgrms.artzip.common.util.AmazonS3Remover;
 import com.prgrms.artzip.common.util.AmazonS3Uploader;
-import com.prgrms.artzip.review.domain.ReviewPhoto;
 import com.prgrms.artzip.user.domain.LocalUser;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
@@ -96,16 +95,16 @@ public class UserService {
       } else {
         // 수정하지 않은 경우
         if (hasText(request.getProfileImage())) {
-          if (user.getProfileImage().equals(request.getProfileImage()))
+          if (request.getProfileImage().equals(amazonS3Uploader.getDefaultProfileImage()) || user.getProfileImage().equals(request.getProfileImage()))
             updatedProfile = request.getProfileImage();
           else
             throw new InvalidRequestException(USER_PROFILE_NOT_MATCHED);
         }
       }
-      if (!user.getProfileImage().equals(amazonS3Uploader.getDefaultProfileImage()))
+      if (!user.getProfileImage().equals(amazonS3Uploader.getDefaultProfileImage()) && !user.getProfileImage().equals(request.getProfileImage()))
         amazonS3Remover.removeFile(user.getProfileImage(), PROFILE_DIRECTORY_NAME);
       user.setProfileImage(updatedProfile);
-    } catch (Exception e) {
+    } catch (IOException e) {
       log.error("이미지 처리 실패: {}", e.getMessage());
     }
     userRepository.save(user);

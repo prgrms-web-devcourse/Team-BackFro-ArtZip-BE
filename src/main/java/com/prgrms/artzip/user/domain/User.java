@@ -15,6 +15,7 @@ import javax.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,8 +31,6 @@ public class User extends BaseEntity {
   private static final int MAX_NICKNAME_LENGTH = 10;
   private static final int MAX_PROFILEIMAGE_LENGTH = 300;
 
-  private static final String defaultProfileImage = "https://devcourse-backfro-s3.s3.ap-northeast-2.amazonaws.com/profileImage/default/anonymous-user.jpg";
-
   // TODO: max 값 erd 보고 확인
   // TODO: 기본 프사 이미지 s3에 올리고 링크 디폴트로 설정.
 
@@ -44,7 +43,7 @@ public class User extends BaseEntity {
   private String email;
 
   @Column(name = "profile_image", length = 300)
-  private String profileImage = "default s3 profileImage link";
+  private String profileImage = "https://devcourse-backfro-s3.s3.ap-northeast-2.amazonaws.com/profileImage/default/anonymous-user.jpg";
 
   @Column(name = "nickname", nullable = false, length = MAX_NICKNAME_LENGTH)
   private String nickname;
