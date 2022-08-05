@@ -162,9 +162,11 @@ public class ReviewController {
             .build());
   }
 
+  @ApiOperation(value = "후기 삭제", notes = "후기 삭제를 요청합니다.")
   @DeleteMapping("/{reviewId}")
   public ResponseEntity<ApiResponse<ReviewIdResponse>> removeReview(
       @CurrentUser User user,
+      @ApiParam(value = "삭제할 후기의 ID")
       @PathVariable(value = "reviewId") Long reviewId) {
 
     ReviewIdResponse response = reviewService.removeReview(user, reviewId);
