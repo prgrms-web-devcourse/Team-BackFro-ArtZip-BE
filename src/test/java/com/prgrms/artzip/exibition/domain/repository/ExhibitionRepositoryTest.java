@@ -148,7 +148,7 @@ class ExhibitionRepositoryTest {
           .findUpcomingExhibitions(null, PageRequest.of(0, 10));
       ExhibitionForSimpleQuery exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);
 
-      assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(2);
+      assertThat(exhibitionsPagingResult.getContent()).hasSize(2);
       assertThat(exhibitionAtSeoul)
           .hasFieldOrPropertyWithValue("name", "전시회 at 서울")
           .hasFieldOrPropertyWithValue("likeCount", 1L)
@@ -163,7 +163,7 @@ class ExhibitionRepositoryTest {
           .findUpcomingExhibitions(user1.getId(), PageRequest.of(0, 10));
       ExhibitionForSimpleQuery exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);
 
-      assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(2);
+      assertThat(exhibitionsPagingResult.getContent()).hasSize(2);
       assertThat(exhibitionAtSeoul)
           .hasFieldOrPropertyWithValue("name", "전시회 at 서울")
           .hasFieldOrPropertyWithValue("likeCount", 1L)
@@ -183,7 +183,7 @@ class ExhibitionRepositoryTest {
           .findMostLikeExhibitions(null, true, PageRequest.of(0, 10));
       ExhibitionForSimpleQuery exhibitionAtGyeonggi = exhibitionsPagingResult.getContent().get(0);
 
-      assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(3);
+      assertThat(exhibitionsPagingResult.getContent()).hasSize(3);
 
       assertThat(exhibitionAtGyeonggi)
           .hasFieldOrPropertyWithValue("name", "전시회 at 경기")
@@ -247,7 +247,7 @@ class ExhibitionRepositoryTest {
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
           .findExhibitionsByQuery(null, "부산", true, PageRequest.of(0, 10));
 
-      assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(1);
+      assertThat(exhibitionsPagingResult.getContent()).hasSize(1);
     }
 
     @Test
@@ -256,7 +256,7 @@ class ExhibitionRepositoryTest {
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
           .findExhibitionsByQuery(user2.getId(), "전시회", false, PageRequest.of(0, 10));
 
-      assertThat(exhibitionsPagingResult.getContent().size()).isEqualTo(2);
+      assertThat(exhibitionsPagingResult.getContent()).hasSize(2);
       assertThat(exhibitionsPagingResult.getContent().get(0))
           .hasFieldOrPropertyWithValue("isLiked", false);
     }
@@ -272,7 +272,7 @@ class ExhibitionRepositoryTest {
       List<ExhibitionBasicForSimpleQuery> exhibitions = exhibitionRepository.findExhibitionsForReview(
           "부산");
 
-      assertThat(exhibitions.size()).isEqualTo(1);
+      assertThat(exhibitions).hasSize(1);
       assertThat(exhibitions.get(0))
           .hasFieldOrPropertyWithValue("name", "전시회 at 부산")
           .hasFieldOrPropertyWithValue("thumbnail",
@@ -293,7 +293,7 @@ class ExhibitionRepositoryTest {
           .findUserLikeExhibitions(user2.getId(), user1.getId(), PageRequest.of(0, 8));
 
       List<ExhibitionForSimpleQuery> contents = exhibitionsPagingResult.getContent();
-      assertThat(contents.size()).isEqualTo(3);
+      assertThat(contents).hasSize(3);
 
       assertThat(contents.get(0))
           .hasFieldOrPropertyWithValue("name", "전시회 at 경기")
@@ -312,7 +312,7 @@ class ExhibitionRepositoryTest {
           .findUserLikeExhibitions(user1.getId(), user1.getId(), PageRequest.of(0, 8));
 
       List<ExhibitionForSimpleQuery> contents = exhibitionsPagingResult.getContent();
-      assertThat(contents.size()).isEqualTo(3);
+      assertThat(contents).hasSize(3);
 
       for (ExhibitionBasicForSimpleQuery exhibition : contents) {
         assertThat(exhibition).hasFieldOrPropertyWithValue("isLiked", true);
