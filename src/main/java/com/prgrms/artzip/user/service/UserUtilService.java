@@ -11,14 +11,14 @@ import static com.prgrms.artzip.common.ErrorCode.USER_NOT_FOUND;
 @Service
 public class UserUtilService {
 
-    private final UserRepository userRepository;
+  private final UserRepository userRepository;
 
-    public UserUtilService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+  public UserUtilService(UserRepository userRepository) {
+    this.userRepository = userRepository;
+  }
 
-    @Transactional(readOnly = true)
-    public User getUserById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
-    }
+  @Transactional(readOnly = true)
+  public User getUserById(Long userId) {
+    return userRepository.findById(userId).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+  }
 }

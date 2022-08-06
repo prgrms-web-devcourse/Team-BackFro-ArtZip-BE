@@ -27,49 +27,49 @@ import java.util.Optional;
 @ExtendWith(MockitoExtension.class)
 class UserUtilServiceTest {
 
-    @Mock
-    private UserRepository userRepository;
+  @Mock
+  private UserRepository userRepository;
 
-    @InjectMocks
-    private UserUtilService utilService;
+  @InjectMocks
+  private UserUtilService utilService;
 
-    private User testUser;
-    private Role userRole;
-    @Spy
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-    private static final String testPassword = "test1234!";
-    private static final String testEmail = "test@gmail.com";
-    private static final String testNickname = "testUser";
+  private User testUser;
+  private Role userRole;
+  @Spy
+  private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+  private static final String testPassword = "test1234!";
+  private static final String testEmail = "test@gmail.com";
+  private static final String testNickname = "testUser";
 
-    @BeforeEach
-    void setUp() {
-        userRole = new Role(Authority.USER);
-        testUser = LocalUser.builder()
-                .email(testEmail)
-                .nickname(testNickname)
-                .password(passwordEncoder.encode(testPassword))
-                .roles(List.of(userRole)).build();
-    }
+  @BeforeEach
+  void setUp() {
+    userRole = new Role(Authority.USER);
+    testUser = LocalUser.builder()
+        .email(testEmail)
+        .nickname(testNickname)
+        .password(passwordEncoder.encode(testPassword))
+        .roles(List.of(userRole)).build();
+  }
 
-    @Test
-    @DisplayName("존재하는 유저 반환 테스트")
-    void testGetUserById() {
-        // given
-        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
-        // when
-        User userResult = utilService.getUserById(1L);
-        // then
-        assertThat(userResult).hasFieldOrPropertyWithValue("email", testUser.getEmail());
-    }
+  @Test
+  @DisplayName("존재하는 유저 반환 테스트")
+  void testGetUserById() {
+    // given
+    when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+    // when
+    User userResult = utilService.getUserById(1L);
+    // then
+    assertThat(userResult).hasFieldOrPropertyWithValue("email", testUser.getEmail());
+  }
 
-    @Test
-    @DisplayName("존재하지 않는 유저 예외 테스트")
-    void testGetAnonymous() {
-        // given
-        when(userRepository.findById(1L)).thenReturn(Optional.empty());
-        // when then
-        assertThatThrownBy(() -> utilService.getUserById(1L))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessage(USER_NOT_FOUND.getMessage());
-    }
+  @Test
+  @DisplayName("존재하지 않는 유저 예외 테스트")
+  void testGetAnonymous() {
+    // given
+    when(userRepository.findById(1L)).thenReturn(Optional.empty());
+    // when then
+    assertThatThrownBy(() -> utilService.getUserById(1L))
+        .isInstanceOf(NotFoundException.class)
+        .hasMessage(USER_NOT_FOUND.getMessage());
+  }
 }

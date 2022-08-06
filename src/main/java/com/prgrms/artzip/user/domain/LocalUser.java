@@ -20,35 +20,36 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LocalUser extends User {
 
-    private static final String PASSWORD_REGEX = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$";
-    private static final int MAX_PASSWORD_LENGTH = 500;
+  private static final String PASSWORD_REGEX = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$";
+  private static final int MAX_PASSWORD_LENGTH = 500;
 
-    @Column(name = "password")
-    private String password;
+  @Column(name = "password")
+  private String password;
 
-    @Builder
-    public LocalUser(String email, String nickname, String password, List<Role> roles) {
-        super(email, nickname, roles);
-        this.password = password;
+  @Builder
+  public LocalUser(String email, String nickname, String password, List<Role> roles) {
+    super(email, nickname, roles);
+    this.password = password;
+  }
+
+  public void checkPassword(PasswordEncoder passwordEncoder, String credentials) {
+      if (!passwordEncoder.matches(credentials, password)) {
+          throw new AuthErrorException(INVALID_ACCOUNT_REQUEST);
+      }
+  }
+
+  private void validatePassword(String password) {
+    if (password.length() > MAX_PASSWORD_LENGTH) {
+      throw new InvalidRequestException(INVALID_LENGTH);
     }
-
-    public void checkPassword(PasswordEncoder passwordEncoder, String credentials) {
-        if (!passwordEncoder.matches(credentials, password))
-            throw new AuthErrorException(INVALID_ACCOUNT_REQUEST);
+    if (!Pattern.matches(PASSWORD_REGEX, password)) {
+      throw new InvalidRequestException(INVALID_INPUT_VALUE);
     }
+  }
 
-    private void validatePassword(String password) {
-        if(password.length() > MAX_PASSWORD_LENGTH) {
-            throw new InvalidRequestException(INVALID_LENGTH);
-        }
-        if(!Pattern.matches(PASSWORD_REGEX, password)) {
-            throw new InvalidRequestException(INVALID_INPUT_VALUE);
-        }
-    }
-
-    public void changePassword(PasswordEncoder passwordEncoder, String password) {
-        validatePassword(password);
-        this.password = passwordEncoder.encode(password);
-    }
+  public void changePassword(PasswordEncoder passwordEncoder, String password) {
+    validatePassword(password);
+    this.password = passwordEncoder.encode(password);
+  }
 }
 
