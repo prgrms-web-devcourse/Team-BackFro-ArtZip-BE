@@ -111,8 +111,12 @@ public class UserController {
   }
 
   @GetMapping("/check")
-  public ResponseEntity<ApiResponse<UniqueCheckResponse>> checkNicknameValid(@RequestParam("nickname") String nickname, @RequestParam("email") String email) {
-    UniqueCheckResponse response = null;
+  public ResponseEntity<ApiResponse<UniqueCheckResponse>> checkNicknameValid(
+      @RequestParam("nickname") String nickname, @RequestParam("email") String email) {
+    UniqueCheckResponse response =
+        userUtilService.checkNicknameUnique(nickname) && userUtilService.checkEmailUnique(email)
+            ? new UniqueCheckResponse(true)
+            : new UniqueCheckResponse(false);
     ApiResponse apiResponse = ApiResponse.builder()
         .message("중복검사가 완료되었습니다.")
         .status(OK.value())

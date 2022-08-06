@@ -21,4 +21,14 @@ public class UserUtilService {
   public User getUserById(Long userId) {
     return userRepository.findById(userId).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
   }
+
+  @Transactional(readOnly = true)
+  public boolean checkNicknameUnique(String nickname) {
+    return userRepository.existsByNicknameAndIsQuit(nickname, false);
+  }
+
+  @Transactional(readOnly = true)
+  public boolean checkEmailUnique(String nickname) {
+    return userRepository.existsByEmailAndIsQuit(nickname, false);
+  }
 }
