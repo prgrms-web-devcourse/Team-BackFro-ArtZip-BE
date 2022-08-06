@@ -1,7 +1,6 @@
 package com.prgrms.artzip.exibition.domain.repository;
 
 import static com.prgrms.artzip.exibition.domain.QExhibition.exhibition;
-import static com.prgrms.artzip.exibition.domain.QExhibitionLike.exhibitionLike;
 import static com.prgrms.artzip.review.domain.QReview.review;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -30,6 +29,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
+// 재사용성이 shit
 @RequiredArgsConstructor
 public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
 
@@ -37,6 +37,8 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
 
   private final QExhibitionLike exhibitionLikeForIsLiked = new QExhibitionLike(
       "exhibitionLikeForIsLiked");
+  private final QExhibitionLike exhibitionLikeForLikeCount = new QExhibitionLike(
+      "exhibitionLikeForLikeCount");
 
   @Override
   public Page<ExhibitionForSimpleQuery> findUpcomingExhibitions(Long userId, Pageable pageable) {
@@ -48,19 +50,20 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
                 exhibition.name,
                 exhibition.thumbnail,
                 new CaseBuilder()
-                    .when(exhibitionLikeUserIdEq(userId))
+                    .when(exhibitionLikeForIsLikedUserIdEq(userId))
                     .then(true)
                     .otherwise(false).as("isLiked"),
                 exhibition.period,
-                exhibitionLike.id.countDistinct().as("likeCount"),
+                exhibitionLikeForLikeCount.id.countDistinct().as("likeCount"),
                 review.id.countDistinct().as("reviewCount")
             )
         )
         .from(exhibition)
         .leftJoin(exhibitionLikeForIsLiked)
-        .on(exhibitionLikeForIsLiked.exhibition.eq(exhibition), exhibitionLikeUserIdEq(userId))
-        .leftJoin(exhibitionLike)
-        .on(exhibitionLike.exhibition.eq(exhibition))
+        .on(exhibitionLikeForIsLiked.exhibition.eq(exhibition),
+            exhibitionLikeForIsLikedUserIdEq(userId))
+        .leftJoin(exhibitionLikeForLikeCount)
+        .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
         .leftJoin(review)
         .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse())
         .where(exhibition.period.startDate.goe(today))
@@ -90,19 +93,20 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
                 exhibition.name,
                 exhibition.thumbnail,
                 new CaseBuilder()
-                    .when(exhibitionLikeUserIdEq(userId))
+                    .when(exhibitionLikeForIsLikedUserIdEq(userId))
                     .then(true)
                     .otherwise(false).as("isLiked"),
                 exhibition.period,
-                exhibitionLike.id.countDistinct().as("likeCount"),
+                exhibitionLikeForLikeCount.id.countDistinct().as("likeCount"),
                 review.id.countDistinct().as("reviewCount")
             )
         )
         .from(exhibition)
         .leftJoin(exhibitionLikeForIsLiked)
-        .on(exhibitionLikeForIsLiked.exhibition.eq(exhibition), exhibitionLikeUserIdEq(userId))
-        .leftJoin(exhibitionLike)
-        .on(exhibitionLike.exhibition.eq(exhibition))
+        .on(exhibitionLikeForIsLiked.exhibition.eq(exhibition),
+            exhibitionLikeForIsLikedUserIdEq(userId))
+        .leftJoin(exhibitionLikeForLikeCount)
+        .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
         .leftJoin(review)
         .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse())
         .where(mostLikeCondition)
@@ -137,17 +141,18 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
                 exhibition.url,
                 exhibition.placeUrl,
                 new CaseBuilder()
-                    .when(exhibitionLikeUserIdEq(userId))
+                    .when(exhibitionLikeForIsLikedUserIdEq(userId))
                     .then(true)
                     .otherwise(false).as("isLiked"),
-                exhibitionLike.exhibition.id.count().as("likeCount")
+                exhibitionLikeForLikeCount.id.count().as("likeCount")
             )
         )
         .from(exhibition)
         .leftJoin(exhibitionLikeForIsLiked)
-        .on(exhibitionLikeForIsLiked.exhibition.eq(exhibition), exhibitionLikeUserIdEq(userId))
-        .leftJoin(exhibitionLike)
-        .on(exhibitionLike.exhibition.eq(exhibition))
+        .on(exhibitionLikeForIsLiked.exhibition.eq(exhibition),
+            exhibitionLikeForIsLikedUserIdEq(userId))
+        .leftJoin(exhibitionLikeForLikeCount)
+        .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
         .where(exhibition.id.eq(exhibitionId))
         .groupBy(exhibition.id)
         .fetchOne());
@@ -165,19 +170,20 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
                 exhibition.name,
                 exhibition.thumbnail,
                 new CaseBuilder()
-                    .when(exhibitionLikeUserIdEq(userId))
+                    .when(exhibitionLikeForIsLikedUserIdEq(userId))
                     .then(true)
                     .otherwise(false).as("isLiked"),
                 exhibition.period,
-                exhibitionLike.id.countDistinct().as("likeCount"),
+                exhibitionLikeForLikeCount.id.countDistinct().as("likeCount"),
                 review.id.countDistinct().as("reviewCount")
             )
         )
         .from(exhibition)
         .leftJoin(exhibitionLikeForIsLiked)
-        .on(exhibitionLikeForIsLiked.exhibition.eq(exhibition), exhibitionLikeUserIdEq(userId))
-        .leftJoin(exhibitionLike)
-        .on(exhibitionLike.exhibition.eq(exhibition))
+        .on(exhibitionLikeForIsLiked.exhibition.eq(exhibition),
+            exhibitionLikeForIsLikedUserIdEq(userId))
+        .leftJoin(exhibitionLikeForLikeCount)
+        .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
         .leftJoin(review)
         .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse())
         .where(exhibitionsByQueryCondition)
@@ -225,20 +231,22 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
                 exhibition.name,
                 exhibition.thumbnail,
                 new CaseBuilder()
-                    .when(exhibitionLikeUserIdEq(userId))
+                    .when(exhibitionLikeForIsLikedUserIdEq(userId))
                     .then(true)
                     .otherwise(false).as("isLiked"),
                 exhibition.period,
-                exhibitionLike.id.countDistinct().as("likeCount"),
+                exhibitionLikeForLikeCount.id.countDistinct().as("likeCount"),
+                exhibitionLikeForLikeCount.id.countDistinct().as("likeCount"),
                 review.id.countDistinct().as("reviewCount")
             )
         )
         .from(exhibition)
         .leftJoin(exhibitionLikeForIsLiked)
-        .on(exhibitionLikeForIsLiked.exhibition.eq(exhibition), exhibitionLikeUserIdEq(userId))
+        .on(exhibitionLikeForIsLiked.exhibition.eq(exhibition),
+            exhibitionLikeForIsLikedUserIdEq(userId))
         .join(exhibition.exhibitionLikes, exhibitionLikeForExhibitionLikeUser)
-        .leftJoin(exhibitionLike)
-        .on(exhibitionLike.exhibition.eq(exhibition))
+        .leftJoin(exhibitionLikeForLikeCount)
+        .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
         .leftJoin(review)
         .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse())
         .where(exhibitionLikeForExhibitionLikeUser.user.id.eq(exhibitionLikeUserId))
@@ -268,25 +276,26 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
                 exhibition.name,
                 exhibition.thumbnail,
                 new CaseBuilder()
-                    .when(exhibitionLikeUserIdEq(userId))
+                    .when(exhibitionLikeForIsLikedUserIdEq(userId))
                     .then(true)
                     .otherwise(false).as("isLiked"),
                 exhibition.period,
-                exhibitionLike.id.countDistinct().as("likeCount"),
+                exhibitionLikeForLikeCount.id.countDistinct().as("likeCount"),
                 review.id.countDistinct().as("reviewCount")
             )
         )
         .from(exhibition)
         .leftJoin(exhibitionLikeForIsLiked)
-        .on(exhibitionLikeForIsLiked.exhibition.eq(exhibition), exhibitionLikeUserIdEq(userId))
-        .leftJoin(exhibitionLike)
-        .on(exhibitionLike.exhibition.eq(exhibition))
+        .on(exhibitionLikeForIsLiked.exhibition.eq(exhibition),
+            exhibitionLikeForIsLikedUserIdEq(userId))
+        .leftJoin(exhibitionLikeForLikeCount)
+        .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
         .leftJoin(review)
         .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse())
         .where(customCondition)
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize())
-        .groupBy(exhibition.id, exhibition.period.startDate)
+        .groupBy(exhibition.id)
         .orderBy(exhibition.period.startDate.asc())
         .fetch();
 
@@ -362,7 +371,7 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
     return customCondition;
   }
 
-  private BooleanExpression exhibitionLikeUserIdEq(Long userId) {
+  private BooleanExpression exhibitionLikeForIsLikedUserIdEq(Long userId) {
     if (isNull(userId)) {
       return exhibitionLikeForIsLiked.user.id.eq(-1L);
     } else {
