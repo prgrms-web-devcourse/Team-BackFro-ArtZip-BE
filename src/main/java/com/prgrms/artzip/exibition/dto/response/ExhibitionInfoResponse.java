@@ -9,7 +9,7 @@ import lombok.Getter;
 
 @Getter
 @JsonInclude(NON_NULL)
-public class ExhibitionInfoResponseResponse extends ExhibitionBasicInfoResponse {
+public class ExhibitionInfoResponse extends ExhibitionBasicInfoResponse {
 
   private LocalDate startDate;
   private LocalDate endDate;
@@ -19,7 +19,7 @@ public class ExhibitionInfoResponseResponse extends ExhibitionBasicInfoResponse 
   private Double lat;
   private Double lng;
 
-  public ExhibitionInfoResponseResponse(ExhibitionForSimpleQuery exhibitionForSimpleQuery) {
+  public ExhibitionInfoResponse(ExhibitionForSimpleQuery exhibitionForSimpleQuery) {
     super(exhibitionForSimpleQuery.getId(), exhibitionForSimpleQuery.getName(),
         exhibitionForSimpleQuery.getThumbnail());
     this.startDate = exhibitionForSimpleQuery.getPeriod().getStartDate();

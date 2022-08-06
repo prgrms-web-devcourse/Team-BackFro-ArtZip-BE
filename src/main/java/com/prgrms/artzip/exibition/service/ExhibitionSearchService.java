@@ -14,7 +14,7 @@ import com.prgrms.artzip.exibition.dto.ExhibitionCustomCondition;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.request.ExhibitionCustomConditionRequest;
 import com.prgrms.artzip.exibition.dto.response.ExhibitionBasicInfoResponse;
-import com.prgrms.artzip.exibition.dto.response.ExhibitionInfoResponseResponse;
+import com.prgrms.artzip.exibition.dto.response.ExhibitionInfoResponse;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,7 +30,7 @@ public class ExhibitionSearchService {
 
   private final ExhibitionRepository exhibitionRepository;
 
-  public Page<ExhibitionInfoResponseResponse> getExhibitionsByQuery(Long userId, String query,
+  public Page<ExhibitionInfoResponse> getExhibitionsByQuery(Long userId, String query,
       boolean includeEnd,
       Pageable pageable) {
     if (isNull(query) || query.isBlank() || query.length() < 2) {
@@ -38,7 +38,7 @@ public class ExhibitionSearchService {
     }
 
     return exhibitionRepository.findExhibitionsByQuery(userId, query, includeEnd, pageable)
-        .map(ExhibitionInfoResponseResponse::new);
+        .map(ExhibitionInfoResponse::new);
   }
 
   public List<ExhibitionBasicInfoResponse> getExhibitionsForReview(String query) {
@@ -55,7 +55,7 @@ public class ExhibitionSearchService {
         .collect(Collectors.toList());
   }
 
-  public Page<ExhibitionInfoResponseResponse> getExhibitionsByCustomCondition(Long userId,
+  public Page<ExhibitionInfoResponse> getExhibitionsByCustomCondition(Long userId,
       ExhibitionCustomConditionRequest exhibitionCustomConditionRequest, boolean includeEnd,
       Pageable pageable) {
 
@@ -65,7 +65,7 @@ public class ExhibitionSearchService {
     Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
         .findExhibitionsByCustomCondition(userId, exhibitionCustomCondition, pageable);
 
-    return exhibitionsPagingResult.map(ExhibitionInfoResponseResponse::new);
+    return exhibitionsPagingResult.map(ExhibitionInfoResponse::new);
   }
 
   private ExhibitionCustomCondition validateCondition(

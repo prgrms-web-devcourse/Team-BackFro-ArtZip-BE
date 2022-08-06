@@ -6,8 +6,8 @@ import com.prgrms.artzip.common.ApiResponse;
 import com.prgrms.artzip.common.PageResponse;
 import com.prgrms.artzip.common.entity.CurrentUser;
 import com.prgrms.artzip.exibition.dto.request.ExhibitionCustomConditionRequest;
-import com.prgrms.artzip.exibition.dto.response.ExhibitionDetailInfoResponseResponse;
-import com.prgrms.artzip.exibition.dto.response.ExhibitionInfoResponseResponse;
+import com.prgrms.artzip.exibition.dto.response.ExhibitionDetailInfoResponse;
+import com.prgrms.artzip.exibition.dto.response.ExhibitionInfoResponse;
 import com.prgrms.artzip.exibition.dto.response.ExhibitionLikeResponse;
 import com.prgrms.artzip.exibition.service.ExhibitionLikeService;
 import com.prgrms.artzip.exibition.service.ExhibitionSearchService;
@@ -42,7 +42,7 @@ public class ExhibitionController {
 
   @ApiOperation(value = "다가오는 전시회 조회", notes = "다가오는 전시회를 조회합니다.")
   @GetMapping("/upcoming")
-  public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfoResponseResponse>>> getUpcomingExhibitions(
+  public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfoResponse>>> getUpcomingExhibitions(
       @CurrentUser User user,
       @PageableDefault(page = 0, size = 8) Pageable pageable) {
     ApiResponse apiResponse = ApiResponse.builder()
@@ -59,7 +59,7 @@ public class ExhibitionController {
 
   @ApiOperation(value = "인기 많은 전시회 조회", notes = "인기 많은 전시회를 조회합니다.")
   @GetMapping("/mostlike")
-  public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfoResponseResponse>>> getMostLikeExhibitions(
+  public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfoResponse>>> getMostLikeExhibitions(
       @CurrentUser User user,
       @RequestParam(value = "include-end", required = false, defaultValue = "true") boolean includeEnd,
       @PageableDefault(page = 0, size = 8) Pageable pageable) {
@@ -79,7 +79,7 @@ public class ExhibitionController {
 
   @ApiOperation(value = "전시회 상세 조회", notes = "전시회를 조회합니다.")
   @GetMapping("/{exhibitionId}")
-  public ResponseEntity<ApiResponse<ExhibitionDetailInfoResponseResponse>> getExhibition(
+  public ResponseEntity<ApiResponse<ExhibitionDetailInfoResponse>> getExhibition(
       @CurrentUser User user,
       @PathVariable Long exhibitionId) {
     ApiResponse apiResponse = ApiResponse.builder()
@@ -111,7 +111,7 @@ public class ExhibitionController {
 
   @ApiOperation(value = "전시회 검색", notes = "전시회를 이름으로 검색합니다.")
   @GetMapping
-  public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfoResponseResponse>>> getExhibitionByQuery(
+  public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfoResponse>>> getExhibitionByQuery(
       @CurrentUser User user,
       String query,
       @RequestParam(value = "include-end", required = false, defaultValue = "true") boolean includeEnd,
@@ -132,7 +132,7 @@ public class ExhibitionController {
 
   @ApiOperation(value = "맞춤 전시회 조회", notes = "위치와 시기에 맞는 전시회들을 조회합니다.")
   @GetMapping("/custom")
-  public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfoResponseResponse>>> getExhibitionsByCustomCondition(
+  public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfoResponse>>> getExhibitionsByCustomCondition(
       @CurrentUser User user,
       @ModelAttribute @Valid ExhibitionCustomConditionRequest exhibitionCustomConditionRequest,
       @RequestParam(value = "include-end", required = false, defaultValue = "true") boolean includeEnd,
