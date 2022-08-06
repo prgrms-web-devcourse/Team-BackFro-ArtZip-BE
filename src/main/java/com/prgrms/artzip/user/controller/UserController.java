@@ -20,6 +20,7 @@ import com.prgrms.artzip.user.dto.response.UserResponse;
 import com.prgrms.artzip.user.service.UserService;
 import com.prgrms.artzip.user.service.UserUtilService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,7 +33,7 @@ import java.net.URI;
 
 import static org.springframework.http.HttpStatus.*;
 
-@Api(tags = {"users"})
+@Api(tags = {"유저 API"})
 @RestController
 @RequestMapping("api/v1/users")
 @RequiredArgsConstructor
@@ -56,6 +57,7 @@ public class UserController {
   private final ReviewLikeService reviewLikeService;
 
 
+  @ApiOperation(value = "로컬 로그인", notes = "이메일과 비밀번호로 로컬로그인을 진행합니다.")
   @PostMapping("/local/login")
   public ResponseEntity<ApiResponse<LoginResponse>> localLogin(
       @RequestBody @Valid UserLocalLoginRequest request) {
@@ -76,6 +78,7 @@ public class UserController {
     return ResponseEntity.ok(response);
   }
 
+  @ApiOperation(value = "회원가입", notes = "회원가입을 합니다.")
   @PostMapping("/signup")
   public ResponseEntity<ApiResponse<SignUpResponse>> signUp(@RequestBody @Valid
   UserSignUpRequest request) {
@@ -88,6 +91,7 @@ public class UserController {
     return ResponseEntity.created(URI.create("/signup")).body(response);
   }
 
+  @ApiOperation(value = "유저 정보 조회", notes = "유저 정보를 조회합니다.")
   @GetMapping("/{userId}/info")
   public ResponseEntity<ApiResponse<UserRepository>> getUserInfo(
       @PathVariable("userId") Long userId) {

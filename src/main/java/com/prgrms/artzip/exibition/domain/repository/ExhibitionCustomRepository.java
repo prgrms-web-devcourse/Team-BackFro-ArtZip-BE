@@ -1,5 +1,6 @@
 package com.prgrms.artzip.exibition.domain.repository;
 
+import com.prgrms.artzip.exibition.dto.ExhibitionCustomCondition;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionBasicForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQuery;
@@ -23,6 +24,8 @@ public interface ExhibitionCustomRepository {
   List<ExhibitionBasicForSimpleQuery> findExhibitionsForReview(String query);
 
   Page<ExhibitionForSimpleQuery> findUserLikeExhibitions(Long userId,
-      Long exhibitionLikeUserId,
-      Pageable pageable);
+      Long exhibitionLikeUserId, Pageable pageable);
+
+  Page<ExhibitionForSimpleQuery> findExhibitionsByCustomCondition(Long userId,
+      ExhibitionCustomCondition exhibitionCustomCondition, Pageable pageable);
 }
