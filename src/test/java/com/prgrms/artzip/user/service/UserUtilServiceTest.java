@@ -32,24 +32,18 @@ class UserUtilServiceTest {
 
   @InjectMocks
   private UserUtilService utilService;
-
-  private User testUser;
-  private Role userRole;
+  private static Role userRole = new Role(Authority.USER);;
   @Spy
   private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
   private static final String testPassword = "test1234!";
   private static final String testEmail = "test@gmail.com";
   private static final String testNickname = "testUser";
 
-  @BeforeEach
-  void setUp() {
-    userRole = new Role(Authority.USER);
-    testUser = LocalUser.builder()
-        .email(testEmail)
-        .nickname(testNickname)
-        .password(passwordEncoder.encode(testPassword))
-        .roles(List.of(userRole)).build();
-  }
+  private User testUser = LocalUser.builder()
+      .email(testEmail)
+      .nickname(testNickname)
+      .password(passwordEncoder.encode(testPassword))
+      .roles(List.of(userRole)).build();
 
   @Test
   @DisplayName("존재하는 유저 반환 테스트")
