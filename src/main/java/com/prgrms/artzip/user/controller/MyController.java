@@ -1,10 +1,9 @@
 package com.prgrms.artzip.user.controller;
 
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.OK;
 
 import com.prgrms.artzip.common.ApiResponse;
 import com.prgrms.artzip.common.entity.CurrentUser;
-import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
 import com.prgrms.artzip.user.domain.LocalUser;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.dto.request.PasswordUpdateRequest;
@@ -15,13 +14,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
