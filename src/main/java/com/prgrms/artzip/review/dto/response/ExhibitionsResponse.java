@@ -1,6 +1,6 @@
 package com.prgrms.artzip.review.dto.response;
 
-import com.prgrms.artzip.exibition.dto.response.ExhibitionBasicInfoResponse;
+import com.prgrms.artzip.exhibition.dto.response.ExhibitionBasicInfoResponse;
 import java.util.List;
 import lombok.Getter;
 

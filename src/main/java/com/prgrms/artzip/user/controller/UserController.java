@@ -2,12 +2,10 @@ package com.prgrms.artzip.user.controller;
 
 import com.prgrms.artzip.comment.service.CommentService;
 import com.prgrms.artzip.common.ApiResponse;
-import com.prgrms.artzip.common.entity.CurrentUser;
 import com.prgrms.artzip.common.jwt.JwtAuthenticationToken;
 import com.prgrms.artzip.common.jwt.JwtPrincipal;
 import com.prgrms.artzip.common.util.JwtService;
-import com.prgrms.artzip.exibition.service.ExhibitionLikeService;
-import com.prgrms.artzip.exibition.service.ExhibitionService;
+import com.prgrms.artzip.exhibition.service.ExhibitionLikeService;
 import com.prgrms.artzip.review.service.ReviewLikeService;
 import com.prgrms.artzip.review.service.ReviewService;
 import com.prgrms.artzip.user.domain.User;
@@ -78,7 +76,7 @@ public class UserController {
 
   @PostMapping("/signup")
   public ResponseEntity<ApiResponse<SignUpResponse>> signUp(@RequestBody @Valid
-  UserSignUpRequest request) {
+      UserSignUpRequest request) {
     User newUser = userService.signUp(request);
     ApiResponse response = ApiResponse.builder()
         .message("회원가입 성공하였습니다.")

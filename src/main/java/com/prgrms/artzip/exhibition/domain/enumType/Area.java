@@ -1,0 +1,5 @@
+package com.prgrms.artzip.exhibition.domain.enumType;
+
+public enum Area {
+  ALL, SEOUL, BUSAN, DAEGU, INCHEON, DAEJEON, GWANGJU, ULSAN, SEJONG, GYEONGGI, GANGWON, CHUNGBUK, CHUNGNAM, JEONBUK, JEONNAM, GYEONGBUK, GYEONGNAM, JEJU
+}
