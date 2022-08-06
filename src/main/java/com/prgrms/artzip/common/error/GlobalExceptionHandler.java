@@ -70,14 +70,6 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
   }
 
-  @ExceptionHandler(FileSizeLimitExceededException.class)
-  public ResponseEntity<ErrorResponse> handleFileSizeLimitExceededException(
-      FileSizeLimitExceededException e) {
-    log.warn(e.getMessage(), e);
-    ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.MAX_UPLOAD_SIZE_EXCEEDED);
-    return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
-  }
-
   @ExceptionHandler(HttpMessageNotReadableException.class)
   public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
       HttpMessageNotReadableException e) {
