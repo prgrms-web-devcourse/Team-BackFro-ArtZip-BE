@@ -11,6 +11,7 @@ import com.prgrms.artzip.user.dto.request.UserUpdateRequest;
 import com.prgrms.artzip.user.dto.response.UserUpdateResponse;
 import com.prgrms.artzip.user.service.UserService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +49,7 @@ public class MyController {
     return ResponseEntity.ok(apiResponse);
   }
 
+  @ApiOperation(value = "비밀번호 변경", notes = "비밀번호를 변경합니다.")
   @PatchMapping("/password")
   public ResponseEntity<ApiResponse> updatePassword(@CurrentUser User user, @RequestBody @Valid
       PasswordUpdateRequest request) {
