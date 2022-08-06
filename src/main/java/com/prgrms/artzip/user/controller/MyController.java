@@ -10,6 +10,9 @@ import com.prgrms.artzip.user.dto.request.UserUpdateRequest;
 import com.prgrms.artzip.user.dto.response.UserUpdateResponse;
 import com.prgrms.artzip.user.service.UserService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-@Api(tags = {"users-me"})
+@Api(tags = {"로그인한 유저 전용 API"})
 @RestController
 @RequestMapping("api/v1/users/me")
 @RequiredArgsConstructor
@@ -31,9 +34,11 @@ public class MyController {
 
   private final UserService userService;
 
+  @ApiOperation(value = "내 정보 수정", notes = "로그인한 유저의 정보를 수정합니다.")
   @PatchMapping("/info")
   public ResponseEntity<ApiResponse<UserUpdateResponse>> updateMyInfo(
       @CurrentUser User user,
+      @Parameter(name = "data", schema = @Schema(type = "string", format = "binary"))
       @RequestPart(value = "data") UserUpdateRequest request,
       @RequestPart(required = false) MultipartFile profileImage) {
     UserUpdateResponse updateResponse = userService.updateUserInfo(user, request, profileImage);
