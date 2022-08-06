@@ -122,6 +122,7 @@ public class UserService {
     LocalUser localUser = (LocalUser) user;
     localUser.checkPassword(passwordEncoder, request.getOldPassword());
     localUser.changePassword(passwordEncoder, request.getNewPassword());
+    userRepository.save(localUser);
   }
 
   private void validateFileExtension(final MultipartFile file) {
