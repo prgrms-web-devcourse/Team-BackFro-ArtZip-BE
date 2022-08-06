@@ -15,10 +15,12 @@ import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.RoleRepository;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
+import com.prgrms.artzip.user.dto.request.PasswordUpdateRequest;
 import com.prgrms.artzip.user.dto.request.UserLocalLoginRequest;
 import com.prgrms.artzip.user.dto.request.UserSignUpRequest;
 import com.prgrms.artzip.user.dto.request.UserUpdateRequest;
 import com.prgrms.artzip.user.dto.response.UserUpdateResponse;
+import io.swagger.v3.oas.annotations.Parameter;
 import java.io.IOException;
 import net.bytebuddy.asm.Advice.Argument;
 import org.junit.jupiter.api.BeforeAll;
@@ -36,6 +38,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -366,6 +369,29 @@ class UserServiceTest {
         .hasMessage(USER_PROFILE_NOT_MATCHED.getMessage());
   }
 
+  @Test
+  @DisplayName("유저 비밀번호 변경")
+  void testUpdatePassword() {
+    // given
+    PasswordUpdateRequest request = new PasswordUpdateRequest(testPassword, "test2345!");
+    // when
+    userService.updatePassword(testUser, request);
+    // then
+    verify(userRepository).save(testUser);
+  }
+
+  @ParameterizedTest
+  @MethodSource("invalidPasswordParameter")
+  @DisplayName("유저 비밀번호 변경 : 비밀번호 규칙 위반")
+  void testUpdateInvalidPassword(String invalidPassword) {
+    // given
+    PasswordUpdateRequest request = new PasswordUpdateRequest(testPassword, invalidPassword);
+    // when then
+    assertThatThrownBy(() -> userService.updatePassword(testUser, request))
+        .isInstanceOf(InvalidRequestException.class)
+        .hasMessage(INVALID_INPUT_VALUE.getMessage());
+  }
+
 
   private static Stream<Arguments> errorLoginParameter() {
     return Stream.of(
@@ -398,6 +424,14 @@ class UserServiceTest {
     return Stream.of(
         noSizeFile,
         null
+    );
+  }
+
+  private static Stream<String> invalidPasswordParameter() {
+    return Stream.of(
+        "!lt8",
+        "onlyenglish",
+        "noSpecial1"
     );
   }
 }

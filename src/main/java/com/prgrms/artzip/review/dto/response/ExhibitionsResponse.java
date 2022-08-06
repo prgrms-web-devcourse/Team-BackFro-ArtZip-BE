@@ -1,15 +1,15 @@
 package com.prgrms.artzip.review.dto.response;
 
-import com.prgrms.artzip.exibition.dto.response.ExhibitionBasicInfo;
+import com.prgrms.artzip.exibition.dto.response.ExhibitionBasicInfoResponse;
 import java.util.List;
 import lombok.Getter;
 
 @Getter
 public class ExhibitionsResponse {
 
-  private final List<ExhibitionBasicInfo> exhibitions;
+  private final List<ExhibitionBasicInfoResponse> exhibitions;
 
-  public ExhibitionsResponse(List<ExhibitionBasicInfo> exhibitions) {
+  public ExhibitionsResponse(List<ExhibitionBasicInfoResponse> exhibitions) {
     this.exhibitions = exhibitions;
   }
 }

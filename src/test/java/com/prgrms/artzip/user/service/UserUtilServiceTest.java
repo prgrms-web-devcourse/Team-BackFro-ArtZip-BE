@@ -11,7 +11,6 @@ import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,14 +20,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
-import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 class UserUtilServiceTest {
@@ -83,7 +79,7 @@ class UserUtilServiceTest {
     // when
     boolean result = utilService.checkNicknameUnique(testNickname);
     // then
-    assertThat(result).isEqualTo(testFlag);
+    assertThat(result).isEqualTo(!testFlag);
     verify(userRepository).existsByNicknameAndIsQuit(testNickname, false);
   }
 
@@ -96,7 +92,7 @@ class UserUtilServiceTest {
     // when
     boolean result = utilService.checkEmailUnique(testEmail);
     // then
-    assertThat(result).isEqualTo(testFlag);
+    assertThat(result).isEqualTo(!testFlag);
     verify(userRepository).existsByEmailAndIsQuit(testEmail, false);
   }
 

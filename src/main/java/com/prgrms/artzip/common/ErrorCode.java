@@ -64,6 +64,7 @@ public enum ErrorCode {
   EXHB_NOT_FOUND(404, "EX015", "존재하지 않는 전시회 입니다."),
   INVALID_EXHB_QUERY(400, "EX016", "검색어는 필수입니다.(2 <= 검색어)"),
   INVALID_EXHB_QUERY_FOR_REVIEW(400, "EX017", "검색어는 필수입니다."),
+  INVALID_CUSTOM_EXHB_CONDITION(400, "EX018", "areas와 months에는 null이 포함될 수 없습니다"),
 
   /**
    * Comment Domain
@@ -87,8 +88,7 @@ public enum ErrorCode {
   INVALID_REVIEW_PHOTO_COUNT(400, "R008", "리뷰 사진은 최대 9개입니다."),
   REVIEW_NOT_FOUND(400, "R009", "존재하지 않는 리뷰입니다."),
   REVIEW_PHOTO_NOT_FOUND(400, "R010", "존재하지 않는 리뷰 사진입니다."),
-  NO_PERMISSION_TO_UPDATE_REVIEW(404, "R011", "해당 리뷰를 수정할 수 없습니다.")
-  ;
+  NO_PERMISSION_TO_UPDATE_REVIEW(404, "R011", "해당 리뷰를 수정할 수 없습니다.");
 
 
   private final int status;

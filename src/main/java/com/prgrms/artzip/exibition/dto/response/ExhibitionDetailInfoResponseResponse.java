@@ -8,7 +8,7 @@ import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
 @Getter
-public class ExhibitionDetailInfo extends ExhibitionBasicInfo {
+public class ExhibitionDetailInfoResponseResponse extends ExhibitionBasicInfoResponse {
 
   private LocalDate startDate;
   private LocalDate endDate;
@@ -25,7 +25,7 @@ public class ExhibitionDetailInfo extends ExhibitionBasicInfo {
   private Boolean isLiked;
   // reviews
 
-  public ExhibitionDetailInfo(Long exhibitionId, String name, String thumbnail,
+  public ExhibitionDetailInfoResponseResponse(Long exhibitionId, String name, String thumbnail,
       LocalDate startDate, LocalDate endDate, Area area, String url, String placeUrl,
       String inquiry, Genre genre, String description, long likeCount, String placeAddress,
       double lat, double lng, boolean isLiked) {

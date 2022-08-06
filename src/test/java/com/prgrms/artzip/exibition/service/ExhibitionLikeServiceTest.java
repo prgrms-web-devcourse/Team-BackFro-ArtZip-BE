@@ -16,7 +16,7 @@ import com.prgrms.artzip.exibition.domain.enumType.Area;
 import com.prgrms.artzip.exibition.domain.enumType.Genre;
 import com.prgrms.artzip.exibition.domain.repository.ExhibitionLikeRepository;
 import com.prgrms.artzip.exibition.domain.repository.ExhibitionRepository;
-import com.prgrms.artzip.exibition.dto.response.ExhibitionLikeResult;
+import com.prgrms.artzip.exibition.dto.response.ExhibitionLikeResponse;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import java.time.LocalDate;
@@ -94,10 +94,10 @@ class ExhibitionLikeServiceTest {
     when(exhibitionLikeRepository.countByExhibitionId(exhibitionId))
         .thenReturn(100L);
 
-    ExhibitionLikeResult exhibitionLikeResult = exhibitionLikeService
+    ExhibitionLikeResponse exhibitionLikeResponse = exhibitionLikeService
         .updateExhibitionLike(user, exhibitionId);
 
-    assertThat(exhibitionLikeResult.getIsLiked()).isTrue();
+    assertThat(exhibitionLikeResponse.getIsLiked()).isTrue();
 
     verify(exhibitionLikeRepository).findByUserIdAndExhibitionId(user.getId(), exhibitionId);
     verify(exhibitionRepository).findById(exhibitionId);
@@ -117,7 +117,7 @@ class ExhibitionLikeServiceTest {
     when(exhibitionLikeRepository.countByExhibitionId(exhibitionId))
         .thenReturn(100L);
 
-    ExhibitionLikeResult exhibitionLikeResult = exhibitionLikeService
+    ExhibitionLikeResponse exhibitionLikeResponse = exhibitionLikeService
         .updateExhibitionLike(user, exhibitionId);
 
     verify(exhibitionLikeRepository).findByUserIdAndExhibitionId(user.getId(), exhibitionId);
@@ -127,7 +127,7 @@ class ExhibitionLikeServiceTest {
     verify(exhibitionRepository, never()).findById(exhibitionId);
     verify(exhibitionLikeRepository, never()).save(any());
 
-    assertThat(exhibitionLikeResult.getIsLiked()).isFalse();
+    assertThat(exhibitionLikeResponse.getIsLiked()).isFalse();
   }
 
   @Test
