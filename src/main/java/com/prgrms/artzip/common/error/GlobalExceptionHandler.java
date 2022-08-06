@@ -12,6 +12,7 @@ import com.prgrms.artzip.common.error.exception.PermissionDeniedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -56,6 +57,15 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(org.springframework.validation.BindException.class)
   public ResponseEntity<ErrorResponse> handleBindException(BindException e) {
     return handleException(e, ErrorCode.INVALID_INPUT_VALUE);
+  }
+
+  // 403 : Access Denied
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<ErrorResponse> handleAccessDeniedException(
+          AccessDeniedException e) {
+    log.warn(e.getMessage(), e);
+    ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.ACCESS_DENIED);
+    return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
   }
 
   @ExceptionHandler(HttpMessageNotReadableException.class)

@@ -9,7 +9,9 @@ import com.prgrms.artzip.common.util.AmazonS3Uploader;
 import com.prgrms.artzip.exibition.domain.Exhibition;
 import com.prgrms.artzip.exibition.domain.repository.ExhibitionRepository;
 import com.prgrms.artzip.review.domain.Review;
+import com.prgrms.artzip.review.domain.ReviewLike;
 import com.prgrms.artzip.review.domain.ReviewPhoto;
+import com.prgrms.artzip.review.domain.repository.ReviewLikeRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewPhotoRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewRepository;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
@@ -35,6 +37,7 @@ public class ReviewService {
 
   private final ReviewRepository reviewRepository;
   private final ReviewPhotoRepository reviewPhotoRepository;
+  private final ReviewLikeRepository reviewLikeRepository;
   private final UserRepository userRepository;
   private final ExhibitionRepository exhibitionRepository;
   private final AmazonS3Uploader amazonS3Uploader;
@@ -79,7 +82,7 @@ public class ReviewService {
     validateFileCount(review, request.getDeletedPhotos(), files);
     validateFileExtensions(files);
 
-    removeReviewPhotos(request.getDeletedPhotos());
+    removeReviewPhotosById(request.getDeletedPhotos());
 
     if (files != null) {
       createReviewPhoto(review, files);
@@ -93,10 +96,34 @@ public class ReviewService {
     return new ReviewIdResponse(review.getId());
   }
 
-  private void removeReviewPhotos(List<Long> reviewPhotoIds) {
+  @Transactional
+  public ReviewIdResponse removeReview(final User user, final Long reviewId) {
+    Review review = reviewRepository.findById(reviewId)
+        .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_NOT_FOUND));
+    validateUser(user);
+    validateUserAuthority(user, review);
+
+    review.updateIdDeleted(true);
+    removeReviewPhotos(review.getReviewPhotos());
+    removeReviewLikes(review.getReviewLikes());
+
+    return new ReviewIdResponse(review.getId());
+  }
+
+  private void removeReviewLikes(List<ReviewLike> reviewLikes) {
+    reviewLikeRepository.deleteAllInBatch(reviewLikes);
+  }
+
+  private void removeReviewPhotosById(List<Long> reviewPhotoIds) {
     reviewPhotoIds.forEach(photoId -> {
       ReviewPhoto reviewPhoto = reviewPhotoRepository.findById(photoId)
           .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_PHOTO_NOT_FOUND));
+      removeReviewPhoto(reviewPhoto);
+    });
+  }
+
+  private void removeReviewPhotos(List<ReviewPhoto> reviewPhotos) {
+    reviewPhotos.forEach(reviewPhoto -> {
       removeReviewPhoto(reviewPhoto);
     });
   }
@@ -150,6 +177,12 @@ public class ReviewService {
 
     if (reviewPhotoCount - deletedPhotosCount + filesCount > REVIEW_PHOTO_COUNT) {
       throw new InvalidRequestException(ErrorCode.INVALID_REVIEW_PHOTO_COUNT);
+    }
+  }
+
+  private void validateUser(User user) {
+    if (Objects.isNull(user)) {
+      throw new PermissionDeniedException(ErrorCode.UNAUTHENTICATED_USER);
     }
   }
 
