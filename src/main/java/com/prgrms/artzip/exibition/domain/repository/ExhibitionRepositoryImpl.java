@@ -13,14 +13,16 @@ import com.prgrms.artzip.exibition.dto.projection.ExhibitionBasicForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQuery;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -29,8 +31,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
-// 재사용성이 shit
 @RequiredArgsConstructor
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
 
   private final JPAQueryFactory queryFactory;
@@ -42,41 +44,15 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
 
   @Override
   public Page<ExhibitionForSimpleQuery> findUpcomingExhibitions(Long userId, Pageable pageable) {
-    LocalDate today = LocalDate.now();
+    BooleanBuilder upcomingCondition = getUpcomingCondition();
 
-    List<ExhibitionForSimpleQuery> exhibitions = queryFactory
-        .select(Projections.fields(ExhibitionForSimpleQuery.class,
-                exhibition.id,
-                exhibition.name,
-                exhibition.thumbnail,
-                new CaseBuilder()
-                    .when(exhibitionLikeForIsLikedUserIdEq(userId))
-                    .then(true)
-                    .otherwise(false).as("isLiked"),
-                exhibition.period,
-                exhibitionLikeForLikeCount.id.countDistinct().as("likeCount"),
-                review.id.countDistinct().as("reviewCount")
-            )
-        )
-        .from(exhibition)
-        .leftJoin(exhibitionLikeForIsLiked)
-        .on(exhibitionLikeForIsLiked.exhibition.eq(exhibition),
-            exhibitionLikeForIsLikedUserIdEq(userId))
-        .leftJoin(exhibitionLikeForLikeCount)
-        .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
-        .leftJoin(review)
-        .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse())
-        .where(exhibition.period.startDate.goe(today))
-        .offset(pageable.getOffset())
-        .limit(pageable.getPageSize())
-        .groupBy(exhibition.id)
-        .orderBy(exhibition.period.startDate.asc(), exhibition.period.endDate.asc())
-        .fetch();
+    List<ExhibitionForSimpleQuery> exhibitions = findExhibitions(userId, upcomingCondition,
+        Arrays.asList(
+            new OrderSpecifier(Order.ASC, exhibition.period.startDate),
+            new OrderSpecifier(Order.ASC, exhibition.period.endDate)),
+        pageable);
 
-    JPAQuery<Long> countQuery = queryFactory
-        .select(exhibition.count())
-        .from(exhibition)
-        .where(exhibition.period.startDate.goe(today));
+    JPAQuery<Long> countQuery = getExhibitionCountQuery(upcomingCondition);
 
     return PageableExecutionUtils.getPage(exhibitions, pageable, countQuery::fetchOne);
   }
@@ -85,41 +61,13 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
   public Page<ExhibitionForSimpleQuery> findMostLikeExhibitions(Long userId, boolean includeEnd,
       Pageable pageable) {
     BooleanBuilder mostLikeCondition = getMostLikeCondition(includeEnd);
-    NumberPath<Long> likeCount = Expressions.numberPath(Long.class, "likeCount");
 
-    List<ExhibitionForSimpleQuery> exhibitions = queryFactory
-        .select(Projections.fields(ExhibitionForSimpleQuery.class,
-                exhibition.id,
-                exhibition.name,
-                exhibition.thumbnail,
-                new CaseBuilder()
-                    .when(exhibitionLikeForIsLikedUserIdEq(userId))
-                    .then(true)
-                    .otherwise(false).as("isLiked"),
-                exhibition.period,
-                exhibitionLikeForLikeCount.id.countDistinct().as("likeCount"),
-                review.id.countDistinct().as("reviewCount")
-            )
-        )
-        .from(exhibition)
-        .leftJoin(exhibitionLikeForIsLiked)
-        .on(exhibitionLikeForIsLiked.exhibition.eq(exhibition),
-            exhibitionLikeForIsLikedUserIdEq(userId))
-        .leftJoin(exhibitionLikeForLikeCount)
-        .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
-        .leftJoin(review)
-        .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse())
-        .where(mostLikeCondition)
-        .offset(pageable.getOffset())
-        .limit(pageable.getPageSize())
-        .groupBy(exhibition.id)
-        .orderBy(likeCount.desc())
-        .fetch();
+    List<ExhibitionForSimpleQuery> exhibitions = findExhibitions(userId,
+        mostLikeCondition,
+        List.of(new OrderSpecifier(Order.DESC, Expressions.numberPath(Long.class, "likeCount"))),
+        pageable);
 
-    JPAQuery<Long> countQuery = queryFactory
-        .select(exhibition.count())
-        .from(exhibition)
-        .where(mostLikeCondition);
+    JPAQuery<Long> countQuery = getExhibitionCountQuery(mostLikeCondition);
 
     return PageableExecutionUtils.getPage(exhibitions, pageable, countQuery::fetchOne);
   }
@@ -160,42 +108,15 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
 
   @Override
   public Page<ExhibitionForSimpleQuery> findExhibitionsByQuery(Long userId, String query,
-      boolean includeEnd,
-      Pageable pageable) {
+      boolean includeEnd, Pageable pageable) {
     BooleanBuilder exhibitionsByQueryCondition = getExhibitionsByQueryCondition(query, includeEnd);
 
-    List<ExhibitionForSimpleQuery> exhibitions = queryFactory
-        .select(Projections.fields(ExhibitionForSimpleQuery.class,
-                exhibition.id,
-                exhibition.name,
-                exhibition.thumbnail,
-                new CaseBuilder()
-                    .when(exhibitionLikeForIsLikedUserIdEq(userId))
-                    .then(true)
-                    .otherwise(false).as("isLiked"),
-                exhibition.period,
-                exhibitionLikeForLikeCount.id.countDistinct().as("likeCount"),
-                review.id.countDistinct().as("reviewCount")
-            )
-        )
-        .from(exhibition)
-        .leftJoin(exhibitionLikeForIsLiked)
-        .on(exhibitionLikeForIsLiked.exhibition.eq(exhibition),
-            exhibitionLikeForIsLikedUserIdEq(userId))
-        .leftJoin(exhibitionLikeForLikeCount)
-        .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
-        .leftJoin(review)
-        .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse())
-        .where(exhibitionsByQueryCondition)
-        .offset(pageable.getOffset())
-        .limit(pageable.getPageSize())
-        .groupBy(exhibition.id)
-        .fetch();
+    List<ExhibitionForSimpleQuery> exhibitions = findExhibitions(userId,
+        exhibitionsByQueryCondition,
+        List.of(new OrderSpecifier(Order.ASC, exhibition.id)),
+        pageable);
 
-    JPAQuery<Long> countQuery = queryFactory
-        .select(exhibition.count())
-        .from(exhibition)
-        .where(exhibitionsByQueryCondition);
+    JPAQuery<Long> countQuery = getExhibitionCountQuery(exhibitionsByQueryCondition);
 
     return PageableExecutionUtils.getPage(exhibitions, pageable, countQuery::fetchOne);
   }
@@ -270,7 +191,18 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
       ExhibitionCustomCondition exhibitionCustomCondition, Pageable pageable) {
     BooleanBuilder customCondition = getCustomCondition(exhibitionCustomCondition);
 
-    List<ExhibitionForSimpleQuery> exhibitions = queryFactory
+    List<ExhibitionForSimpleQuery> exhibitions = findExhibitions(userId, customCondition,
+        List.of(new OrderSpecifier(Order.ASC, exhibition.period.startDate)),
+        pageable);
+    
+    JPAQuery<Long> countQuery = getExhibitionCountQuery(customCondition);
+
+    return PageableExecutionUtils.getPage(exhibitions, pageable, countQuery::fetchOne);
+  }
+
+  private List<ExhibitionForSimpleQuery> findExhibitions(Long userId, BooleanBuilder condition,
+      List<OrderSpecifier> orders, Pageable pageable) {
+    return queryFactory
         .select(Projections.fields(ExhibitionForSimpleQuery.class,
                 exhibition.id,
                 exhibition.name,
@@ -292,19 +224,28 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
         .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
         .leftJoin(review)
         .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse())
-        .where(customCondition)
+        .where(condition)
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize())
         .groupBy(exhibition.id)
-        .orderBy(exhibition.period.startDate.asc())
+        .orderBy(orders.toArray(OrderSpecifier[]::new))
         .fetch();
+  }
 
-    JPAQuery<Long> countQuery = queryFactory
+  private JPAQuery<Long> getExhibitionCountQuery(BooleanBuilder condition) {
+    return queryFactory
         .select(exhibition.count())
         .from(exhibition)
-        .where(customCondition);
+        .where(condition);
+  }
 
-    return PageableExecutionUtils.getPage(exhibitions, pageable, countQuery::fetchOne);
+  private BooleanBuilder getUpcomingCondition() {
+    BooleanBuilder upcomingCondition = new BooleanBuilder();
+    LocalDate today = LocalDate.now();
+
+    upcomingCondition.and(exhibition.period.startDate.goe(today));
+
+    return upcomingCondition;
   }
 
   private BooleanBuilder getMostLikeCondition(boolean includeEnd) {
