@@ -165,10 +165,10 @@ class ExhibitionSearchServiceTest {
     private Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = new PageImpl(exhibitions);
 
     @Test
-    @DisplayName("ExhibitionCustomConditionRequest의 areas 또는 months가 비어있는 경우 테스트")
-    void testEmptyList() {
+    @DisplayName("ExhibitionCustomConditionRequest의 areas가 비어있는 경우 테스트")
+    void testEmptyAreas() {
       ExhibitionCustomConditionRequest exhibitionCustomConditionRequest = new ExhibitionCustomConditionRequest(
-          new ArrayList<>(), new ArrayList<>());
+          new ArrayList<>(), List.of(Month.JUN));
 
       assertThatThrownBy(() -> exhibitionSearchService.getExhibitionsByCustomCondition(userId,
           exhibitionCustomConditionRequest, includeEnd, pageable))
@@ -180,10 +180,40 @@ class ExhibitionSearchServiceTest {
     }
 
     @Test
-    @DisplayName("ExhibitionCustomConditionRequest의 areas 또는 months에 null이 포함된 경우 테스트")
-    void testIncludeNull() {
+    @DisplayName("ExhibitionCustomConditionRequest의 months가 비어있는 경우 테스트")
+    void testEmptyMonths() {
       ExhibitionCustomConditionRequest exhibitionCustomConditionRequest = new ExhibitionCustomConditionRequest(
-          Arrays.asList(Area.SEOUL, null), Arrays.asList(Month.JUN, null));
+          List.of(Area.SEOUL), new ArrayList<>());
+
+      assertThatThrownBy(() -> exhibitionSearchService.getExhibitionsByCustomCondition(userId,
+          exhibitionCustomConditionRequest, includeEnd, pageable))
+          .isInstanceOf(InvalidRequestException.class)
+          .hasMessage(INVALID_INPUT_VALUE.getMessage());
+
+      verify(exhibitionRepository, never()).findExhibitionsByCustomCondition(eq(userId),
+          any(ExhibitionCustomCondition.class), eq(pageable));
+    }
+
+    @Test
+    @DisplayName("ExhibitionCustomConditionRequest의 areas에 null이 포함된 경우 테스트")
+    void testAreasIncludeNull() {
+      ExhibitionCustomConditionRequest exhibitionCustomConditionRequest = new ExhibitionCustomConditionRequest(
+          Arrays.asList(Area.SEOUL, null), Arrays.asList(Month.JUN));
+
+      assertThatThrownBy(() -> exhibitionSearchService.getExhibitionsByCustomCondition(userId,
+          exhibitionCustomConditionRequest, includeEnd, pageable))
+          .isInstanceOf(InvalidRequestException.class)
+          .hasMessage(INVALID_CUSTOM_EXHB_CONDITION.getMessage());
+
+      verify(exhibitionRepository, never()).findExhibitionsByCustomCondition(eq(userId),
+          any(ExhibitionCustomCondition.class), eq(pageable));
+    }
+
+    @Test
+    @DisplayName("ExhibitionCustomConditionRequest의 months에 null이 포함된 경우 테스트")
+    void testMonthsIncludeNull() {
+      ExhibitionCustomConditionRequest exhibitionCustomConditionRequest = new ExhibitionCustomConditionRequest(
+          Arrays.asList(Area.SEOUL), Arrays.asList(Month.DEC, null));
 
       assertThatThrownBy(() -> exhibitionSearchService.getExhibitionsByCustomCondition(userId,
           exhibitionCustomConditionRequest, includeEnd, pageable))

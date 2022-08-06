@@ -76,7 +76,7 @@ public class ExhibitionSearchService {
     if (requestedAreas.isEmpty() || requestedMonths.isEmpty()) {
       throw new InvalidRequestException(INVALID_INPUT_VALUE);
     }
-
+    
     if (requestedAreas.contains(null) || requestedMonths.contains(null)) {
       throw new InvalidRequestException(INVALID_CUSTOM_EXHB_CONDITION);
     }
