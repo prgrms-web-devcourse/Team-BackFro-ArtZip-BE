@@ -16,6 +16,7 @@ import com.prgrms.artzip.user.dto.request.UserLocalLoginRequest;
 import com.prgrms.artzip.user.dto.request.UserSignUpRequest;
 import com.prgrms.artzip.user.dto.response.LoginResponse;
 import com.prgrms.artzip.user.dto.response.SignUpResponse;
+import com.prgrms.artzip.user.dto.response.UniqueCheckResponse;
 import com.prgrms.artzip.user.dto.response.UserResponse;
 import com.prgrms.artzip.user.service.UserService;
 import com.prgrms.artzip.user.service.UserUtilService;
@@ -105,6 +106,17 @@ public class UserController {
         .message("유저 정보 조회 성공하였습니다.")
         .status(OK.value())
         .data(userResponse)
+        .build();
+    return ResponseEntity.ok(apiResponse);
+  }
+
+  @GetMapping("/check")
+  public ResponseEntity<ApiResponse<UniqueCheckResponse>> checkNicknameValid(@RequestParam("nickname") String nickname, @RequestParam("email") String email) {
+    UniqueCheckResponse response = null;
+    ApiResponse apiResponse = ApiResponse.builder()
+        .message("중복검사가 완료되었습니다.")
+        .status(OK.value())
+        .data(response)
         .build();
     return ResponseEntity.ok(apiResponse);
   }
