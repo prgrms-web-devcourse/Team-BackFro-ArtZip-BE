@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,7 +51,7 @@ public class MyController {
   @PatchMapping("/password")
   public ResponseEntity<ApiResponse> updatePassword(@CurrentUser User user, @RequestBody @Valid
       PasswordUpdateRequest request) {
-
+    userService.updatePassword(user, request);
     ApiResponse apiResponse = ApiResponse.builder()
         .message("유저의 비밀번호가 변경되었습니다.")
         .status(OK.value())
