@@ -375,7 +375,7 @@ class UserServiceTest {
     // given
     PasswordUpdateRequest request = new PasswordUpdateRequest(testPassword, "test2345!");
     // when
-    userService.updatePassword(testUser, request);
+    userService.updatePassword((LocalUser) testUser, request);
     // then
     verify(userRepository).save(testUser);
   }
@@ -387,7 +387,7 @@ class UserServiceTest {
     // given
     PasswordUpdateRequest request = new PasswordUpdateRequest(testPassword, invalidPassword);
     // when then
-    assertThatThrownBy(() -> userService.updatePassword(testUser, request))
+    assertThatThrownBy(() -> userService.updatePassword((LocalUser)testUser, request))
         .isInstanceOf(InvalidRequestException.class)
         .hasMessage(INVALID_INPUT_VALUE.getMessage());
   }

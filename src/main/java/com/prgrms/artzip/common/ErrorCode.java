@@ -43,6 +43,7 @@ public enum ErrorCode {
   USER_PARAM_REQUIRED(400, "U010", "유저가 누락되었습니다."),
   USER_PROFILE_NOT_MATCHED(400, "U011", "수정할 프로필 사진이 누락되었으며, 유저의 기존 프로필 이미지와 다른 링크입니다."),
   NICKNAME_ALREADY_EXISTS(400, "U012", "이미 존재하는 닉네임입니다."),
+  PASSWORD_CANNOT_BE_SAME(400, "U013", "새 비밀번호는 이전 비밀번호와 같을 수 없습니다."),
   /**
    * Exhibition Domain
    */
