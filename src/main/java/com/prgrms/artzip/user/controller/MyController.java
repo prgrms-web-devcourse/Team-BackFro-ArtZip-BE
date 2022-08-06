@@ -10,6 +10,8 @@ import com.prgrms.artzip.user.dto.request.UserUpdateRequest;
 import com.prgrms.artzip.user.dto.response.UserUpdateResponse;
 import com.prgrms.artzip.user.service.UserService;
 import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +36,7 @@ public class MyController {
   @PatchMapping("/info")
   public ResponseEntity<ApiResponse<UserUpdateResponse>> updateMyInfo(
       @CurrentUser User user,
+      @Parameter(name = "data", schema = @Schema(type = "string", format = "binary"))
       @RequestPart(value = "data") UserUpdateRequest request,
       @RequestPart(required = false) MultipartFile profileImage) {
     UserUpdateResponse updateResponse = userService.updateUserInfo(user, request, profileImage);
