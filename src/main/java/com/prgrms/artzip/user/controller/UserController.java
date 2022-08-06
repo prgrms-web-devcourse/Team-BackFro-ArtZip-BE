@@ -21,6 +21,7 @@ import com.prgrms.artzip.user.dto.response.UserResponse;
 import com.prgrms.artzip.user.service.UserService;
 import com.prgrms.artzip.user.service.UserUtilService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -110,6 +111,7 @@ public class UserController {
     return ResponseEntity.ok(apiResponse);
   }
 
+  @ApiOperation(value = "중복 검사", notes = "이메일 및 닉네임에 대해 중복 검사를 진행합니다.")
   @GetMapping("/check")
   public ResponseEntity<ApiResponse<UniqueCheckResponse>> checkNicknameValid(
       @RequestParam("nickname") String nickname, @RequestParam("email") String email) {
@@ -118,7 +120,7 @@ public class UserController {
             ? new UniqueCheckResponse(true)
             : new UniqueCheckResponse(false);
     ApiResponse apiResponse = ApiResponse.builder()
-        .message("중복검사가 완료되었습니다.")
+        .message("중복 검사가 완료되었습니다.")
         .status(OK.value())
         .data(response)
         .build();
