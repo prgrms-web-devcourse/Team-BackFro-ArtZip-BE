@@ -10,19 +10,25 @@ import com.prgrms.artzip.user.domain.LocalUser;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 class UserUtilServiceTest {
@@ -32,7 +38,8 @@ class UserUtilServiceTest {
 
   @InjectMocks
   private UserUtilService utilService;
-  private static Role userRole = new Role(Authority.USER);;
+  private static Role userRole = new Role(Authority.USER);
+  ;
   @Spy
   private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
   private static final String testPassword = "test1234!";
@@ -65,5 +72,35 @@ class UserUtilServiceTest {
     assertThatThrownBy(() -> utilService.getUserById(1L))
         .isInstanceOf(NotFoundException.class)
         .hasMessage(USER_NOT_FOUND.getMessage());
+  }
+
+  @ParameterizedTest
+  @DisplayName("닉네임 중복 확인")
+  @MethodSource("booleanParameter")
+  void testCheckNicknameUnique(Boolean testFlag) {
+    // given
+    when(userRepository.existsByNicknameAndIsQuit(testNickname, false)).thenReturn(testFlag);
+    // when
+    boolean result = utilService.checkNicknameUnique(testNickname);
+    // then
+    assertThat(result).isEqualTo(testFlag);
+    verify(userRepository).existsByNicknameAndIsQuit(testNickname, false);
+  }
+
+  @ParameterizedTest
+  @DisplayName("이메일 중복 확인")
+  @MethodSource("booleanParameter")
+  void testCheckEmailUnique(Boolean testFlag) {
+    // given
+    when(userRepository.existsByEmailAndIsQuit(testEmail, false)).thenReturn(testFlag);
+    // when
+    boolean result = utilService.checkEmailUnique(testEmail);
+    // then
+    assertThat(result).isEqualTo(testFlag);
+    verify(userRepository).existsByEmailAndIsQuit(testEmail, false);
+  }
+
+  private static Stream<Boolean> booleanParameter() {
+    return Stream.of(true, false);
   }
 }

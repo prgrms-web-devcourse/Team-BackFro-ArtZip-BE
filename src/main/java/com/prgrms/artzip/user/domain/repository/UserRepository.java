@@ -21,7 +21,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmailAndIsQuit(@Param("email") String email, @Param("isQuit") Boolean isQuit);
 
     boolean existsByNicknameAndIsQuit(@Param("nickname") String nickname, @Param("isQuit") Boolean isQuit);
-    // TODO: exists refactor
+    // TODO: exists refactor, 회원가입 시 중복이랑 이미 있는 유저 중복 체크 다름.
     @Query("select case when count(u)> 0 then true else false end from User u where u.id <> :userId and u.nickname = :nickname and u.isQuit = false")
     boolean existsByNicknameExceptId(@Param("userId") Long userId, @Param("nickname") String nickname);
 }
