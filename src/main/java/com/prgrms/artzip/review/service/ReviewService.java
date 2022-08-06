@@ -146,9 +146,7 @@ public class ReviewService {
 
   private void validateFileExtensions(List<MultipartFile> files) {
     if (Objects.nonNull(files)) {
-      files.forEach(file -> {
-        validateFileExtension(file);
-      });
+      files.forEach(this::validateFileExtension);
     }
   }
 
@@ -160,7 +158,6 @@ public class ReviewService {
         fileExtension.equalsIgnoreCase(".png"))) {
       throw new InvalidRequestException(ErrorCode.INVALID_FILE_EXTENSION);
     }
-
   }
 
   private void validateFileCount(List<MultipartFile> files) {
@@ -194,8 +191,7 @@ public class ReviewService {
 
   private void validateDeletedPhotos(Review review, List<Long> deletedPhotoIds) {
     List<Long> reviewPhotoIds = review.getReviewPhotos().stream()
-        .map(ReviewPhoto::getId)
-        .collect(Collectors.toList());
+        .map(ReviewPhoto::getId).toList();
     deletedPhotoIds.forEach(photoId -> {
       reviewPhotoRepository.findById(photoId)
           .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_PHOTO_NOT_FOUND));

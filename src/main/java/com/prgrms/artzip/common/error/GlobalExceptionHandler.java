@@ -9,7 +9,9 @@ import com.prgrms.artzip.common.error.exception.DuplicateRequestException;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
 import com.prgrms.artzip.common.error.exception.PermissionDeniedException;
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
@@ -65,6 +67,14 @@ public class GlobalExceptionHandler {
           AccessDeniedException e) {
     log.warn(e.getMessage(), e);
     ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.ACCESS_DENIED);
+    return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
+  }
+
+  @ExceptionHandler(FileSizeLimitExceededException.class)
+  public ResponseEntity<ErrorResponse> handleFileSizeLimitExceededException(
+      FileSizeLimitExceededException e) {
+    log.warn(e.getMessage(), e);
+    ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.MAX_UPLOAD_SIZE_EXCEEDED);
     return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
   }
 

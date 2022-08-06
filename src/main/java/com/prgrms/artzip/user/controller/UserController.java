@@ -57,53 +57,55 @@ public class UserController {
 
 
   @PostMapping("/local/login")
-  public ResponseEntity<ApiResponse<LoginResponse>> localLogin(@RequestBody @Valid UserLocalLoginRequest request) {
+  public ResponseEntity<ApiResponse<LoginResponse>> localLogin(
+      @RequestBody @Valid UserLocalLoginRequest request) {
     JwtAuthenticationToken authToken = new JwtAuthenticationToken(request.getEmail(),
         request.getPassword());
     Authentication authentication = authenticationManager.authenticate(authToken);
     String refreshToken = (String) authentication.getDetails();
     JwtPrincipal principal = (JwtPrincipal) authentication.getPrincipal();
     ApiResponse response = ApiResponse.builder()
-            .message("로그인 성공하였습니다.")
-            .status(OK.value())
-            .data(LoginResponse.builder()
-                    .userId(principal.getUser().getId())
-                    .accessToken(principal.getAccessToken())
-                    .refreshToken(refreshToken)
-                    .build())
-            .build();
+        .message("로그인 성공하였습니다.")
+        .status(OK.value())
+        .data(LoginResponse.builder()
+            .userId(principal.getUser().getId())
+            .accessToken(principal.getAccessToken())
+            .refreshToken(refreshToken)
+            .build())
+        .build();
     return ResponseEntity.ok(response);
   }
 
   @PostMapping("/signup")
   public ResponseEntity<ApiResponse<SignUpResponse>> signUp(@RequestBody @Valid
-                                                            UserSignUpRequest request) {
+  UserSignUpRequest request) {
     User newUser = userService.signUp(request);
     ApiResponse response = ApiResponse.builder()
-            .message("회원가입 성공하였습니다.")
-            .status(CREATED.value())
-            .data(SignUpResponse.from(newUser))
-            .build();
+        .message("회원가입 성공하였습니다.")
+        .status(CREATED.value())
+        .data(SignUpResponse.from(newUser))
+        .build();
     return ResponseEntity.created(URI.create("/signup")).body(response);
   }
 
   @GetMapping("/{userId}/info")
-  public ResponseEntity<ApiResponse<UserRepository>> getUserInfo (@PathVariable("userId") Long userId) {
+  public ResponseEntity<ApiResponse<UserRepository>> getUserInfo(
+      @PathVariable("userId") Long userId) {
     User user = userUtilService.getUserById(userId);
     UserResponse userResponse = UserResponse.builder()
-            .userId(user.getId())
-            .nickname(user.getNickname())
-            .profileImage(user.getProfileImage())
-            .email(user.getEmail())
-            .reviewCount(reviewService.getReviewCountByUserId(user.getId()))
-            .exhibitionLikeCount(exhibitionLikeService.getExhibitionLikeCountByUserId(user.getId()))
-            .reviewLikeCount(reviewLikeService.getReviewLikeCountByUserId(user.getId()))
-            .commentCount(commentService.getCommentCountByUserId(user.getId())).build();
+        .userId(user.getId())
+        .nickname(user.getNickname())
+        .profileImage(user.getProfileImage())
+        .email(user.getEmail())
+        .reviewCount(reviewService.getReviewCountByUserId(user.getId()))
+        .exhibitionLikeCount(exhibitionLikeService.getExhibitionLikeCountByUserId(user.getId()))
+        .reviewLikeCount(reviewLikeService.getReviewLikeCountByUserId(user.getId()))
+        .commentCount(commentService.getCommentCountByUserId(user.getId())).build();
     ApiResponse apiResponse = ApiResponse.builder()
-            .message("유저 정보 조회 성공하였습니다.")
-            .status(OK.value())
-            .data(userResponse)
-            .build();
+        .message("유저 정보 조회 성공하였습니다.")
+        .status(OK.value())
+        .data(userResponse)
+        .build();
     return ResponseEntity.ok(apiResponse);
   }
 }
