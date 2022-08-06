@@ -286,7 +286,7 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
         .where(customCondition)
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize())
-        .groupBy(exhibition.id)
+        .groupBy(exhibition.id, exhibition.period.startDate)
         .orderBy(exhibition.period.startDate.asc())
         .fetch();
 

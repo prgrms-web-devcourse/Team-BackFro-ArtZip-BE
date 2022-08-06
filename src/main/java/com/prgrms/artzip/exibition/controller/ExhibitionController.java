@@ -5,6 +5,7 @@ import static java.util.Objects.isNull;
 import com.prgrms.artzip.common.ApiResponse;
 import com.prgrms.artzip.common.PageResponse;
 import com.prgrms.artzip.common.entity.CurrentUser;
+import com.prgrms.artzip.exibition.dto.request.ExhibitionCustomConditionRequest;
 import com.prgrms.artzip.exibition.dto.response.ExhibitionDetailInfoResponseResponse;
 import com.prgrms.artzip.exibition.dto.response.ExhibitionInfoResponseResponse;
 import com.prgrms.artzip.exibition.dto.response.ExhibitionLikeResponse;
@@ -14,12 +15,14 @@ import com.prgrms.artzip.exibition.service.ExhibitionService;
 import com.prgrms.artzip.user.domain.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -120,6 +123,28 @@ public class ExhibitionController {
         .data(new PageResponse(
             exhibitionSearchService.getExhibitionsByQuery(isNull(user) ? null : user.getId(), query,
                 includeEnd, pageable)))
+        .build();
+
+    return ResponseEntity
+        .ok()
+        .body(apiResponse);
+  }
+
+  @ApiOperation(value = "맞춤 전시회 조회", notes = "위치와 시기에 맞는 전시회들을 조회합니다.")
+  @GetMapping("/custom")
+  public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfoResponseResponse>>> getExhibitionsByCustomCondition(
+      @CurrentUser User user,
+      @ModelAttribute @Valid ExhibitionCustomConditionRequest exhibitionCustomConditionRequest,
+      @RequestParam(value = "include-end", required = false, defaultValue = "true") boolean includeEnd,
+      @PageableDefault(page = 0, size = 8) Pageable pageable) {
+
+    ApiResponse apiResponse = ApiResponse.builder()
+        .message("맞춤 전시회 조회 성공")
+        .status(HttpStatus.OK.value())
+        .data(new PageResponse(
+            exhibitionSearchService.getExhibitionsByCustomCondition(
+                isNull(user) ? null : user.getId(), exhibitionCustomConditionRequest, includeEnd,
+                pageable)))
         .build();
 
     return ResponseEntity
