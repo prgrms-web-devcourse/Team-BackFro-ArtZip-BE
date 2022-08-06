@@ -1,19 +1,28 @@
 package com.prgrms.artzip.exibition.service;
 
+import static com.prgrms.artzip.common.ErrorCode.INVALID_CUSTOM_EXHB_CONDITION;
 import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHB_QUERY;
 import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHB_QUERY_FOR_REVIEW;
+import static com.prgrms.artzip.common.ErrorCode.INVALID_INPUT_VALUE;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
+import com.prgrms.artzip.exibition.domain.enumType.Area;
+import com.prgrms.artzip.exibition.domain.enumType.Month;
 import com.prgrms.artzip.exibition.domain.repository.ExhibitionRepository;
 import com.prgrms.artzip.exibition.domain.vo.Period;
+import com.prgrms.artzip.exibition.dto.ExhibitionCustomCondition;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionBasicForSimpleQuery;
 import com.prgrms.artzip.exibition.dto.projection.ExhibitionForSimpleQuery;
+import com.prgrms.artzip.exibition.dto.request.ExhibitionCustomConditionRequest;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
@@ -29,6 +38,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class ExhibitionSearchServiceTest {
@@ -133,4 +143,88 @@ class ExhibitionSearchServiceTest {
     }
   }
 
+  @Nested
+  @DisplayName("getExhibitionsByCustomCondition() 테스트")
+  class GetExhibitionsByCustomConditionTest {
+
+    private Long userId = null;
+    private boolean includeEnd = true;
+    private Pageable pageable = PageRequest.of(0, 8);
+
+    private List<ExhibitionForSimpleQuery> exhibitions = Arrays.asList(
+        ExhibitionForSimpleQuery.builder()
+            .id(11L)
+            .name("고흐 전시")
+            .thumbnail("http://www.culture.go.kr/upload/rdf/22/07/show_2022071411402126915.png")
+            .isLiked(false)
+            .period(new Period(LocalDate.of(LocalDate.now().getYear(), 6, 5),
+                LocalDate.of(LocalDate.now().getYear(), 8, 10)))
+            .likeCount(30)
+            .reviewCount(15)
+            .build());
+    private Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = new PageImpl(exhibitions);
+
+    @Test
+    @DisplayName("ExhibitionCustomConditionRequest의 areas 또는 months가 비어있는 경우 테스트")
+    void testEmptyList() {
+      ExhibitionCustomConditionRequest exhibitionCustomConditionRequest = new ExhibitionCustomConditionRequest(
+          new ArrayList<>(), new ArrayList<>());
+
+      assertThatThrownBy(() -> exhibitionSearchService.getExhibitionsByCustomCondition(userId,
+          exhibitionCustomConditionRequest, includeEnd, pageable))
+          .isInstanceOf(InvalidRequestException.class)
+          .hasMessage(INVALID_INPUT_VALUE.getMessage());
+
+      verify(exhibitionRepository, never()).findExhibitionsByCustomCondition(eq(userId),
+          any(ExhibitionCustomCondition.class), eq(pageable));
+    }
+
+    @Test
+    @DisplayName("ExhibitionCustomConditionRequest의 areas 또는 months에 null이 포함된 경우 테스트")
+    void testIncludeNull() {
+      ExhibitionCustomConditionRequest exhibitionCustomConditionRequest = new ExhibitionCustomConditionRequest(
+          Arrays.asList(Area.SEOUL, null), Arrays.asList(Month.JUN, null));
+
+      assertThatThrownBy(() -> exhibitionSearchService.getExhibitionsByCustomCondition(userId,
+          exhibitionCustomConditionRequest, includeEnd, pageable))
+          .isInstanceOf(InvalidRequestException.class)
+          .hasMessage(INVALID_CUSTOM_EXHB_CONDITION.getMessage());
+
+      verify(exhibitionRepository, never()).findExhibitionsByCustomCondition(eq(userId),
+          any(ExhibitionCustomCondition.class), eq(pageable));
+    }
+
+    @Test
+    @DisplayName("ExhibitionCustomConditionRequest의 areas에 ALL이 포함된 경우 테스트")
+    void testAreasIncludeAll() {
+      ExhibitionCustomConditionRequest exhibitionCustomConditionRequest = new ExhibitionCustomConditionRequest(
+          Arrays.asList(Area.SEOUL, Area.ALL), Arrays.asList(Month.JUN));
+
+      when(exhibitionRepository.findExhibitionsByCustomCondition(eq(userId),
+          any(ExhibitionCustomCondition.class), eq(pageable))).thenReturn(exhibitionsPagingResult);
+
+      exhibitionSearchService.getExhibitionsByCustomCondition(userId,
+          exhibitionCustomConditionRequest, includeEnd, pageable);
+
+      verify(exhibitionRepository).findExhibitionsByCustomCondition(eq(userId),
+          any(ExhibitionCustomCondition.class), eq(pageable));
+    }
+    
+    @Test
+    @DisplayName("ExhibitionCustomConditionRequest의 months에 ALL이 포함된 경우 테스트")
+    void testMonthsIncludeAll() {
+      ExhibitionCustomConditionRequest exhibitionCustomConditionRequest = new ExhibitionCustomConditionRequest(
+          Arrays.asList(Area.SEOUL), Arrays.asList(Month.JUN, Month.ALL));
+
+      when(exhibitionRepository.findExhibitionsByCustomCondition(eq(userId),
+          any(ExhibitionCustomCondition.class), eq(pageable))).thenReturn(exhibitionsPagingResult);
+
+      exhibitionSearchService.getExhibitionsByCustomCondition(userId,
+          exhibitionCustomConditionRequest, includeEnd, pageable);
+
+      verify(exhibitionRepository).findExhibitionsByCustomCondition(eq(userId),
+          any(ExhibitionCustomCondition.class), eq(pageable));
+    }
+
+  }
 }
