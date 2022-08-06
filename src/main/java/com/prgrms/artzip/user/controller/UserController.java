@@ -2,12 +2,11 @@ package com.prgrms.artzip.user.controller;
 
 import com.prgrms.artzip.comment.service.CommentService;
 import com.prgrms.artzip.common.ApiResponse;
-import com.prgrms.artzip.common.entity.CurrentUser;
+import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.jwt.JwtAuthenticationToken;
 import com.prgrms.artzip.common.jwt.JwtPrincipal;
 import com.prgrms.artzip.common.util.JwtService;
 import com.prgrms.artzip.exibition.service.ExhibitionLikeService;
-import com.prgrms.artzip.exibition.service.ExhibitionService;
 import com.prgrms.artzip.review.service.ReviewLikeService;
 import com.prgrms.artzip.review.service.ReviewService;
 import com.prgrms.artzip.user.domain.User;
@@ -22,6 +21,13 @@ import com.prgrms.artzip.user.service.UserService;
 import com.prgrms.artzip.user.service.UserUtilService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,6 +38,8 @@ import javax.validation.Valid;
 
 import java.net.URI;
 
+import static com.prgrms.artzip.common.ErrorCode.MISSING_REQUEST_PARAMETER;
+import static java.util.Objects.isNull;
 import static org.springframework.http.HttpStatus.*;
 
 @Api(tags = {"users"})
@@ -114,16 +122,33 @@ public class UserController {
   @ApiOperation(value = "중복 검사", notes = "이메일 및 닉네임에 대해 중복 검사를 진행합니다.")
   @GetMapping("/check")
   public ResponseEntity<ApiResponse<UniqueCheckResponse>> checkNicknameValid(
-      @RequestParam("nickname") String nickname, @RequestParam("email") String email) {
-    UniqueCheckResponse response =
-        userUtilService.checkNicknameUnique(nickname) && userUtilService.checkEmailUnique(email)
-            ? new UniqueCheckResponse(true)
-            : new UniqueCheckResponse(false);
+      @RequestParam(value = "nickname", required = false) String nickname,
+      @RequestParam(value = "email", required = false) String email) {
+    List<String> params = new ArrayList<>();
+    params.add(nickname);
+    params.add(email);
+    boolean isUnique = makeUnanimousVote(params, List.of(userUtilService::checkNicknameUnique, userUtilService::checkEmailUnique));
+    UniqueCheckResponse response = new UniqueCheckResponse(isUnique);
     ApiResponse apiResponse = ApiResponse.builder()
         .message("중복 검사가 완료되었습니다.")
         .status(OK.value())
         .data(response)
         .build();
     return ResponseEntity.ok(apiResponse);
+  }
+
+  private boolean makeUnanimousVote(List<String> params, List<Function<String, Boolean>> functions) {
+    boolean allParamsNull = true;
+    boolean voteFlag = true;
+    int idx = 0;
+    for (String param : params) {
+      if (!isNull(param)) {
+        voteFlag = voteFlag && functions.get(idx).apply(param);
+        allParamsNull = false;
+      }
+      idx++;
+    }
+    if (allParamsNull) throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
+    return voteFlag;
   }
 }
