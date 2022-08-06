@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -126,6 +127,12 @@ public class WebSecurityConfig {
                         "/api/v1/comments/**",
                         "/api/v1/reviews/**/comments/new",
                         "/api/v1/exhibitions/**/likes").hasAnyAuthority(USER.name(), ADMIN.name())
+                .antMatchers(HttpMethod.POST,
+                    "/api/v1/reviews").hasAnyAuthority(USER.name(), ADMIN.name())
+                .antMatchers(HttpMethod.PATCH,
+                    "/api/v1/reviews/**", "/api/v1/reviews/**/like").hasAnyAuthority(USER.name(), ADMIN.name())
+                .antMatchers(HttpMethod.DELETE,
+                    "/api/v1/reviews/**").hasAnyAuthority(USER.name(), ADMIN.name())
                 .anyRequest().permitAll()
                 .and()
                 .exceptionHandling()
