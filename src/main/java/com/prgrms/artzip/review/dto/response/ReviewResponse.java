@@ -2,7 +2,6 @@ package com.prgrms.artzip.review.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.prgrms.artzip.exibition.dto.response.ExhibitionInfo;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
@@ -12,5 +11,5 @@ import lombok.experimental.SuperBuilder;
 public class ReviewResponse extends ReviewInfo {
 
   private ReviewUserInfo user;
-  private ExhibitionInfo exhibition;
+  private ReviewExhibitionInfo exhibition;
 }
