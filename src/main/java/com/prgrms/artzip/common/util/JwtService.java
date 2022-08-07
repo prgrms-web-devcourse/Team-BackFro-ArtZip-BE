@@ -17,7 +17,6 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import static java.util.Objects.*;
 
@@ -49,7 +48,6 @@ public class JwtService {
     return accessJwt.sign(new AccessClaim(userId, email, roles));
   }
 
-  @Transactional
   public String createRefreshToken(String email) {
     String refreshToken = refreshJwt.sign(new RefreshClaim(email));
     redisService.setValues(email, refreshToken, Duration.ofSeconds(
@@ -57,7 +55,6 @@ public class JwtService {
     return refreshToken;
   }
 
-  @Transactional(readOnly = true)
   public void checkRefreshToken(String email, String refreshToken) {
     try{
       refreshJwt.verifyRefreshToken(refreshToken);
@@ -71,7 +68,6 @@ public class JwtService {
     }
   }
 
-  @Transactional(readOnly = true)
   public String reissueAccessToken(User user, String expiredAccessToken, String refreshToken) {
     Date now = new Date();
     try {
@@ -90,7 +86,6 @@ public class JwtService {
     }
   }
 
-  @Transactional
   public void logout(String token) {
     AccessClaim claim = accessJwt.verifyAccessToken(token);
     long expiredAccessTokenTime = claim.getExp().getTime() - new Date().getTime();
@@ -98,7 +93,6 @@ public class JwtService {
     redisService.deleteValues(claim.getEmail());
   }
 
-  @Transactional(readOnly = true)
   public AccessClaim verifyAccessToken(String token) {
     String expiredAt = redisService.getValues(jwtConfig.getBlackListPrefix() + token);
     if (expiredAt != null) throw new AuthErrorException(TOKEN_EXPIRED);
