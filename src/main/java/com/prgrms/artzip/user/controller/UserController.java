@@ -172,25 +172,12 @@ public class UserController {
   public ResponseEntity<ApiResponse<LoginResponse>> reIssueAccessToken(@RequestBody @Valid
   TokenReissueRequest request) {
     User user = userUtilService.getUserById(request.getUserId());
-    Date now = new Date();
-    try {
-      AccessClaim claims = jwtService.verifyAccessToken(request.getAccessToken());
-      if (!claims.getUserId().equals(request.getUserId())) throw new InvalidRequestException(TOKEN_USER_ID_NOT_MATCHED);
-      if (claims.getExp().getTime() - now.getTime() >= 1000 * 60 * 5) {
-        throw new InvalidRequestException(TOKEN_NOT_EXPIRED);
-      } else {
-        throw new TokenExpiredException(TOKEN_EXPIRED.getMessage());
-      }
-    } catch (TokenExpiredException e) {
-      jwtService.checkRefreshToken(user.getEmail(), request.getRefreshToken());
-      List<GrantedAuthority> authorities = user.getRoles().stream().map(Role::toGrantedAuthority).collect(Collectors.toList());
-      String newAccessToken = jwtService.createAccessToken(user.getId(), user.getEmail(), authorities);
-      ApiResponse apiResponse = ApiResponse.builder()
-          .message("토큰이 재발급되었습니다.")
-          .status(OK.value())
-          .data(new TokenResponse(newAccessToken))
-          .build();
-      return ResponseEntity.ok(apiResponse);
-    }
+    String newAccessToken = jwtService.reissueAccessToken(user, request.getAccessToken(), request.getRefreshToken());
+    ApiResponse apiResponse = ApiResponse.builder()
+        .message("토큰이 재발급되었습니다.")
+        .status(OK.value())
+        .data(new TokenResponse(newAccessToken))
+        .build();
+    return ResponseEntity.ok(apiResponse);
   }
 }

@@ -1,12 +1,19 @@
 package com.prgrms.artzip.common.util;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.prgrms.artzip.common.ApiResponse;
 import com.prgrms.artzip.common.config.JwtConfig;
 import com.prgrms.artzip.common.error.exception.AuthErrorException;
+import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.jwt.Jwt;
 import com.prgrms.artzip.common.jwt.claims.AccessClaim;
 import com.prgrms.artzip.common.jwt.claims.RefreshClaim;
+import com.prgrms.artzip.user.domain.Role;
+import com.prgrms.artzip.user.domain.User;
+import com.prgrms.artzip.user.dto.response.TokenResponse;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
@@ -60,6 +67,24 @@ public class JwtService {
     if(isNull(redisToken)) throw new AuthErrorException(REDIS_TOKEN_NOT_FOUND);
     if(!redisToken.equals(refreshToken)) {
       throw new AuthErrorException(INVALID_TOKEN_REQUEST);
+    }
+  }
+
+  public String reissueAccessToken(User user, String expiredAccessToken, String refreshToken) {
+    Date now = new Date();
+    try {
+      AccessClaim claims = verifyAccessToken(expiredAccessToken);
+      if (!claims.getUserId().equals(user.getId())) throw new InvalidRequestException(TOKEN_USER_ID_NOT_MATCHED);
+      if (claims.getExp().getTime() - now.getTime() >= 1000 * 60 * 5) {
+        throw new InvalidRequestException(TOKEN_NOT_EXPIRED);
+      } else {
+        throw new TokenExpiredException(TOKEN_EXPIRED.getMessage());
+      }
+    } catch (TokenExpiredException e) {
+      checkRefreshToken(user.getEmail(), refreshToken);
+      List<GrantedAuthority> authorities = user.getRoles().stream().map(Role::toGrantedAuthority).collect(
+          Collectors.toList());
+      return createAccessToken(user.getId(), user.getEmail(), authorities);
     }
   }
 
