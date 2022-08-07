@@ -4,6 +4,7 @@ import com.prgrms.artzip.exhibition.dto.ExhibitionCustomCondition;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionBasicForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionForSimpleQuery;
+import com.prgrms.artzip.review.dto.response.ReviewExhibitionInfo;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -28,4 +29,6 @@ public interface ExhibitionCustomRepository {
 
   Page<ExhibitionForSimpleQuery> findExhibitionsByCustomCondition(Long userId,
       ExhibitionCustomCondition exhibitionCustomCondition, Pageable pageable);
+
+  Optional<ReviewExhibitionInfo> findExhibitionForReview(Long userId, Long exhibitionId);
 }

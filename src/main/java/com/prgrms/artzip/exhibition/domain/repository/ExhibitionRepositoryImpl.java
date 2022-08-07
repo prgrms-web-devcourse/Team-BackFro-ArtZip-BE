@@ -1,6 +1,7 @@
 package com.prgrms.artzip.exhibition.domain.repository;
 
 import static com.prgrms.artzip.exhibition.domain.QExhibition.exhibition;
+import static com.prgrms.artzip.exhibition.domain.QExhibitionLike.exhibitionLike;
 import static com.prgrms.artzip.review.domain.QReview.review;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -12,6 +13,7 @@ import com.prgrms.artzip.exhibition.dto.ExhibitionCustomCondition;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionBasicForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionForSimpleQuery;
+import com.prgrms.artzip.review.dto.response.ReviewExhibitionInfo;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -198,6 +200,42 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
     JPAQuery<Long> countQuery = getExhibitionCountQuery(customCondition);
 
     return PageableExecutionUtils.getPage(exhibitions, pageable, countQuery::fetchOne);
+  }
+
+  @Override
+  public Optional<ReviewExhibitionInfo> findExhibitionForReview(
+      Long userId, Long exhibitionId) {
+
+    ReviewExhibitionInfo data = queryFactory
+        .select(Projections.fields(ReviewExhibitionInfo.class,
+                exhibition.id.as("exhibitionId"),
+                exhibition.name,
+                exhibition.thumbnail,
+                exhibition.period.startDate.as("startDate"),
+                exhibition.period.endDate.as("endDate"),
+                new CaseBuilder()
+                    .when(exhibitionLikeForIsLikedUserIdEq(userId))
+                    .then(true)
+                    .otherwise(false).as("isLiked"),
+            exhibitionLike.id.countDistinct().as("likeCount"),
+                review.id.countDistinct().as("reviewCount")
+            )
+        )
+        .from(exhibition)
+        .leftJoin(exhibitionLikeForIsLiked)
+        .on(exhibitionLikeForIsLiked.exhibition.eq(exhibition),
+            exhibitionLikeForIsLikedUserIdEq(userId))
+        .leftJoin(exhibitionLike)
+        .on(exhibition.id.eq(exhibitionLike.exhibition.id))
+        .leftJoin(review)
+        .on(review.exhibition.eq(exhibition),
+            review.isDeleted.isFalse(),
+            review.isPublic.isTrue())
+        .where(exhibition.id.eq(exhibitionId))
+        .groupBy(exhibition.id)
+        .fetchOne();
+
+    return Optional.ofNullable(data);
   }
 
   private List<ExhibitionForSimpleQuery> findExhibitions(Long userId, BooleanBuilder condition,
