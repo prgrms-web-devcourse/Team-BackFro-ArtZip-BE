@@ -175,11 +175,10 @@ public class UserController {
     Date now = new Date();
     try {
       AccessClaim claims = jwtService.verifyAccessToken(request.getAccessToken());
+      if (!claims.getUserId().equals(request.getUserId())) throw new InvalidRequestException(TOKEN_USER_ID_NOT_MATCHED);
       if (claims.getExp().getTime() - now.getTime() >= 1000 * 60 * 5) {
-        throw new InvalidRequestException(
-            TOKEN_NOT_EXPIRED);
+        throw new InvalidRequestException(TOKEN_NOT_EXPIRED);
       } else {
-        if (!claims.getUserId().equals(request.getUserId())) throw new InvalidRequestException(TOKEN_USER_ID_NOT_MATCHED);
         throw new TokenExpiredException(TOKEN_EXPIRED.getMessage());
       }
     } catch (TokenExpiredException e) {
