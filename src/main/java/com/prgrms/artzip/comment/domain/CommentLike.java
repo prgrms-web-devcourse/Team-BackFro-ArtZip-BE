@@ -30,14 +30,14 @@ public class CommentLike {
   @MapsId("commentId")
   @ManyToOne(fetch = LAZY)
   @JoinColumnOrFormula(column =
-  @JoinColumn(name = "comment_id", referencedColumnName = "commentId")
+  @JoinColumn(name = "comment_id", referencedColumnName = "comment_Id")
   )
   private Comment comment;
 
   @MapsId("userId")
   @ManyToOne(fetch = LAZY)
   @JoinColumnOrFormula(column =
-  @JoinColumn(name = "user_id", referencedColumnName = "commentId")
+  @JoinColumn(name = "user_id", referencedColumnName = "user_Id")
   )
   private User user;
 

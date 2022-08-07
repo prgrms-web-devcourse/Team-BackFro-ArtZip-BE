@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface CommentLikeRepository extends JpaRepository<CommentLike, Long> {
   @Query("select cl from CommentLike cl where cl.user.id = :userId and cl.comment.id = :commentId")
-  Optional<CommentLike> findCommentLikeByCommentIdAndUserId(@Param("commentId") Long commentId, @Param("userId") Long userId);
+  Optional<CommentLike> getCommentLikeByCommentIdAndUserId(@Param("commentId") Long commentId, @Param("userId") Long userId);
 
   @Modifying(clearAutomatically = true)
   @Query("delete from CommentLike cl where cl.comment.id = :commentId and cl.user.id = :userId")
