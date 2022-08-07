@@ -2,7 +2,9 @@ package com.prgrms.artzip.review.dto.response;
 
 import java.time.LocalDate;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @Getter
 public class ReviewExhibitionInfo {
 
