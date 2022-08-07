@@ -118,8 +118,8 @@ public class UserService {
   }
 
   @Transactional
-  public void updatePassword(User user, PasswordUpdateRequest request) {
-    LocalUser localUser = (LocalUser) user;
+  public void updatePassword(LocalUser localUser, PasswordUpdateRequest request) {
+    if (request.getNewPassword().equals(request.getOldPassword())) throw new InvalidRequestException(PASSWORD_CANNOT_BE_SAME);
     localUser.checkPassword(passwordEncoder, request.getOldPassword());
     localUser.changePassword(passwordEncoder, request.getNewPassword());
     userRepository.save(localUser);
