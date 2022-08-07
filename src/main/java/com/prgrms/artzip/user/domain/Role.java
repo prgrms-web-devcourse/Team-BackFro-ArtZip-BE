@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 @Entity
 @Getter
@@ -32,6 +34,10 @@ public class Role {
           throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
       }
     this.authority = authority;
+  }
+
+  public static SimpleGrantedAuthority toGrantedAuthority(Role role) {
+    return new SimpleGrantedAuthority(role.getAuthority().name());
   }
 
 }
