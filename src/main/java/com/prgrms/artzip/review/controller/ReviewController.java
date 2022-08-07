@@ -6,7 +6,7 @@ import com.prgrms.artzip.comment.service.CommentService;
 import com.prgrms.artzip.common.ApiResponse;
 import com.prgrms.artzip.common.PageResponse;
 import com.prgrms.artzip.common.entity.CurrentUser;
-import com.prgrms.artzip.exibition.service.ExhibitionSearchService;
+import com.prgrms.artzip.exhibition.service.ExhibitionSearchService;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
 import com.prgrms.artzip.review.dto.response.ExhibitionsResponse;
 import com.prgrms.artzip.review.dto.response.ReviewCreateResponse;
@@ -108,7 +108,7 @@ public class ReviewController {
     return ResponseEntity.ok()
         .body(apiResponse);
   }
-  
+
   //TODO 아래 두 API 테스트 작성
 
   @ApiOperation(value = "후기 댓글 다건 조회", notes = "후기의 댓글들을 조회합니다.")

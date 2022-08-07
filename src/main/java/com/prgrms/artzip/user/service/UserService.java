@@ -16,6 +16,7 @@ import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.RoleRepository;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
+import com.prgrms.artzip.user.dto.request.PasswordUpdateRequest;
 import com.prgrms.artzip.user.dto.request.UserSignUpRequest;
 import com.prgrms.artzip.user.dto.request.UserUpdateRequest;
 import com.prgrms.artzip.user.dto.response.UserUpdateResponse;
@@ -114,6 +115,14 @@ public class UserService {
         .nickname(user.getNickname())
         .profileImage(user.getProfileImage())
         .build();
+  }
+
+  @Transactional
+  public void updatePassword(LocalUser localUser, PasswordUpdateRequest request) {
+    if (request.getNewPassword().equals(request.getOldPassword())) throw new InvalidRequestException(PASSWORD_CANNOT_BE_SAME);
+    localUser.checkPassword(passwordEncoder, request.getOldPassword());
+    localUser.changePassword(passwordEncoder, request.getNewPassword());
+    userRepository.save(localUser);
   }
 
   private void validateFileExtension(final MultipartFile file) {

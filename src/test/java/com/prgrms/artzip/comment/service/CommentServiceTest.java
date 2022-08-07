@@ -16,9 +16,9 @@ import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
-import com.prgrms.artzip.exibition.domain.Exhibition;
-import com.prgrms.artzip.exibition.domain.enumType.Area;
-import com.prgrms.artzip.exibition.domain.enumType.Genre;
+import com.prgrms.artzip.exhibition.domain.Exhibition;
+import com.prgrms.artzip.exhibition.domain.enumType.Area;
+import com.prgrms.artzip.exhibition.domain.enumType.Genre;
 import com.prgrms.artzip.review.domain.Review;
 import com.prgrms.artzip.review.domain.repository.ReviewRepository;
 import com.prgrms.artzip.user.domain.LocalUser;
@@ -267,7 +267,8 @@ class CommentServiceTest {
     doReturn(new ArrayList<>()).when(commentRepository).getCommentsOfParents(List.of(0L));
 
     //when
-    CommentResponse response = commentService.updateComment(new CommentUpdateRequest("반가워"), 0L, user);
+    CommentResponse response = commentService.updateComment(new CommentUpdateRequest("반가워"), 0L,
+        user);
 
     //then
     verify(commentUtilService).getComment(0L);

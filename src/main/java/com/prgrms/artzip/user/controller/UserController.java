@@ -1,13 +1,17 @@
 package com.prgrms.artzip.user.controller;
 
+import static com.prgrms.artzip.common.ErrorCode.MISSING_REQUEST_PARAMETER;
+import static java.util.Objects.isNull;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
+
 import com.prgrms.artzip.comment.service.CommentService;
 import com.prgrms.artzip.common.ApiResponse;
-import com.prgrms.artzip.common.entity.CurrentUser;
+import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.jwt.JwtAuthenticationToken;
 import com.prgrms.artzip.common.jwt.JwtPrincipal;
 import com.prgrms.artzip.common.util.JwtService;
-import com.prgrms.artzip.exibition.service.ExhibitionLikeService;
-import com.prgrms.artzip.exibition.service.ExhibitionService;
+import com.prgrms.artzip.exhibition.service.ExhibitionLikeService;
 import com.prgrms.artzip.review.service.ReviewLikeService;
 import com.prgrms.artzip.review.service.ReviewService;
 import com.prgrms.artzip.user.domain.User;
@@ -16,24 +20,32 @@ import com.prgrms.artzip.user.dto.request.UserLocalLoginRequest;
 import com.prgrms.artzip.user.dto.request.UserSignUpRequest;
 import com.prgrms.artzip.user.dto.response.LoginResponse;
 import com.prgrms.artzip.user.dto.response.SignUpResponse;
+import com.prgrms.artzip.user.dto.response.UniqueCheckResponse;
 import com.prgrms.artzip.user.dto.response.UserResponse;
 import com.prgrms.artzip.user.service.UserService;
 import com.prgrms.artzip.user.service.UserUtilService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
-
-import java.net.URI;
-
-import static org.springframework.http.HttpStatus.*;
-
-@Api(tags = {"users"})
+@Api(tags = {"유저 API"})
 @RestController
 @RequestMapping("api/v1/users")
 @RequiredArgsConstructor
@@ -57,6 +69,7 @@ public class UserController {
   private final ReviewLikeService reviewLikeService;
 
 
+  @ApiOperation(value = "로컬 로그인", notes = "이메일과 비밀번호로 로컬로그인을 진행합니다.")
   @PostMapping("/local/login")
   public ResponseEntity<ApiResponse<LoginResponse>> localLogin(
       @RequestBody @Valid UserLocalLoginRequest request) {
@@ -77,9 +90,10 @@ public class UserController {
     return ResponseEntity.ok(response);
   }
 
+  @ApiOperation(value = "회원가입", notes = "회원가입을 합니다.")
   @PostMapping("/signup")
   public ResponseEntity<ApiResponse<SignUpResponse>> signUp(@RequestBody @Valid
-  UserSignUpRequest request) {
+      UserSignUpRequest request) {
     User newUser = userService.signUp(request);
     ApiResponse response = ApiResponse.builder()
         .message("회원가입 성공하였습니다.")
@@ -89,6 +103,7 @@ public class UserController {
     return ResponseEntity.created(URI.create("/signup")).body(response);
   }
 
+  @ApiOperation(value = "유저 정보 조회", notes = "유저 정보를 조회합니다.")
   @GetMapping("/{userId}/info")
   public ResponseEntity<ApiResponse<UserRepository>> getUserInfo(
       @PathVariable("userId") Long userId) {
@@ -110,6 +125,44 @@ public class UserController {
     return ResponseEntity.ok(apiResponse);
   }
 
+  @ApiOperation(value = "중복 검사", notes = "이메일 및 닉네임에 대해 중복 검사를 진행합니다.")
+  @GetMapping("/check")
+  public ResponseEntity<ApiResponse<UniqueCheckResponse>> checkNicknameValid(
+      @RequestParam(value = "nickname", required = false) String nickname,
+      @RequestParam(value = "email", required = false) String email) {
+    List<String> params = new ArrayList<>();
+    params.add(nickname);
+    params.add(email);
+    boolean isUnique = makeUnanimousVote(params,
+        List.of(userUtilService::checkNicknameUnique, userUtilService::checkEmailUnique));
+    UniqueCheckResponse response = new UniqueCheckResponse(isUnique);
+    ApiResponse apiResponse = ApiResponse.builder()
+        .message("중복 검사가 완료되었습니다.")
+        .status(OK.value())
+        .data(response)
+        .build();
+    return ResponseEntity.ok(apiResponse);
+  }
+
+  private boolean makeUnanimousVote(List<String> params,
+      List<Function<String, Boolean>> functions) {
+    boolean allParamsNull = true;
+    boolean voteFlag = true;
+    int idx = 0;
+    for (String param : params) {
+      if (!isNull(param)) {
+        voteFlag = voteFlag && functions.get(idx).apply(param);
+        allParamsNull = false;
+      }
+      idx++;
+    }
+    if (allParamsNull) {
+      throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
+    }
+    return voteFlag;
+  }
+
+  @ApiOperation(value = "로그아웃", notes = "요청한 accessToken을 로그아웃 토큰으로 저장합니다.")
   @PatchMapping("/logout")
   public ResponseEntity<ApiResponse<Object>> logout(@AuthenticationPrincipal JwtPrincipal principal) {
     jwtService.logout(principal.getAccessToken());

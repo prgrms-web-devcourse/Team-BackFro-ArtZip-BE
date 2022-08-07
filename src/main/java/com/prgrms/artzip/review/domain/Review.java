@@ -3,7 +3,7 @@ package com.prgrms.artzip.review.domain;
 import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.entity.BaseEntity;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
-import com.prgrms.artzip.exibition.domain.Exhibition;
+import com.prgrms.artzip.exhibition.domain.Exhibition;
 import com.prgrms.artzip.user.domain.User;
 import java.time.LocalDate;
 import java.util.ArrayList;
