@@ -10,7 +10,7 @@ import lombok.Getter;
 @Getter
 public enum ErrorCode {
   // Internal Server Error
-  INTERNAL_SERVER_ERROR(500, "server01", "서버에 문제가 생겼습니다."),
+  INTERNAL_SERVER_ERROR(500, "C000", "서버에 문제가 생겼습니다."),
 
   // 400 Client Error
   METHOD_NOT_ALLOWED(405, "C001", "적절하지 않은 HTTP 메소드입니다."),
@@ -41,6 +41,9 @@ public enum ErrorCode {
   EMAIL_REQUIRED(400, "U008", "이메일은 필수입니다."),
   ROLE_NOT_FOUND(400, "U009", "역할이 존재하지 않습니다."),
   USER_PARAM_REQUIRED(400, "U010", "유저가 누락되었습니다."),
+  USER_PROFILE_NOT_MATCHED(400, "U011", "수정할 프로필 사진이 누락되었으며, 유저의 기존 프로필 이미지와 다른 링크입니다."),
+  NICKNAME_ALREADY_EXISTS(400, "U012", "이미 존재하는 닉네임입니다."),
+  PASSWORD_CANNOT_BE_SAME(400, "U013", "새 비밀번호는 이전 비밀번호와 같을 수 없습니다."),
   /**
    * Exhibition Domain
    */
@@ -62,6 +65,7 @@ public enum ErrorCode {
   EXHB_NOT_FOUND(404, "EX015", "존재하지 않는 전시회 입니다."),
   INVALID_EXHB_QUERY(400, "EX016", "검색어는 필수입니다.(2 <= 검색어)"),
   INVALID_EXHB_QUERY_FOR_REVIEW(400, "EX017", "검색어는 필수입니다."),
+  INVALID_CUSTOM_EXHB_CONDITION(400, "EX018", "areas와 months에는 null이 포함될 수 없습니다"),
 
   /**
    * Comment Domain
@@ -85,8 +89,7 @@ public enum ErrorCode {
   INVALID_REVIEW_PHOTO_COUNT(400, "R008", "리뷰 사진은 최대 9개입니다."),
   REVIEW_NOT_FOUND(400, "R009", "존재하지 않는 리뷰입니다."),
   REVIEW_PHOTO_NOT_FOUND(400, "R010", "존재하지 않는 리뷰 사진입니다."),
-  NO_PERMISSION_TO_UPDATE_REVIEW(404, "R011", "해당 리뷰를 수정할 수 없습니다.")
-  ;
+  NO_PERMISSION_TO_UPDATE_REVIEW(404, "R011", "해당 리뷰를 수정할 수 없습니다.");
 
 
   private final int status;

@@ -3,20 +3,26 @@ package com.prgrms.artzip.review.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
+import com.prgrms.artzip.common.error.exception.PermissionDeniedException;
 import com.prgrms.artzip.common.util.AmazonS3Remover;
 import com.prgrms.artzip.common.util.AmazonS3Uploader;
-import com.prgrms.artzip.exibition.domain.Exhibition;
-import com.prgrms.artzip.exibition.domain.enumType.Area;
-import com.prgrms.artzip.exibition.domain.enumType.Genre;
-import com.prgrms.artzip.exibition.domain.repository.ExhibitionRepository;
+import com.prgrms.artzip.exhibition.domain.Exhibition;
+import com.prgrms.artzip.exhibition.domain.enumType.Area;
+import com.prgrms.artzip.exhibition.domain.enumType.Genre;
+import com.prgrms.artzip.exhibition.domain.repository.ExhibitionRepository;
 import com.prgrms.artzip.review.domain.Review;
 import com.prgrms.artzip.review.domain.ReviewPhoto;
+import com.prgrms.artzip.review.domain.repository.ReviewLikeRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewPhotoRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewRepository;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
@@ -25,13 +31,11 @@ import com.prgrms.artzip.review.dto.response.ReviewIdResponse;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -47,23 +51,26 @@ import org.springframework.web.multipart.MultipartFile;
 @ExtendWith(MockitoExtension.class)
 class ReviewServiceTest {
 
-    @InjectMocks
-    private ReviewService reviewService;
+  @InjectMocks
+  private ReviewService reviewService;
 
-    @Mock
-    private ReviewRepository reviewRepository;
+  @Mock
+  private ReviewRepository reviewRepository;
 
-    @Mock
-    private ReviewPhotoRepository reviewPhotoRepository;
+  @Mock
+  private ReviewPhotoRepository reviewPhotoRepository;
 
-    @Mock
-    private UserRepository userRepository;
+  @Mock
+  private ReviewLikeRepository reviewLikeRepository;
 
-    @Mock
-    private ExhibitionRepository exhibitionRepository;
+  @Mock
+  private UserRepository userRepository;
 
-    @Mock
-    AmazonS3Uploader amazonS3Uploader;
+  @Mock
+  private ExhibitionRepository exhibitionRepository;
+
+  @Mock
+  AmazonS3Uploader amazonS3Uploader;
 
   @Mock
   AmazonS3Remover amazonS3Remover;
@@ -126,183 +133,183 @@ class ReviewServiceTest {
             "test3".getBytes())
     );
 
-        @Nested
-        @DisplayName("성공")
-        class Success {
+    @Nested
+    @DisplayName("성공")
+    class Success {
 
-            @Test
-            @DisplayName("후기 사진이 없는 경우 후기 생성이 정상적으로 작동")
-            void testReviewCreationWithoutPhoto() {
-                doReturn(Optional.of(user)).when(userRepository).findById(user.getId());
-                doReturn(Optional.of(exhibition)).when(exhibitionRepository)
-                        .findById(request.getExhibitionId());
-                doReturn(review).when(reviewRepository).save(any());
-                reviewService.createReview(user.getId(), request, null);
+      @Test
+      @DisplayName("후기 사진이 없는 경우 후기 생성이 정상적으로 작동")
+      void testReviewCreationWithoutPhoto() {
+        doReturn(Optional.of(user)).when(userRepository).findById(user.getId());
+        doReturn(Optional.of(exhibition)).when(exhibitionRepository)
+            .findById(request.getExhibitionId());
+        doReturn(review).when(reviewRepository).save(any());
+        reviewService.createReview(user.getId(), request, null);
 
-                verify(reviewRepository).save(any());
-            }
+        verify(reviewRepository).save(any());
+      }
 
-            @Test
-            @DisplayName("후기 사진이 있는 경우 후기 생성이 정상적으로 작동")
-            void reviewCreationTest() throws IOException {
-                ReviewPhoto reviewPhoto1 = mock(ReviewPhoto.class);
-                ReviewPhoto reviewPhoto2 = mock(ReviewPhoto.class);
-                ReviewPhoto reviewPhoto3 = mock(ReviewPhoto.class);
+      @Test
+      @DisplayName("후기 사진이 있는 경우 후기 생성이 정상적으로 작동")
+      void reviewCreationTest() throws IOException {
+        ReviewPhoto reviewPhoto1 = mock(ReviewPhoto.class);
+        ReviewPhoto reviewPhoto2 = mock(ReviewPhoto.class);
+        ReviewPhoto reviewPhoto3 = mock(ReviewPhoto.class);
 
-                String url1 = "https://www.example1.com";
-                String url2 = "https://www.example2.com";
-                String url3 = "https://www.example3.com";
+        String url1 = "https://www.example1.com";
+        String url2 = "https://www.example2.com";
+        String url3 = "https://www.example3.com";
 
-                doReturn(Optional.of(user)).when(userRepository).findById(user.getId());
-                doReturn(Optional.of(exhibition)).when(exhibitionRepository)
-                        .findById(request.getExhibitionId());
-                doReturn(review).when(reviewRepository).save(any());
+        doReturn(Optional.of(user)).when(userRepository).findById(user.getId());
+        doReturn(Optional.of(exhibition)).when(exhibitionRepository)
+            .findById(request.getExhibitionId());
+        doReturn(review).when(reviewRepository).save(any());
 
-                doReturn(url1).doReturn(url2).doReturn(url3)
-                        .when(amazonS3Uploader).upload(any(), any());
+        doReturn(url1).doReturn(url2).doReturn(url3)
+            .when(amazonS3Uploader).upload(any(), any());
 
-                doReturn(reviewPhoto1).doReturn(reviewPhoto2).doReturn(reviewPhoto3)
-                        .when(reviewPhotoRepository).save(any());
+        doReturn(reviewPhoto1).doReturn(reviewPhoto2).doReturn(reviewPhoto3)
+            .when(reviewPhotoRepository).save(any());
 
-                reviewService.createReview(user.getId(), request, files);
+        reviewService.createReview(user.getId(), request, files);
 
-                verify(reviewRepository).save(any());
-                verify(reviewPhotoRepository, times(3)).save(any());
-            }
+        verify(reviewRepository).save(any());
+        verify(reviewPhotoRepository, times(3)).save(any());
+      }
 
-        }
+    }
 
-        @Nested
-        @DisplayName("실패")
-        class Failure {
+    @Nested
+    @DisplayName("실패")
+    class Failure {
 
-            @Test
-            @DisplayName("존재하지 않는 user인 경우 NotFoundException 발생")
-            void invokeUserNotFoundExceptionTest() {
-                doThrow(new NotFoundException(ErrorCode.USER_NOT_FOUND))
-                        .when(userRepository).findById(any());
+      @Test
+      @DisplayName("존재하지 않는 user인 경우 NotFoundException 발생")
+      void invokeUserNotFoundExceptionTest() {
+        doThrow(new NotFoundException(ErrorCode.USER_NOT_FOUND))
+            .when(userRepository).findById(any());
 
-                assertThatThrownBy(() -> {
-                    reviewService.createReview(user.getId(), request, null);
-                }).isInstanceOf(NotFoundException.class)
-                        .hasMessageContaining(ErrorCode.USER_NOT_FOUND.getMessage());
-            }
+        assertThatThrownBy(() -> {
+          reviewService.createReview(user.getId(), request, null);
+        }).isInstanceOf(NotFoundException.class)
+            .hasMessageContaining(ErrorCode.USER_NOT_FOUND.getMessage());
+      }
 
-            @Test
-            @DisplayName("존재하지 않는 exhibition인 경우 NotFoundException 발생")
-            void invokeExhibitionNotFoundExceptionTest() {
-                doReturn(Optional.of(user)).when(userRepository).findById(any());
-                doThrow(new NotFoundException(ErrorCode.EXHB_NOT_FOUND))
-                        .when(exhibitionRepository).findById(any());
+      @Test
+      @DisplayName("존재하지 않는 exhibition인 경우 NotFoundException 발생")
+      void invokeExhibitionNotFoundExceptionTest() {
+        doReturn(Optional.of(user)).when(userRepository).findById(any());
+        doThrow(new NotFoundException(ErrorCode.EXHB_NOT_FOUND))
+            .when(exhibitionRepository).findById(any());
 
-                assertThatThrownBy(() -> {
-                    reviewService.createReview(user.getId(), request, null);
-                }).isInstanceOf(NotFoundException.class)
-                        .hasMessageContaining(ErrorCode.EXHB_NOT_FOUND.getMessage());
-            }
+        assertThatThrownBy(() -> {
+          reviewService.createReview(user.getId(), request, null);
+        }).isInstanceOf(NotFoundException.class)
+            .hasMessageContaining(ErrorCode.EXHB_NOT_FOUND.getMessage());
+      }
 
-            @Test
-            @DisplayName("리뷰 이미지 파일이 올바르지 않은 파일 확장자인 경우 InvalidRequestException 발생")
-            void invokeInvalidFileExtensionExceptionTest() {
-                List<MultipartFile> files = List.of(
-                        new MockMultipartFile(
-                                "test1",
-                                "test1.pn",
-                                MediaType.MULTIPART_FORM_DATA_VALUE,
-                                "test1".getBytes()),
-                        new MockMultipartFile(
-                                "test2",
-                                "test2.jpeeg",
-                                MediaType.MULTIPART_FORM_DATA_VALUE,
-                                "test2".getBytes())
-                );
+      @Test
+      @DisplayName("리뷰 이미지 파일이 올바르지 않은 파일 확장자인 경우 InvalidRequestException 발생")
+      void invokeInvalidFileExtensionExceptionTest() {
+        List<MultipartFile> files = List.of(
+            new MockMultipartFile(
+                "test1",
+                "test1.pn",
+                MediaType.MULTIPART_FORM_DATA_VALUE,
+                "test1".getBytes()),
+            new MockMultipartFile(
+                "test2",
+                "test2.jpeeg",
+                MediaType.MULTIPART_FORM_DATA_VALUE,
+                "test2".getBytes())
+        );
 
         doReturn(Optional.of(user)).when(userRepository).findById(any());
         doReturn(Optional.of(exhibition)).when(exhibitionRepository).findById(any());
 
-                assertThatThrownBy(() -> {
-                    reviewService.createReview(user.getId(), request, files);
-                }).isInstanceOf(InvalidRequestException.class)
-                        .hasMessageContaining(ErrorCode.INVALID_FILE_EXTENSION.getMessage());
-            }
+        assertThatThrownBy(() -> {
+          reviewService.createReview(user.getId(), request, files);
+        }).isInstanceOf(InvalidRequestException.class)
+            .hasMessageContaining(ErrorCode.INVALID_FILE_EXTENSION.getMessage());
+      }
 
-            @Test
-            @DisplayName("s3에 이미지 업로드할 때 IOException 발생")
-            void invokeIOException() throws IOException {
-                doReturn(Optional.of(user)).when(userRepository).findById(user.getId());
-                doReturn(Optional.of(exhibition)).when(exhibitionRepository)
-                        .findById(request.getExhibitionId());
-                doReturn(review).when(reviewRepository).save(any());
-                doThrow(IOException.class).when(amazonS3Uploader).upload(any(), any());
+      @Test
+      @DisplayName("s3에 이미지 업로드할 때 IOException 발생")
+      void invokeIOException() throws IOException {
+        doReturn(Optional.of(user)).when(userRepository).findById(user.getId());
+        doReturn(Optional.of(exhibition)).when(exhibitionRepository)
+            .findById(request.getExhibitionId());
+        doReturn(review).when(reviewRepository).save(any());
+        doThrow(IOException.class).when(amazonS3Uploader).upload(any(), any());
 
-                reviewService.createReview(user.getId(), request, files);
-            }
+        reviewService.createReview(user.getId(), request, files);
+      }
 
-            @Test
-            @DisplayName("파일 개수가 최대 개수를 초과하면 InvalidRequestException 발생")
-            void invokeFileCountInvalidRequestException() {
-                doReturn(Optional.of(user)).when(userRepository).findById(user.getId());
-                doReturn(Optional.of(exhibition)).when(exhibitionRepository)
-                        .findById(request.getExhibitionId());
+      @Test
+      @DisplayName("파일 개수가 최대 개수를 초과하면 InvalidRequestException 발생")
+      void invokeFileCountInvalidRequestException() {
+        doReturn(Optional.of(user)).when(userRepository).findById(user.getId());
+        doReturn(Optional.of(exhibition)).when(exhibitionRepository)
+            .findById(request.getExhibitionId());
 
-                List<MultipartFile> files = List.of(
-                        new MockMultipartFile(
-                                "test1",
-                                "test1.png",
-                                MediaType.MULTIPART_FORM_DATA_VALUE,
-                                "test1".getBytes()),
-                        new MockMultipartFile(
-                                "test2",
-                                "test2.jpeg",
-                                MediaType.MULTIPART_FORM_DATA_VALUE,
-                                "test2".getBytes()),
-                        new MockMultipartFile(
-                                "test3",
-                                "test3.png",
-                                MediaType.MULTIPART_FORM_DATA_VALUE,
-                                "test3".getBytes()),
-                        new MockMultipartFile(
-                                "test4",
-                                "test4.png",
-                                MediaType.MULTIPART_FORM_DATA_VALUE,
-                                "test4".getBytes()),
-                        new MockMultipartFile(
-                                "test5",
-                                "test5.png",
-                                MediaType.MULTIPART_FORM_DATA_VALUE,
-                                "test5".getBytes()),
-                        new MockMultipartFile(
-                                "test6",
-                                "test6.png",
-                                MediaType.MULTIPART_FORM_DATA_VALUE,
-                                "test6".getBytes()),
-                        new MockMultipartFile(
-                                "test7",
-                                "test7.png",
-                                MediaType.MULTIPART_FORM_DATA_VALUE,
-                                "test7".getBytes()),
-                        new MockMultipartFile(
-                                "test8",
-                                "test8.png",
-                                MediaType.MULTIPART_FORM_DATA_VALUE,
-                                "test8".getBytes()),
-                        new MockMultipartFile(
-                                "test9",
-                                "test9.png",
-                                MediaType.MULTIPART_FORM_DATA_VALUE,
-                                "test9".getBytes()),
-                        new MockMultipartFile(
-                                "test10",
-                                "test10.png",
-                                MediaType.MULTIPART_FORM_DATA_VALUE,
-                                "test10".getBytes())
-                );
+        List<MultipartFile> files = List.of(
+            new MockMultipartFile(
+                "test1",
+                "test1.png",
+                MediaType.MULTIPART_FORM_DATA_VALUE,
+                "test1".getBytes()),
+            new MockMultipartFile(
+                "test2",
+                "test2.jpeg",
+                MediaType.MULTIPART_FORM_DATA_VALUE,
+                "test2".getBytes()),
+            new MockMultipartFile(
+                "test3",
+                "test3.png",
+                MediaType.MULTIPART_FORM_DATA_VALUE,
+                "test3".getBytes()),
+            new MockMultipartFile(
+                "test4",
+                "test4.png",
+                MediaType.MULTIPART_FORM_DATA_VALUE,
+                "test4".getBytes()),
+            new MockMultipartFile(
+                "test5",
+                "test5.png",
+                MediaType.MULTIPART_FORM_DATA_VALUE,
+                "test5".getBytes()),
+            new MockMultipartFile(
+                "test6",
+                "test6.png",
+                MediaType.MULTIPART_FORM_DATA_VALUE,
+                "test6".getBytes()),
+            new MockMultipartFile(
+                "test7",
+                "test7.png",
+                MediaType.MULTIPART_FORM_DATA_VALUE,
+                "test7".getBytes()),
+            new MockMultipartFile(
+                "test8",
+                "test8.png",
+                MediaType.MULTIPART_FORM_DATA_VALUE,
+                "test8".getBytes()),
+            new MockMultipartFile(
+                "test9",
+                "test9.png",
+                MediaType.MULTIPART_FORM_DATA_VALUE,
+                "test9".getBytes()),
+            new MockMultipartFile(
+                "test10",
+                "test10.png",
+                MediaType.MULTIPART_FORM_DATA_VALUE,
+                "test10".getBytes())
+        );
 
-                assertThatThrownBy(() -> reviewService.createReview(user.getId(), request, files))
-                        .isInstanceOf(InvalidRequestException.class);
-            }
-        }
+        assertThatThrownBy(() -> reviewService.createReview(user.getId(), request, files))
+            .isInstanceOf(InvalidRequestException.class);
+      }
     }
+  }
 
   @Nested
   @DisplayName("후기 수정")
@@ -575,6 +582,92 @@ class ReviewServiceTest {
           reviewService.updateReview(user.getId(), review.getId(), request, null);
         }).isInstanceOf(NotFoundException.class)
             .hasMessageContaining(ErrorCode.REVIEW_PHOTO_NOT_FOUND.getMessage());
+      }
+
+    }
+
+  }
+
+  @Nested
+  @DisplayName("후기 삭제")
+  class ReviewDeletionTest {
+
+    @Nested
+    @DisplayName("성공")
+    class Success {
+
+      @Test
+      @DisplayName("후기에 reviewPhoto가 없는 경우 후기 삭제 정상 작동")
+      void testReviewSoftDeletion() {
+        // given
+        doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
+
+        // when
+        ReviewIdResponse response = reviewService.removeReview(user, review.getId());
+
+        // then
+        assertThat(response.getReviewId()).isEqualTo(review.getId());
+        Optional<Review> maybeReview = reviewRepository.findById(response.getReviewId());
+        assertThat(maybeReview.isPresent()).isTrue();
+        assertThat(maybeReview.get().getIsDeleted()).isEqualTo(true);
+      }
+
+      @Test
+      @DisplayName("후기에 reviewPhoto가 있는 경우 후기 삭제 정상 작동")
+      void testReviewSoftDeletionWithReviewPhoto() {
+        // given
+        int reviewPhotoCount = 4;
+        for (int i = 0; i < reviewPhotoCount; i++) {
+          new ReviewPhoto(review, "https://s3-review-photo.png");
+        }
+
+        doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
+
+        // when
+        ReviewIdResponse response = reviewService.removeReview(user, review.getId());
+
+        // then
+        verify(amazonS3Remover, times(reviewPhotoCount)).removeFile(any(), any());
+        verify(reviewPhotoRepository, times(reviewPhotoCount)).delete(any());
+
+        assertThat(response.getReviewId()).isEqualTo(review.getId());
+        Optional<Review> maybeReview = reviewRepository.findById(response.getReviewId());
+        assertThat(maybeReview.isPresent()).isTrue();
+        assertThat(maybeReview.get().getIsDeleted()).isEqualTo(true);
+      }
+    }
+
+    @Nested
+    @DisplayName("실패")
+    class Failure {
+
+      @Test
+      @DisplayName("존재하지 않는 review인 경우 NotFoundException 발생")
+      void invokeReviewNotFoundExceptionTest() {
+        // given
+        doThrow(new NotFoundException(ErrorCode.REVIEW_NOT_FOUND))
+            .when(reviewRepository).findById(any());
+
+        // when
+        // then
+        assertThatThrownBy(() -> {
+          reviewService.removeReview(user, review.getId());
+        }).isInstanceOf(NotFoundException.class)
+            .hasMessageContaining(ErrorCode.REVIEW_NOT_FOUND.getMessage());
+      }
+
+      @Test
+      @DisplayName("user == null인 경우 PermissionDeniedException 발생")
+      void invokeUserPermissionDeniedExceptionTest() {
+        // given
+        doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
+
+        // when
+        // then
+        assertThatThrownBy(() -> {
+          reviewService.removeReview(null, review.getId());
+        }).isInstanceOf(PermissionDeniedException.class)
+            .hasMessageContaining(ErrorCode.UNAUTHENTICATED_USER.getMessage());
       }
 
     }

@@ -6,7 +6,7 @@ import com.prgrms.artzip.comment.service.CommentService;
 import com.prgrms.artzip.common.ApiResponse;
 import com.prgrms.artzip.common.PageResponse;
 import com.prgrms.artzip.common.entity.CurrentUser;
-import com.prgrms.artzip.exibition.service.ExhibitionSearchService;
+import com.prgrms.artzip.exhibition.service.ExhibitionSearchService;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
 import com.prgrms.artzip.review.dto.response.ExhibitionsResponse;
 import com.prgrms.artzip.review.dto.response.ReviewCreateResponse;
@@ -29,6 +29,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -107,7 +108,7 @@ public class ReviewController {
     return ResponseEntity.ok()
         .body(apiResponse);
   }
-  
+
   //TODO 아래 두 API 테스트 작성
 
   @ApiOperation(value = "후기 댓글 다건 조회", notes = "후기의 댓글들을 조회합니다.")
@@ -156,6 +157,23 @@ public class ReviewController {
     return ResponseEntity.ok()
         .body(ApiResponse.builder()
             .message("후기 수정 성공")
+            .status(HttpStatus.OK.value())
+            .data(response)
+            .build());
+  }
+
+  @ApiOperation(value = "후기 삭제", notes = "후기 삭제를 요청합니다.")
+  @DeleteMapping("/{reviewId}")
+  public ResponseEntity<ApiResponse<ReviewIdResponse>> removeReview(
+      @CurrentUser User user,
+      @ApiParam(value = "삭제할 후기의 ID")
+      @PathVariable(value = "reviewId") Long reviewId) {
+
+    ReviewIdResponse response = reviewService.removeReview(user, reviewId);
+
+    return ResponseEntity.ok()
+        .body(ApiResponse.<ReviewIdResponse>builder()
+            .message("후기 삭제 성공")
             .status(HttpStatus.OK.value())
             .data(response)
             .build());

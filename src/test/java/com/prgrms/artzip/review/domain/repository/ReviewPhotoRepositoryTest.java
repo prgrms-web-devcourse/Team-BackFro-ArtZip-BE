@@ -1,18 +1,16 @@
 package com.prgrms.artzip.review.domain.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import com.prgrms.artzip.QueryDslTestConfig;
 import com.prgrms.artzip.common.Authority;
-import com.prgrms.artzip.exibition.domain.Exhibition;
-import com.prgrms.artzip.exibition.domain.enumType.Area;
-import com.prgrms.artzip.exibition.domain.enumType.Genre;
+import com.prgrms.artzip.exhibition.domain.Exhibition;
+import com.prgrms.artzip.exhibition.domain.enumType.Area;
+import com.prgrms.artzip.exhibition.domain.enumType.Genre;
 import com.prgrms.artzip.review.domain.Review;
 import com.prgrms.artzip.review.domain.ReviewPhoto;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
-import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;

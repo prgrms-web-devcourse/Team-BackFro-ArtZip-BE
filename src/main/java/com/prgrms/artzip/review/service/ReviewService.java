@@ -6,10 +6,12 @@ import com.prgrms.artzip.common.error.exception.NotFoundException;
 import com.prgrms.artzip.common.error.exception.PermissionDeniedException;
 import com.prgrms.artzip.common.util.AmazonS3Remover;
 import com.prgrms.artzip.common.util.AmazonS3Uploader;
-import com.prgrms.artzip.exibition.domain.Exhibition;
-import com.prgrms.artzip.exibition.domain.repository.ExhibitionRepository;
+import com.prgrms.artzip.exhibition.domain.Exhibition;
+import com.prgrms.artzip.exhibition.domain.repository.ExhibitionRepository;
 import com.prgrms.artzip.review.domain.Review;
+import com.prgrms.artzip.review.domain.ReviewLike;
 import com.prgrms.artzip.review.domain.ReviewPhoto;
+import com.prgrms.artzip.review.domain.repository.ReviewLikeRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewPhotoRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewRepository;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
@@ -20,7 +22,6 @@ import com.prgrms.artzip.user.domain.repository.UserRepository;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +36,7 @@ public class ReviewService {
 
   private final ReviewRepository reviewRepository;
   private final ReviewPhotoRepository reviewPhotoRepository;
+  private final ReviewLikeRepository reviewLikeRepository;
   private final UserRepository userRepository;
   private final ExhibitionRepository exhibitionRepository;
   private final AmazonS3Uploader amazonS3Uploader;
@@ -79,7 +81,7 @@ public class ReviewService {
     validateFileCount(review, request.getDeletedPhotos(), files);
     validateFileExtensions(files);
 
-    removeReviewPhotos(request.getDeletedPhotos());
+    removeReviewPhotosById(request.getDeletedPhotos());
 
     if (files != null) {
       createReviewPhoto(review, files);
@@ -93,10 +95,34 @@ public class ReviewService {
     return new ReviewIdResponse(review.getId());
   }
 
-  private void removeReviewPhotos(List<Long> reviewPhotoIds) {
+  @Transactional
+  public ReviewIdResponse removeReview(final User user, final Long reviewId) {
+    Review review = reviewRepository.findById(reviewId)
+        .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_NOT_FOUND));
+    validateUser(user);
+    validateUserAuthority(user, review);
+
+    review.updateIdDeleted(true);
+    removeReviewPhotos(review.getReviewPhotos());
+    removeReviewLikes(review.getReviewLikes());
+
+    return new ReviewIdResponse(review.getId());
+  }
+
+  private void removeReviewLikes(List<ReviewLike> reviewLikes) {
+    reviewLikeRepository.deleteAllInBatch(reviewLikes);
+  }
+
+  private void removeReviewPhotosById(List<Long> reviewPhotoIds) {
     reviewPhotoIds.forEach(photoId -> {
       ReviewPhoto reviewPhoto = reviewPhotoRepository.findById(photoId)
           .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_PHOTO_NOT_FOUND));
+      removeReviewPhoto(reviewPhoto);
+    });
+  }
+
+  private void removeReviewPhotos(List<ReviewPhoto> reviewPhotos) {
+    reviewPhotos.forEach(reviewPhoto -> {
       removeReviewPhoto(reviewPhoto);
     });
   }
@@ -119,9 +145,7 @@ public class ReviewService {
 
   private void validateFileExtensions(List<MultipartFile> files) {
     if (Objects.nonNull(files)) {
-      files.forEach(file -> {
-        validateFileExtension(file);
-      });
+      files.forEach(this::validateFileExtension);
     }
   }
 
@@ -133,7 +157,6 @@ public class ReviewService {
         fileExtension.equalsIgnoreCase(".png"))) {
       throw new InvalidRequestException(ErrorCode.INVALID_FILE_EXTENSION);
     }
-
   }
 
   private void validateFileCount(List<MultipartFile> files) {
@@ -153,6 +176,12 @@ public class ReviewService {
     }
   }
 
+  private void validateUser(User user) {
+    if (Objects.isNull(user)) {
+      throw new PermissionDeniedException(ErrorCode.UNAUTHENTICATED_USER);
+    }
+  }
+
   private void validateUserAuthority(User user, Review review) {
     if (review.getUser().getId() != user.getId()) {
       throw new PermissionDeniedException(ErrorCode.NO_PERMISSION_TO_UPDATE_REVIEW);
@@ -161,8 +190,7 @@ public class ReviewService {
 
   private void validateDeletedPhotos(Review review, List<Long> deletedPhotoIds) {
     List<Long> reviewPhotoIds = review.getReviewPhotos().stream()
-        .map(ReviewPhoto::getId)
-        .collect(Collectors.toList());
+        .map(ReviewPhoto::getId).toList();
     deletedPhotoIds.forEach(photoId -> {
       reviewPhotoRepository.findById(photoId)
           .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_PHOTO_NOT_FOUND));
