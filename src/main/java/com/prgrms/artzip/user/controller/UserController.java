@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -105,6 +106,16 @@ public class UserController {
         .message("유저 정보 조회 성공하였습니다.")
         .status(OK.value())
         .data(userResponse)
+        .build();
+    return ResponseEntity.ok(apiResponse);
+  }
+
+  @PatchMapping("/logout")
+  public ResponseEntity<ApiResponse<Object>> logout(@AuthenticationPrincipal JwtPrincipal principal) {
+    jwtService.logout(principal.getAccessToken());
+    ApiResponse apiResponse = ApiResponse.builder()
+        .message("로그아웃 성공하였습니다.")
+        .status(OK.value())
         .build();
     return ResponseEntity.ok(apiResponse);
   }

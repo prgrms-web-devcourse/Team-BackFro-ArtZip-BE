@@ -57,7 +57,7 @@ public class JwtService {
     }
     String redisToken = redisService.getValues(email);
     if(!redisToken.equals(refreshToken)) {
-      throw new AuthErrorException(INVALID_TOKEN_REQUEST);
+      throw new AuthErrorException(INVALID_REFRESH_TOKEN_REQUEST);
     }
   }
 
@@ -70,7 +70,7 @@ public class JwtService {
 
   public AccessClaim verifyAccessToken(String token) {
     String expiredAt = redisService.getValues(jwtConfig.getBlackListPrefix() + token);
-    if (expiredAt != null) throw new AuthErrorException(TOKEN_EXPIRED);
+    if (expiredAt != null) throw new AuthErrorException(BLACKLIST_TOKEN_REQUEST);
     return accessJwt.verifyAccessToken(token);
   }
 }
