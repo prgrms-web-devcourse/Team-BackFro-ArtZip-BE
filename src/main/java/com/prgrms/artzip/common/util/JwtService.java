@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.util.Date;
 import java.util.List;
+import static java.util.Objects.*;
 
 import static com.prgrms.artzip.common.ErrorCode.*;
 
@@ -44,7 +45,7 @@ public class JwtService {
 
   public String createRefreshToken(String email) {
     String refreshToken = refreshJwt.sign(new RefreshClaim(email));
-    redisService.setValues(email, refreshToken, Duration.ofMillis(
+    redisService.setValues(email, refreshToken, Duration.ofSeconds(
         jwtConfig.getRefreshToken().getExpirySeconds()));
     return refreshToken;
   }
@@ -56,6 +57,7 @@ public class JwtService {
       throw new AuthErrorException(TOKEN_EXPIRED);
     }
     String redisToken = redisService.getValues(email);
+    if(isNull(redisToken)) throw new AuthErrorException(REDIS_TOKEN_NOT_FOUND);
     if(!redisToken.equals(refreshToken)) {
       throw new AuthErrorException(INVALID_TOKEN_REQUEST);
     }

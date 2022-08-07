@@ -20,7 +20,7 @@ public class UserUtilService {
 
   @Transactional(readOnly = true)
   public User getUserById(Long userId) {
-    return userRepository.findById(userId).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+    return userRepository.findByIdAndIsQuit(userId, false).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
   }
 
   @Transactional(readOnly = true)

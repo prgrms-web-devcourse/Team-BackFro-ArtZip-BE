@@ -3,6 +3,7 @@ package com.prgrms.artzip.user.controller;
 import static com.prgrms.artzip.common.ErrorCode.MISSING_REQUEST_PARAMETER;
 import static com.prgrms.artzip.common.ErrorCode.TOKEN_EXPIRED;
 import static com.prgrms.artzip.common.ErrorCode.TOKEN_NOT_EXPIRED;
+import static com.prgrms.artzip.common.ErrorCode.TOKEN_USER_ID_NOT_MATCHED;
 import static java.util.Objects.isNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
@@ -37,6 +38,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
@@ -166,16 +168,18 @@ public class UserController {
     return voteFlag;
   }
 
-  @GetMapping("/reissue")
+  @GetMapping("/token/reissue")
   public ResponseEntity<ApiResponse<LoginResponse>> reIssueAccessToken(@RequestBody @Valid
   TokenReissueRequest request) {
     User user = userUtilService.getUserById(request.getUserId());
+    Date now = new Date();
     try {
       AccessClaim claims = jwtService.verifyAccessToken(request.getAccessToken());
-      if (claims.getExp().getTime() - new Date().getTime() <= 1000 * 24 * 60 * 60) {
+      if (claims.getExp().getTime() - now.getTime() >= 1000 * 60 * 5) {
         throw new InvalidRequestException(
             TOKEN_NOT_EXPIRED);
       } else {
+        if (!claims.getUserId().equals(request.getUserId())) throw new InvalidRequestException(TOKEN_USER_ID_NOT_MATCHED);
         throw new TokenExpiredException(TOKEN_EXPIRED.getMessage());
       }
     } catch (TokenExpiredException e) {
