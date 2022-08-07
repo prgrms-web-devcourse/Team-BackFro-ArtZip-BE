@@ -169,7 +169,7 @@ public class UserController {
   }
 
   @GetMapping("/token/reissue")
-  public ResponseEntity<ApiResponse<LoginResponse>> reIssueAccessToken(@RequestBody @Valid
+  public ResponseEntity<ApiResponse<LoginResponse>> reissueAccessToken(@RequestBody @Valid
   TokenReissueRequest request) {
     User user = userUtilService.getUserById(request.getUserId());
     String newAccessToken = jwtService.reissueAccessToken(user, request.getAccessToken(), request.getRefreshToken());
