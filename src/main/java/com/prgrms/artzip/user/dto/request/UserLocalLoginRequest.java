@@ -13,7 +13,6 @@ public class UserLocalLoginRequest {
 
   @NotBlank
   private String email;
-
   @NotBlank
   private String password;
 }
