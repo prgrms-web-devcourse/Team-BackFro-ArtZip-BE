@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.prgrms.artzip.QueryDslTestConfig;
 import com.prgrms.artzip.common.Authority;
-import com.prgrms.artzip.exibition.domain.Exhibition;
-import com.prgrms.artzip.exibition.domain.enumType.Area;
-import com.prgrms.artzip.exibition.domain.enumType.Genre;
+import com.prgrms.artzip.exhibition.domain.Exhibition;
+import com.prgrms.artzip.exhibition.domain.enumType.Area;
+import com.prgrms.artzip.exhibition.domain.enumType.Genre;
 import com.prgrms.artzip.review.domain.Review;
 import com.prgrms.artzip.review.domain.ReviewLike;
 import com.prgrms.artzip.review.dto.projection.ReviewWithLikeData;
