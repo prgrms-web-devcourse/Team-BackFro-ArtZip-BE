@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.net.URI;
 import java.util.List;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -58,7 +59,7 @@ public class ReviewController {
       @RequestParam(value = "userId") Long userId,
       @ApiParam(value = "등록할 후기 데이터", required = true)
       @Parameter(name = "data", schema = @Schema(type = "string", format = "binary"))
-      @RequestPart(value = "data") ReviewCreateRequest request,
+      @RequestPart(value = "data") @Valid ReviewCreateRequest request,
       @RequestPart(required = false) List<MultipartFile> files) {
 
     ReviewIdResponse response = reviewService.createReview(userId, request, files);
@@ -130,7 +131,7 @@ public class ReviewController {
   public ResponseEntity<ApiResponse<CommentResponse>> createComment(
       @ApiParam(value = "댓글 생성할 후기의 ID")
       @PathVariable Long reviewId,
-      @RequestBody CommentCreateRequest request,
+      @RequestBody @Valid CommentCreateRequest request,
       @CurrentUser User user
   ) {
     //TODO 유저 아이디 수정 -> 추후 아마 유저 객체가 들어올듯
@@ -149,7 +150,7 @@ public class ReviewController {
       @ApiParam(value = "수정할 후기의 ID")
       @PathVariable(value = "reviewId") Long reviewId,
       @Parameter(name = "data", schema = @Schema(type = "string", format = "binary"))
-      @RequestPart(value = "data") ReviewUpdateRequest request,
+      @RequestPart(value = "data") @Valid ReviewUpdateRequest request,
       @RequestPart(required = false) List<MultipartFile> files) {
 
     ReviewIdResponse response = reviewService.updateReview(userId, reviewId, request, files);
