@@ -1,10 +1,12 @@
 package com.prgrms.artzip.comment.service;
 
 import com.prgrms.artzip.comment.domain.Comment;
+import com.prgrms.artzip.comment.domain.CommentLike;
 import com.prgrms.artzip.comment.dto.request.CommentCreateRequest;
 import com.prgrms.artzip.comment.dto.request.CommentUpdateRequest;
 import com.prgrms.artzip.comment.dto.response.CommentInfo;
 import com.prgrms.artzip.comment.dto.response.CommentResponse;
+import com.prgrms.artzip.comment.repository.CommentLikeRepository;
 import com.prgrms.artzip.comment.repository.CommentRepository;
 import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.error.exception.AuthErrorException;
@@ -17,6 +19,7 @@ import com.prgrms.artzip.user.domain.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +33,7 @@ public class CommentService {
   private final CommentRepository commentRepository;
   private final ReviewRepository reviewRepository;
   private final CommentUtilService commentUtilService;
+  private final CommentLikeRepository commentLikeRepository;
 
   @Transactional(readOnly = true)
   public Page<CommentResponse> getCommentsByReviewId(Long reviewId, Pageable pageable) {
@@ -89,6 +93,19 @@ public class CommentService {
   @Transactional(readOnly = true)
   public Long getCommentCountByUserId(Long userId) {
     return commentRepository.countByUserId(userId);
+  }
+
+  public Boolean toggleCommentLike(Long commentId, User user) {
+    Comment comment = commentUtilService.getComment(commentId);
+    Optional<CommentLike> commentLike = commentLikeRepository
+        .getCommentLikeByCommentIdAndUserId(commentId, user.getId());
+    if (commentLike.isPresent()) {
+      commentLikeRepository.deleteCommentLikeByCommentIdAndUserId(commentId, user.getId());
+      return false;
+    } else {
+      commentLikeRepository.save(CommentLike.builder().comment(comment).user(user).build());
+      return true;
+    }
   }
 
   private void checkChild(Comment parent) {
