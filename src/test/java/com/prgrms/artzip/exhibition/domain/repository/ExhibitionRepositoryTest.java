@@ -21,6 +21,7 @@ import com.prgrms.artzip.exhibition.dto.ExhibitionCustomCondition;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionBasicForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionForSimpleQuery;
+import com.prgrms.artzip.exhibition.dto.projection.ExhibitionWithLocationForSimpleQuery;
 import com.prgrms.artzip.review.domain.Review;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
@@ -772,6 +773,90 @@ class ExhibitionRepositoryTest {
       assertThat(contents.get(0))
           .hasFieldOrPropertyWithValue("name", "전시회 at 부산")
           .hasFieldOrPropertyWithValue("isLiked", true);
+    }
+  }
+
+  @Nested
+  @DisplayName("findExhibitionAroundMe() 테스트")
+  class FindExhibitionAroundMeTest {
+
+    @BeforeEach
+    void setUp() {
+      Exhibition exhibitionAtBusan = Exhibition.builder()
+          .seq(32)
+          .name("전시회 at 부산")
+          .startDate(LocalDate.now().plusDays(10))
+          .endDate(LocalDate.now().plusDays(15))
+          .genre(Genre.FINEART)
+          .description("이것은 전시회 설명입니다.")
+          .latitude(37.501086)
+          .longitude(127.053447)
+          .area(BUSAN)
+          .place("미술관")
+          .address("부산 동구 중앙대로 11")
+          .inquiry("문의처 정보")
+          .fee("성인 20,000원")
+          .thumbnail("http://www.culture.go.kr/upload/rdf/22/07/show_2022072010193392447.jpg")
+          .url("https://www.example.com")
+          .placeUrl("https://www.place-example.com")
+          .build();
+      em.persist(exhibitionAtBusan);
+
+      Exhibition exhibitionAtSeoul = Exhibition.builder()
+          .seq(33)
+          .name("전시회 at 서울")
+          .startDate(LocalDate.now().plusDays(20))
+          .endDate(LocalDate.now().plusDays(25))
+          .genre(Genre.FINEART)
+          .description("이것은 전시회 설명입니다.")
+          .latitude(37.564138)
+          .longitude(126.973763)
+          .area(SEOUL)
+          .place("미술관")
+          .address("서울 어딘가")
+          .inquiry("문의처 정보")
+          .fee("성인 20,000원")
+          .thumbnail("http://www.culture.go.kr/upload/rdf/22/07/show_2022072010193392447.jpg")
+          .url("https://www.example.com")
+          .placeUrl("https://www.place-example.com")
+          .build();
+      em.persist(exhibitionAtSeoul);
+
+      Exhibition exhibitionAtGyeonggi = Exhibition.builder()
+          .seq(34)
+          .name("전시회 at 경기")
+          .startDate(LocalDate.now().minusDays(10))
+          .endDate(LocalDate.now().minusDays(5))
+          .genre(Genre.FINEART)
+          .description("이것은 전시회 설명입니다.")
+          .latitude(37.496193)
+          .longitude(127.030906)
+          .area(GYEONGGI)
+          .place("미술관")
+          .address("경기도 성남시")
+          .inquiry("문의처 정보")
+          .fee("성인 20,000원")
+          .thumbnail("http://www.culture.go.kr/upload/rdf/22/07/show_2022072010193392447.jpg")
+          .url("https://www.example.com")
+          .placeUrl("https://www.place-example.com")
+          .build();
+      em.persist(exhibitionAtGyeonggi);
+
+      em.flush();
+      em.clear();
+    }
+    
+    @Test
+    @DisplayName("내 주변 전시회 3KM 조건 테스트")
+    void testAroundMe3KM() {
+      List<ExhibitionWithLocationForSimpleQuery> exhibitions = exhibitionRepository
+          .findExhibitionAroundMe(null, 37.492001, 127.029704, 3);
+
+      assertThat(exhibitions).hasSize(1);
+      assertThat(exhibitions.get(0))
+          .hasFieldOrPropertyWithValue("name", "전시회 at 부산")
+          .hasFieldOrPropertyWithValue("location.latitude", 37.501086)
+          .hasFieldOrPropertyWithValue("location.longitude", 127.053447);
     }
   }
 }
