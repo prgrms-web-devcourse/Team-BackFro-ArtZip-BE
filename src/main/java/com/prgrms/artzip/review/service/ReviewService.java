@@ -1,6 +1,5 @@
 package com.prgrms.artzip.review.service;
 
-import com.prgrms.artzip.comment.domain.Comment;
 import com.prgrms.artzip.comment.dto.response.CommentResponse;
 import com.prgrms.artzip.comment.repository.CommentRepository;
 import com.prgrms.artzip.comment.service.CommentService;
@@ -27,13 +26,11 @@ import com.prgrms.artzip.review.dto.response.ReviewResponse;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -52,7 +49,6 @@ public class ReviewService {
   private final ReviewLikeRepository reviewLikeRepository;
   private final UserRepository userRepository;
   private final ExhibitionRepository exhibitionRepository;
-  private final CommentRepository commentRepository;
   private final AmazonS3Uploader amazonS3Uploader;
   private final AmazonS3Remover amazonS3Remover;
 
@@ -142,8 +138,8 @@ public class ReviewService {
             Objects.isNull(user) ? null : user.getId(), review.getExhibition().getId())
         .orElseThrow(() -> new NotFoundException(ErrorCode.EXHB_NOT_FOUND));
     Page<CommentResponse> comments = commentService.getCommentsByReviewId(
-        reviewId,PageRequest.of(0, 20));
-    Long reviewCommentCount = commentRepository.countByReviewId(reviewId);
+        reviewId, PageRequest.of(0, 20));
+    Long reviewCommentCount = commentService.getCommentCountByReviewId(reviewId);
 
     return new ReviewResponse(reviewCommentCount,
         comments,
