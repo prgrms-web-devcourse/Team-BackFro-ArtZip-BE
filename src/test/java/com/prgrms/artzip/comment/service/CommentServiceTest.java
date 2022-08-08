@@ -116,7 +116,7 @@ class CommentServiceTest {
     );
 
     //when
-    commentService.getCommentsByReviewId(review.getId(), pageable);
+    commentService.getCommentsByReviewId(review.getId(), user, pageable);
 
     //then
     verify(commentRepository).getCommentsByReviewId(review.getId(), pageable);
@@ -146,7 +146,7 @@ class CommentServiceTest {
     doReturn(children).when(commentRepository).getCommentsOfParent(0L, pageable);
 
     //when
-    Page<CommentInfo> response = commentService.getChildren(0L, pageable);
+    Page<CommentInfo> response = commentService.getChildren(0L, user, pageable);
 
     //then
     verify(commentUtilService).getComment(0L);
@@ -296,7 +296,7 @@ class CommentServiceTest {
     verify(commentRepository).getCommentsOfParents(List.of(0L));
     assertThat(response).hasFieldOrPropertyWithValue("isDeleted", true);
     assertThat(response).hasAllNullFieldsOrPropertiesExcept("createdAt", "isDeleted", "commentId",
-        "children", "childrenCount");
+        "children", "childrenCount", "likeCount", "isLiked");
   }
 
   @Test

@@ -117,10 +117,11 @@ public class ReviewController {
   public ResponseEntity<ApiResponse<PageResponse<CommentResponse>>> getComment(
       @ApiParam(value = "조회할 후기의 ID")
       @PathVariable Long reviewId,
+      @CurrentUser User user,
       @PageableDefault Pageable pageable
   ) {
     PageResponse<CommentResponse> comments =
-        new PageResponse<>(commentService.getCommentsByReviewId(reviewId, pageable));
+        new PageResponse<>(commentService.getCommentsByReviewId(reviewId, user, pageable));
     ApiResponse<PageResponse<CommentResponse>> response
         = new ApiResponse<>("댓글 다건 조회 성공", HttpStatus.OK.value(), comments);
     return ResponseEntity.ok(response);

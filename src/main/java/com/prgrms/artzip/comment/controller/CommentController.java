@@ -35,10 +35,11 @@ public class CommentController {
   @GetMapping("/{commentId}/children")
   public ResponseEntity<ApiResponse<PageResponse<CommentInfo>>> getChildren(
       @PathVariable Long commentId,
-      @PageableDefault Pageable pageable
+      @PageableDefault Pageable pageable,
+      @CurrentUser User user
   ) {
     PageResponse<CommentInfo> children =
-        new PageResponse<CommentInfo>(commentService.getChildren(commentId, pageable));
+        new PageResponse<CommentInfo>(commentService.getChildren(commentId, user, pageable));
     ApiResponse<PageResponse<CommentInfo>> response =
         new ApiResponse<>("자식 댓글 조회 성공", HttpStatus.OK.value(), children);
     return ResponseEntity

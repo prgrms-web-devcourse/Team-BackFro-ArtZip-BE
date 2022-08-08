@@ -15,4 +15,7 @@ public interface CommentLikeRepository extends JpaRepository<CommentLike, Long> 
   @Modifying(clearAutomatically = true)
   @Query("delete from CommentLike cl where cl.comment.id = :commentId and cl.user.id = :userId")
   void deleteCommentLikeByCommentIdAndUserId(@Param("commentId") Long commentId, @Param("userId") Long userId);
+
+  @Query("select count(cl) from CommentLike cl where cl.comment.id = :commentId")
+  Long countCommentLikeByCommentId(@Param("commentId") Long commentId);
 }
