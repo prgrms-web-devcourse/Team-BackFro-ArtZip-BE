@@ -2,6 +2,7 @@ package com.prgrms.artzip.comment.controller;
 
 import com.prgrms.artzip.comment.dto.request.CommentUpdateRequest;
 import com.prgrms.artzip.comment.dto.response.CommentInfo;
+import com.prgrms.artzip.comment.dto.response.CommentLikeResponse;
 import com.prgrms.artzip.comment.dto.response.CommentResponse;
 import com.prgrms.artzip.comment.service.CommentService;
 import com.prgrms.artzip.common.ApiResponse;
@@ -71,5 +72,21 @@ public class CommentController {
         new ApiResponse<>("댓글 삭제 성공", HttpStatus.OK.value(), comment);
     return ResponseEntity
         .ok(response);
+  }
+
+  @ApiOperation(value = "댓글 좋아요 토글", notes = "댓글 좋아요 / 좋아요 취소 토글입니다.")
+  @PatchMapping("/{commentId}/like")
+  public ResponseEntity<ApiResponse<CommentLikeResponse>> toggleCommentLike(
+      @PathVariable Long commentId,
+      @CurrentUser User currentUser
+  ) {
+    CommentLikeResponse response = commentService.toggleCommentLike(commentId, currentUser);
+    ApiResponse<CommentLikeResponse> apiResponse = ApiResponse.<CommentLikeResponse>builder()
+        .message(response.getIsLiked() ? "댓글 좋아요 성공" : "댓글 좋아요 취소 성공")
+        .status(HttpStatus.OK.value())
+        .data(response)
+        .build();
+    return ResponseEntity
+        .ok(apiResponse);
   }
 }
