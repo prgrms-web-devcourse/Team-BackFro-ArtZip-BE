@@ -133,8 +133,6 @@ public class ReviewRepositoryTest {
       assertThat(result.get().getDate()).isEqualTo(publicReview.getDate());
       assertThat(result.get().getTitle()).isEqualTo(publicReview.getTitle());
       assertThat(result.get().getContent()).isEqualTo(publicReview.getContent());
-      assertThat(result.get().getCreatedAt()).isEqualTo(publicReview.getCreatedAt());
-      assertThat(result.get().getUpdatedAt()).isEqualTo(publicReview.getUpdatedAt());
       assertThat(result.get().getIsLiked()).isEqualTo(true);
       assertThat(result.get().getIsPublic()).isEqualTo(publicReview.getIsPublic());
       assertThat(result.get().getLikeCount()).isEqualTo(2);
@@ -151,8 +149,6 @@ public class ReviewRepositoryTest {
       assertThat(result.get().getDate()).isEqualTo(publicReview.getDate());
       assertThat(result.get().getTitle()).isEqualTo(publicReview.getTitle());
       assertThat(result.get().getContent()).isEqualTo(publicReview.getContent());
-      assertThat(result.get().getCreatedAt()).isEqualTo(publicReview.getCreatedAt());
-      assertThat(result.get().getUpdatedAt()).isEqualTo(publicReview.getUpdatedAt());
       assertThat(result.get().getIsLiked()).isEqualTo(true);
       assertThat(result.get().getIsPublic()).isEqualTo(publicReview.getIsPublic());
       assertThat(result.get().getLikeCount()).isEqualTo(2);
@@ -169,8 +165,6 @@ public class ReviewRepositoryTest {
       assertThat(result.get().getDate()).isEqualTo(privateReview.getDate());
       assertThat(result.get().getTitle()).isEqualTo(privateReview.getTitle());
       assertThat(result.get().getContent()).isEqualTo(privateReview.getContent());
-      assertThat(result.get().getCreatedAt()).isEqualTo(privateReview.getCreatedAt());
-      assertThat(result.get().getUpdatedAt()).isEqualTo(privateReview.getUpdatedAt());
       assertThat(result.get().getIsLiked()).isEqualTo(false);
       assertThat(result.get().getIsPublic()).isEqualTo(privateReview.getIsPublic());
       assertThat(result.get().getLikeCount()).isEqualTo(1);
@@ -187,8 +181,6 @@ public class ReviewRepositoryTest {
       assertThat(result.get().getDate()).isEqualTo(publicReview.getDate());
       assertThat(result.get().getTitle()).isEqualTo(publicReview.getTitle());
       assertThat(result.get().getContent()).isEqualTo(publicReview.getContent());
-      assertThat(result.get().getCreatedAt()).isEqualTo(publicReview.getCreatedAt());
-      assertThat(result.get().getUpdatedAt()).isEqualTo(publicReview.getUpdatedAt());
       assertThat(result.get().getIsLiked()).isEqualTo(true);
       assertThat(result.get().getIsPublic()).isEqualTo(publicReview.getIsPublic());
       assertThat(result.get().getLikeCount()).isEqualTo(2);
