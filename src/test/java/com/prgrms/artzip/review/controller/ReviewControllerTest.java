@@ -1,14 +1,13 @@
-package com.prgrms.artzip.comment.controller;
+package com.prgrms.artzip.review.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prgrms.artzip.comment.domain.Comment;
-import com.prgrms.artzip.comment.dto.request.CommentUpdateRequest;
+import com.prgrms.artzip.comment.dto.request.CommentCreateRequest;
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.util.JwtService;
 import com.prgrms.artzip.exhibition.domain.Exhibition;
@@ -19,6 +18,7 @@ import com.prgrms.artzip.user.domain.LocalUser;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
@@ -36,7 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @AutoConfigureMockMvc
 @SpringBootTest
-class CommentControllerTest {
+class ReviewControllerTest {
 
   @Autowired
   private MockMvc mockMvc;
@@ -50,8 +50,8 @@ class CommentControllerTest {
   private User user;
   private Exhibition exhibition;
   private Review review;
-  private Comment comment;
   private String accessToken;
+  private List<Comment> comments = new ArrayList<>();
 
   @BeforeEach
   void setUp() {
@@ -92,20 +92,23 @@ class CommentControllerTest {
         .isPublic(true)
         .build();
     em.persist(review);
-    comment = Comment.builder()
-        .content("이것은 댓글 본문입니다.")
-        .review(review)
-        .user(user)
-        .build();
-    em.persist(comment);
     for (int i = 0; i < 17; i++) {
-      Comment child = Comment.builder()
-          .content(String.valueOf(i))
+      Comment comment = Comment.builder()
+          .content("이것은 댓글 본문입니다.")
           .review(review)
           .user(user)
-          .parent(comment)
           .build();
-      em.persist(child);
+      comments.add(comment);
+      em.persist(comment);
+      for (int j = 0; j < 15; j++) {
+        Comment child = Comment.builder()
+            .content(String.valueOf(i))
+            .review(review)
+            .user(user)
+            .parent(comment)
+            .build();
+        em.persist(child);
+      }
     }
     accessToken = jwtService.createAccessToken(
         user.getId(),
@@ -119,10 +122,10 @@ class CommentControllerTest {
   }
 
   @Test
-  @DisplayName("자식 댓글 다건 조회 테스트")
-  void testGetChildren() throws Exception {
+  @DisplayName("후기 댓글 다건 조회 테스트")
+  void testGetComments() throws Exception {
     //Given //When //Then
-    mockMvc.perform(get("/api/v1/comments/{commentId}/children", comment.getId())
+    mockMvc.perform(get("/api/v1/reviews/{reviewId}/comments", review.getId())
             .header("accessToken", accessToken)
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
@@ -130,43 +133,28 @@ class CommentControllerTest {
   }
 
   @Test
-  @DisplayName("댓글 수정 테스트")
-  void testUpdateComment() throws Exception {
+  @DisplayName("댓글 생성 테스트")
+  void testCreateComment() throws Exception {
     //Given
-    CommentUpdateRequest request = new CommentUpdateRequest("너 누구야");
+    CommentCreateRequest request = new CommentCreateRequest("너 누구야", null);
 
-    //When //Then
-    mockMvc.perform(patch("/api/v1/comments/{commentId}", comment.getId())
+    // When //Then
+    mockMvc.perform(post("/api/v1/reviews/{reviewId}/comments", review.getId())
             .header("accessToken", accessToken)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().isOk())
+        .andExpect(status().isCreated())
         .andDo(print());
   }
 
   @Test
-  @DisplayName("없는 댓글 수정 테스트")
-  void testUpdateInvalidComment() throws Exception {
+  @DisplayName("빈 본문으로 댓글 생성 테스트")
+  void testCreateCommentWithBlankContent() throws Exception {
     //Given
-    CommentUpdateRequest request = new CommentUpdateRequest("너 누구야");
+    CommentCreateRequest request = new CommentCreateRequest("          ", null);
 
-    //When //Then
-    mockMvc.perform(patch("/api/v1/comments/{commentId}", 9999L)
-            .header("accessToken", accessToken)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().isBadRequest())
-        .andDo(print());
-  }
-
-  @Test
-  @DisplayName("빈 본문으로 댓글 수정 테스트")
-  void testUpdateCommentWithBlankContent() throws Exception {
-    //Given
-    CommentUpdateRequest request = new CommentUpdateRequest("   ");
-
-    //When //Then
-    mockMvc.perform(patch("/api/v1/comments/{commentId}", comment.getId())
+    // When //Then
+    mockMvc.perform(post("/api/v1/reviews/{reviewId}/comments", review.getId())
             .header("accessToken", accessToken)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
@@ -175,71 +163,32 @@ class CommentControllerTest {
   }
 
   @Test
-  @DisplayName("너무 긴 본문으로 댓글 수정 테스트")
-  void testUpdateCommentWithTooLongContent() throws Exception {
+  @DisplayName("자식 댓글 생성 테스트")
+  void testCreateCommentOfParent() throws Exception {
     //Given
-    CommentUpdateRequest request = new CommentUpdateRequest("Long Content".repeat(50));
+    CommentCreateRequest request = new CommentCreateRequest("너 누구야", comments.get(0).getId());
 
-    //When //Then
-    mockMvc.perform(patch("/api/v1/comments/{commentId}", comment.getId())
+    // When //Then
+    mockMvc.perform(post("/api/v1/reviews/{reviewId}/comments", review.getId())
+            .header("accessToken", accessToken)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isCreated())
+        .andDo(print());
+  }
+
+  @Test
+  @DisplayName("존재하지 않는 부모의 자식 댓글 생성 테스트")
+  void testCreateCommentOfInvalidParent() throws Exception {
+    //Given
+    CommentCreateRequest request = new CommentCreateRequest("너 누구야", 9999L);
+
+    // When //Then
+    mockMvc.perform(post("/api/v1/reviews/{reviewId}/comments", review.getId())
             .header("accessToken", accessToken)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isBadRequest())
-        .andDo(print());
-  }
-
-  @Test
-  @DisplayName("댓글 삭제 테스트")
-  void testDeleteComment() throws Exception {
-    //Given //When //Then
-    mockMvc.perform(delete("/api/v1/comments/{commentId}", comment.getId())
-            .header("accessToken", accessToken)
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andDo(print());
-  }
-
-  @Test
-  @DisplayName("없는 댓글 삭제 테스트")
-  void testDeleteInvalidComment() throws Exception {
-    //Given //When //Then
-    mockMvc.perform(delete("/api/v1/comments/{commentId}", 9999L)
-            .header("accessToken", accessToken)
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isBadRequest())
-        .andDo(print());
-  }
-
-  @Test
-  @DisplayName("댓글 중복 삭제 테스트")
-  void testDeleteCommentTwice() throws Exception {
-    //Given //When //Then
-    mockMvc.perform(delete("/api/v1/comments/{commentId}", comment.getId())
-            .header("accessToken", accessToken)
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andDo(print());
-    mockMvc.perform(delete("/api/v1/comments/{commentId}", comment.getId())
-            .header("accessToken", accessToken)
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isBadRequest())
-        .andDo(print());
-  }
-
-  @Test
-  @DisplayName("댓글 좋아요 토글 테스트")
-  void testCommentLikeToggle() throws Exception {
-    //Given //When //Then
-    mockMvc.perform(patch("/api/v1/comments/{commentId}/like", comment.getId())
-            .header("accessToken", accessToken)
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andDo(print());
-    mockMvc.perform(patch("/api/v1/comments/{commentId}/like", comment.getId())
-            .header("accessToken", accessToken)
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
         .andDo(print());
   }
 }
