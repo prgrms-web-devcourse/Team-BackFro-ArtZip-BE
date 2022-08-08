@@ -37,7 +37,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -173,6 +175,18 @@ public class UserController {
         .message("토큰이 재발급되었습니다.")
         .status(OK.value())
         .data(new TokenResponse(newAccessToken))
+        .build();
+    return ResponseEntity.ok(apiResponse);
+  }
+
+  @ApiOperation(value = "로그아웃", notes = "요청한 accessToken을 로그아웃 토큰으로 저장합니다.")
+  @PatchMapping("/logout")
+  public ResponseEntity<ApiResponse<Object>> logout(
+      @AuthenticationPrincipal JwtPrincipal principal) {
+    jwtService.logout(principal.getAccessToken());
+    ApiResponse apiResponse = ApiResponse.builder()
+        .message("로그아웃 성공하였습니다.")
+        .status(OK.value())
         .build();
     return ResponseEntity.ok(apiResponse);
   }

@@ -4,6 +4,7 @@ import static java.util.Objects.*;
 import static org.springframework.util.StringUtils.*;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.prgrms.artzip.common.error.exception.AuthErrorException;
 import com.prgrms.artzip.common.jwt.claims.AccessClaim;
 import com.prgrms.artzip.common.util.JwtService;
 import com.prgrms.artzip.user.domain.User;
@@ -59,6 +60,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (TokenExpiredException e) {
           log.warn("토큰이 만료된 요청입니다. token: {}", token);
           throw e;
+        } catch (AuthErrorException e) {
+          log.warn("로그아웃 처리된 토큰입니다. token: {}", token);
+          throw e;
         } catch (Exception e) {
           log.warn("Jwt 처리 실패: {}, class: {}", e.getMessage(), e.getClass());
           throw e;
@@ -67,7 +71,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     } else {
       log.debug("SecurityContextHolder는 이미 authentication 객체를 가지고 있습니다.: '{}'", SecurityContextHolder.getContext().getAuthentication());
     }
-
     chain.doFilter(request, response);
   }
 
