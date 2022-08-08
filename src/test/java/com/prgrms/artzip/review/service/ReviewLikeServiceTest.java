@@ -12,7 +12,7 @@ import com.prgrms.artzip.exhibition.domain.Exhibition;
 import com.prgrms.artzip.exhibition.domain.enumType.Area;
 import com.prgrms.artzip.exhibition.domain.enumType.Genre;
 import com.prgrms.artzip.review.domain.Review;
-import com.prgrms.artzip.review.domain.ReviewLikeId;
+import com.prgrms.artzip.review.domain.ReviewLike;
 import com.prgrms.artzip.review.domain.repository.ReviewLikeRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewRepository;
 import com.prgrms.artzip.user.domain.Role;
@@ -83,16 +83,19 @@ class ReviewLikeServiceTest {
       @Test
       @DisplayName("현재 좋아요 on인 상태인 경우, 좋아요가 성공적으로 off")
       void testLikeDeletion() {
-        boolean isLiked = true;
-        ReviewLikeId reviewLikeId = new ReviewLikeId(review.getId(), user.getId());
+        // given
+        ReviewLike reviewLike = new ReviewLike(review, user);
 
         doReturn(Optional.of(user)).when(userRepository).findById(user.getId());
         doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
-        doReturn(isLiked).when(reviewLikeRepository).existsById(reviewLikeId);
+        doReturn(Optional.of(reviewLike))
+            .when(reviewLikeRepository).findByReviewIdAndUserId(review.getId(), user.getId());
 
+        // when
         reviewLikeService.updateReviewLike(user.getId(), review.getId());
 
-        verify(reviewLikeRepository).deleteById(reviewLikeId);
+        // then
+        verify(reviewLikeRepository).delete(reviewLike);
         verify(reviewLikeRepository, never()).save(any());
         verify(reviewLikeRepository).countByReview(review);
       }
@@ -100,17 +103,18 @@ class ReviewLikeServiceTest {
       @Test
       @DisplayName("현재 좋아요 off인 상태인 경우, 좋아요가 성공적으로 on")
       void testLikeCreation() {
-        boolean isLiked = false;
-        ReviewLikeId reviewLikeId = new ReviewLikeId(review.getId(), user.getId());
-
+        // given
         doReturn(Optional.of(user)).when(userRepository).findById(user.getId());
         doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
-        doReturn(isLiked).when(reviewLikeRepository).existsById(reviewLikeId);
+        doReturn(Optional.empty())
+            .when(reviewLikeRepository).findByReviewIdAndUserId(review.getId(), user.getId());
 
+        // when
         reviewLikeService.updateReviewLike(user.getId(), review.getId());
 
-        verify(reviewLikeRepository, never()).deleteById(reviewLikeId);
-        verify(reviewLikeRepository).save(any());
+        // then
+        verify(reviewLikeRepository, never()).delete(any());
+        verify(reviewLikeRepository).save(any(ReviewLike.class));
         verify(reviewLikeRepository).countByReview(review);
       }
     }
