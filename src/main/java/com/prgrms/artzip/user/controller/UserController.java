@@ -16,10 +16,12 @@ import com.prgrms.artzip.review.service.ReviewLikeService;
 import com.prgrms.artzip.review.service.ReviewService;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
+import com.prgrms.artzip.user.dto.request.TokenReissueRequest;
 import com.prgrms.artzip.user.dto.request.UserLocalLoginRequest;
 import com.prgrms.artzip.user.dto.request.UserSignUpRequest;
 import com.prgrms.artzip.user.dto.response.LoginResponse;
 import com.prgrms.artzip.user.dto.response.SignUpResponse;
+import com.prgrms.artzip.user.dto.response.TokenResponse;
 import com.prgrms.artzip.user.dto.response.UniqueCheckResponse;
 import com.prgrms.artzip.user.dto.response.UserResponse;
 import com.prgrms.artzip.user.service.UserService;
@@ -35,7 +37,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -91,7 +95,7 @@ public class UserController {
   @ApiOperation(value = "회원가입", notes = "회원가입을 합니다.")
   @PostMapping("/signup")
   public ResponseEntity<ApiResponse<SignUpResponse>> signUp(@RequestBody @Valid
-      UserSignUpRequest request) {
+  UserSignUpRequest request) {
     User newUser = userService.signUp(request);
     ApiResponse response = ApiResponse.builder()
         .message("회원가입 성공하였습니다.")
@@ -158,5 +162,32 @@ public class UserController {
       throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
     }
     return voteFlag;
+  }
+
+  @ApiOperation(value = "토큰 재발행", notes = "토큰을 재발행합니다.")
+  @GetMapping("/token/reissue")
+  public ResponseEntity<ApiResponse<LoginResponse>> reissueAccessToken(@RequestBody @Valid
+  TokenReissueRequest request) {
+    User user = userUtilService.getUserById(request.getUserId());
+    String newAccessToken = jwtService.reissueAccessToken(user, request.getAccessToken(),
+        request.getRefreshToken());
+    ApiResponse apiResponse = ApiResponse.builder()
+        .message("토큰이 재발급되었습니다.")
+        .status(OK.value())
+        .data(new TokenResponse(newAccessToken))
+        .build();
+    return ResponseEntity.ok(apiResponse);
+  }
+
+  @ApiOperation(value = "로그아웃", notes = "요청한 accessToken을 로그아웃 토큰으로 저장합니다.")
+  @PatchMapping("/logout")
+  public ResponseEntity<ApiResponse<Object>> logout(
+      @AuthenticationPrincipal JwtPrincipal principal) {
+    jwtService.logout(principal.getAccessToken());
+    ApiResponse apiResponse = ApiResponse.builder()
+        .message("로그아웃 성공하였습니다.")
+        .status(OK.value())
+        .build();
+    return ResponseEntity.ok(apiResponse);
   }
 }
