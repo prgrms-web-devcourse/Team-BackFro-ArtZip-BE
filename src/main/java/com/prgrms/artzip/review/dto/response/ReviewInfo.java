@@ -1,8 +1,6 @@
 package com.prgrms.artzip.review.dto.response;
 
-import com.prgrms.artzip.comment.dto.response.CommentInfo;
 import com.prgrms.artzip.comment.dto.response.CommentResponse;
-import com.prgrms.artzip.common.PageResponse;
 import com.prgrms.artzip.review.domain.ReviewPhoto;
 import com.prgrms.artzip.review.dto.projection.ReviewWithLikeData;
 import java.time.LocalDate;

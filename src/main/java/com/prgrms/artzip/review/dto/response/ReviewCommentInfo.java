@@ -1,6 +1,7 @@
 package com.prgrms.artzip.review.dto.response;
 
 import com.prgrms.artzip.comment.dto.response.CommentResponse;
+import com.prgrms.artzip.common.PageResponse;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.domain.Page;
@@ -10,10 +11,10 @@ import org.springframework.data.domain.Page;
 public class ReviewCommentInfo {
 
   private Long commentCount;
-  private Page<CommentResponse> comments;
+  private PageResponse<CommentResponse> comments;
 
   public ReviewCommentInfo(Long commentCount, Page<CommentResponse> comments) {
     this.commentCount = commentCount;
-    this.comments = comments;
+    this.comments = new PageResponse<>(comments);
   }
 }
