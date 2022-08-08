@@ -180,9 +180,11 @@ public class ReviewController {
             .build());
   }
 
+  @ApiOperation(value = "후기 단건 조회", notes = "후기 단건 조회를 요청합니다.")
   @GetMapping("/{reviewId}")
   public ResponseEntity<ApiResponse<ReviewResponse>> getReview(
       @CurrentUser User user,
+      @ApiParam(value = "조회할 후기의 ID")
       @PathVariable(value = "reviewId") Long reviewId) {
 
     ReviewResponse response = reviewService.getReview(user, reviewId);
