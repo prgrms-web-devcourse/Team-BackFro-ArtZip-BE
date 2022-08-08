@@ -3,6 +3,7 @@ package com.prgrms.artzip.review.service;
 import com.prgrms.artzip.comment.domain.Comment;
 import com.prgrms.artzip.comment.dto.response.CommentResponse;
 import com.prgrms.artzip.comment.repository.CommentRepository;
+import com.prgrms.artzip.comment.service.CommentService;
 import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
@@ -43,6 +44,8 @@ public class ReviewService {
 
   private static final String REVIEW_DIRECTORY_NAME = "review/";
   private static final int REVIEW_PHOTO_COUNT = 9;
+
+  private final CommentService commentService;
 
   private final ReviewRepository reviewRepository;
   private final ReviewPhotoRepository reviewPhotoRepository;
@@ -138,7 +141,8 @@ public class ReviewService {
     ReviewExhibitionInfo reviewExhibitionInfo = exhibitionRepository.findExhibitionForReview(
             Objects.isNull(user) ? null : user.getId(), review.getExhibition().getId())
         .orElseThrow(() -> new NotFoundException(ErrorCode.EXHB_NOT_FOUND));
-    Page<CommentResponse> comments = getCommentsByReviewId(reviewId);
+    Page<CommentResponse> comments = commentService.getCommentsByReviewId(
+        reviewId,PageRequest.of(0, 20));
     Long reviewCommentCount = commentRepository.countByReviewId(reviewId);
 
     return new ReviewResponse(reviewCommentCount,
@@ -147,20 +151,6 @@ public class ReviewService {
         reviewPhotos,
         reviewUser,
         reviewExhibitionInfo);
-  }
-
-  private Page<CommentResponse> getCommentsByReviewId(final Long reviewId) {
-    Pageable pageable = PageRequest.of(0, 20);
-    Page<Comment> parents = commentRepository.getCommentsByReviewId(reviewId, pageable);
-    List<Comment> children = parents.getSize() > 0 ? commentRepository
-        .getCommentsOfParents(parents.map(Comment::getId).toList()) : new ArrayList<>();
-    return parents.map(
-        p -> new CommentResponse(
-            p, children.stream()
-            .filter(c -> Objects.equals(c.getParent().getId(), p.getId()))
-            .toList()
-        )
-    );
   }
 
   private void removeReviewPhotosById(List<Long> reviewPhotoIds) {
