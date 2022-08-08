@@ -42,7 +42,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
                 .then(true)
                 .otherwise(false).as("isLiked"),
             review.isPublic,
-            reviewLike.count().as("likeCount")
+            reviewLike.reviewLikeId.userId.count().as("likeCount")
         ))
         .from(review)
         .leftJoin(RL).on(RL.review.eq(review),
@@ -58,7 +58,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
   }
 
   private BooleanBuilder reviewLikeUserIdEq(Long userId) {
-    return nullSafeBooleanBuilder(() -> RL.user.id.eq(userId));
+    return nullSafeBooleanBuilder(() -> RL.reviewLikeId.userId.eq(userId));
   }
 
   private BooleanExpression filterIsNotPublic(Long userId) {
