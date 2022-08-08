@@ -16,7 +16,7 @@ public class PageResponse<T> {
   private int totalPage;
 
   @Builder
-  public PageResponse(Page page) {
+  public PageResponse(Page<T> page) {
     this.content = page.getContent();
     this.numberOfElements = page.getNumberOfElements();
     this.pageNumber = page.getPageable().getPageNumber();
