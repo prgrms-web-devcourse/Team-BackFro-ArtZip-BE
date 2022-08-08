@@ -3,7 +3,6 @@ package com.prgrms.artzip.user.dto.request;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 
@@ -14,7 +13,6 @@ public class UserLocalLoginRequest {
 
   @NotBlank
   private String email;
-
   @NotBlank
   private String password;
 }

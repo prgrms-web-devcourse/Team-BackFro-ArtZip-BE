@@ -1,8 +1,18 @@
 package com.prgrms.artzip.user.service;
 
-import static org.mockito.Mockito.*;
-import static org.assertj.core.api.Assertions.*;
-import static com.prgrms.artzip.common.ErrorCode.*;
+import static com.prgrms.artzip.common.ErrorCode.INVALID_INPUT_VALUE;
+import static com.prgrms.artzip.common.ErrorCode.LOGIN_PARAM_REQUIRED;
+import static com.prgrms.artzip.common.ErrorCode.NICKNAME_ALREADY_EXISTS;
+import static com.prgrms.artzip.common.ErrorCode.ROLE_NOT_FOUND;
+import static com.prgrms.artzip.common.ErrorCode.USER_ALREADY_EXISTS;
+import static com.prgrms.artzip.common.ErrorCode.USER_NOT_FOUND;
+import static com.prgrms.artzip.common.ErrorCode.USER_PROFILE_NOT_MATCHED;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.error.exception.AlreadyExistsException;
@@ -19,16 +29,12 @@ import com.prgrms.artzip.user.dto.request.PasswordUpdateRequest;
 import com.prgrms.artzip.user.dto.request.UserLocalLoginRequest;
 import com.prgrms.artzip.user.dto.request.UserSignUpRequest;
 import com.prgrms.artzip.user.dto.request.UserUpdateRequest;
-import com.prgrms.artzip.user.dto.response.UserUpdateResponse;
-import io.swagger.v3.oas.annotations.Parameter;
 import java.io.IOException;
-import net.bytebuddy.asm.Advice.Argument;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -37,16 +43,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
@@ -375,7 +375,7 @@ class UserServiceTest {
     // given
     PasswordUpdateRequest request = new PasswordUpdateRequest(testPassword, "test2345!");
     // when
-    userService.updatePassword(testUser, request);
+    userService.updatePassword((LocalUser) testUser, request);
     // then
     verify(userRepository).save(testUser);
   }
@@ -387,7 +387,7 @@ class UserServiceTest {
     // given
     PasswordUpdateRequest request = new PasswordUpdateRequest(testPassword, invalidPassword);
     // when then
-    assertThatThrownBy(() -> userService.updatePassword(testUser, request))
+    assertThatThrownBy(() -> userService.updatePassword((LocalUser)testUser, request))
         .isInstanceOf(InvalidRequestException.class)
         .hasMessage(INVALID_INPUT_VALUE.getMessage());
   }

@@ -57,7 +57,7 @@
 
 ## ERD
 [ERD Cloud](https://www.erdcloud.com/d/resx4g2DuZiuLWsa8)
-<img width="1557" alt="Screen Shot 2022-07-08 at 15 27 12" src="https://user-images.githubusercontent.com/62789083/183259401-15cc9a55-4ea8-4180-b0ad-6b59f9db34ab.png">
+<img width="1557" alt="Screen Shot 2022-07-08 at 15 27 12" src="https://user-images.githubusercontent.com/62789083/183323115-de55629f-ecab-4d5f-9fd4-55c29ecdf538.png">
 
 ## API 명세
 [Swagger API 명세](https://server.artzip.shop/swagger-ui/index.html)
