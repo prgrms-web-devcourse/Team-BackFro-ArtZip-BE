@@ -157,7 +157,6 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
                     .otherwise(false).as("isLiked"),
                 exhibition.period,
                 exhibitionLikeForLikeCount.id.countDistinct().as("likeCount"),
-                exhibitionLikeForLikeCount.id.countDistinct().as("likeCount"),
                 review.id.countDistinct().as("reviewCount")
             )
         )
