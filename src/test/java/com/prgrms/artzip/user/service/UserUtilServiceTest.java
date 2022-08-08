@@ -52,7 +52,7 @@ class UserUtilServiceTest {
   @DisplayName("존재하는 유저 반환 테스트")
   void testGetUserById() {
     // given
-    when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+    when(userRepository.findByIdAndIsQuit(1L, false)).thenReturn(Optional.of(testUser));
     // when
     User userResult = utilService.getUserById(1L);
     // then
@@ -63,7 +63,7 @@ class UserUtilServiceTest {
   @DisplayName("존재하지 않는 유저 예외 테스트")
   void testGetAnonymous() {
     // given
-    when(userRepository.findById(1L)).thenReturn(Optional.empty());
+    when(userRepository.findByIdAndIsQuit(1L, false)).thenReturn(Optional.empty());
     // when then
     assertThatThrownBy(() -> utilService.getUserById(1L))
         .isInstanceOf(NotFoundException.class)
