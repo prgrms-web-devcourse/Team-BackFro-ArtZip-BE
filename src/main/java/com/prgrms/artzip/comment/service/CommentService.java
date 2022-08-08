@@ -91,6 +91,11 @@ public class CommentService {
     return commentRepository.countByUserId(userId);
   }
 
+  @Transactional(readOnly = true)
+  public Long getCommentCountByReviewId(Long reviewId) {
+    return commentRepository.countByReviewId(reviewId);
+  }
+
   private void checkChild(Comment parent) {
     if (Objects.nonNull(parent.getParent())) {
       throw new InvalidRequestException(ErrorCode.CHILD_CANT_BE_PARENT);
