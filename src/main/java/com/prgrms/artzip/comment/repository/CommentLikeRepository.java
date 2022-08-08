@@ -1,6 +1,7 @@
 package com.prgrms.artzip.comment.repository;
 
 import com.prgrms.artzip.comment.domain.CommentLike;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

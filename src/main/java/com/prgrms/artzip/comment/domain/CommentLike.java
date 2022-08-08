@@ -6,12 +6,15 @@ import static lombok.AccessLevel.PROTECTED;
 
 import com.prgrms.artzip.common.error.exception.NotFoundException;
 import com.prgrms.artzip.user.domain.User;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -53,6 +56,7 @@ public class CommentLike {
       throw new NotFoundException(COMMENT_NOT_FOUND);
     }
     this.comment = comment;
+    comment.addLike(this);
   }
 
   private void setUser(User user) throws NotFoundException {
