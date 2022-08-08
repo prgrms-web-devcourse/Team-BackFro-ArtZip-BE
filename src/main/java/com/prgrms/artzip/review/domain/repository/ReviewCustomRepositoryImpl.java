@@ -20,7 +20,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
 
   private final JPAQueryFactory queryFactory;
 
-  private final QReviewLike RL = new QReviewLike("RL");
+  private final QReviewLike reviewLikeToGetIsLiked = new QReviewLike("reviewLikeToGetIsLiked");
 
   public ReviewCustomRepositoryImpl(EntityManager entityManager) {
     this.queryFactory = new JPAQueryFactory(entityManager);
@@ -42,12 +42,12 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
                 .then(true)
                 .otherwise(false).as("isLiked"),
             review.isPublic,
-            reviewLike.reviewLikeId.userId.count().as("likeCount")
+            reviewLike.id.count().as("likeCount")
         ))
         .from(review)
-        .leftJoin(RL).on(RL.review.eq(review),
+        .leftJoin(reviewLikeToGetIsLiked).on(reviewLikeToGetIsLiked.review.eq(review),
             alwaysFalse().or(reviewLikeUserIdEq(userId)))
-        .leftJoin(reviewLike).on(review.id.eq(reviewLike.reviewLikeId.reviewId))
+        .leftJoin(reviewLike).on(review.id.eq(reviewLike.review.id))
         .where(review.isDeleted.eq(false),
             review.id.eq(reviewId),
             filterIsNotPublic(userId))
@@ -57,8 +57,9 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
     return Optional.ofNullable(data);
   }
 
+
   private BooleanBuilder reviewLikeUserIdEq(Long userId) {
-    return nullSafeBooleanBuilder(() -> RL.reviewLikeId.userId.eq(userId));
+    return nullSafeBooleanBuilder(() -> reviewLikeToGetIsLiked.user.id.eq(userId));
   }
 
   private BooleanExpression filterIsNotPublic(Long userId) {
