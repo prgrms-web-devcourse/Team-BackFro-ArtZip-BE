@@ -2,15 +2,20 @@ package com.prgrms.artzip.comment.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.prgrms.artzip.comment.domain.Comment;
+import com.prgrms.artzip.comment.domain.CommentLike;
 import com.prgrms.artzip.comment.dto.request.CommentCreateRequest;
 import com.prgrms.artzip.comment.dto.request.CommentUpdateRequest;
 import com.prgrms.artzip.comment.dto.response.CommentInfo;
+import com.prgrms.artzip.comment.dto.response.CommentLikeResponse;
 import com.prgrms.artzip.comment.dto.response.CommentResponse;
+import com.prgrms.artzip.comment.repository.CommentLikeRepository;
 import com.prgrms.artzip.comment.repository.CommentRepository;
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.ErrorCode;
@@ -56,6 +61,9 @@ class CommentServiceTest {
 
   @Mock
   private CommentUtilService commentUtilService;
+
+  @Mock
+  private CommentLikeRepository commentLikeRepository;
 
   @InjectMocks
   private CommentService commentService;
@@ -193,23 +201,6 @@ class CommentServiceTest {
         .hasMessage(ErrorCode.REVIEW_NOT_FOUND.getMessage());
   }
 
-  // 로그인한 유저를 알아서 받아오게 함으로써 주석화
-//  @Test
-//  @DisplayName("잘못된 유저의 댓글 생성 테스트")
-//  void testCreateCommentWithInvalidUser() {
-//    //given
-//    doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
-//    doReturn(Optional.empty()).when(userRepository).findById(9999L);
-//
-//    //when //then
-//    assertThatThrownBy(() -> commentService.createComment(
-//        new CommentCreateRequest("안녕", null),
-//        review.getId(),
-//        user
-//    )).isInstanceOf(NotFoundException.class)
-//        .hasMessage(ErrorCode.USER_NOT_FOUND.getMessage());
-//  }
-
   @Test
   @DisplayName("잘못된 부모 댓글의 자식 댓글 생성 테스트")
   void testCreateCommentWithInvalidParent() {
@@ -311,5 +302,62 @@ class CommentServiceTest {
     // then
     assertThat(commentCount).isEqualTo(3L);
     verify(commentRepository).countByUserId(1L);
+  }
+
+  @Test
+  @DisplayName("댓글 좋아요 토글 테스트")
+  void testToggleLikeComment() {
+    //Given
+    Comment comment = Comment.builder()
+        .user(user)
+        .review(review)
+        .content("안녕")
+        .build();
+    doReturn(comment).when(commentUtilService).getComment(0L);
+    doReturn(Optional.empty()).when(commentLikeRepository)
+        .getCommentLikeByCommentIdAndUserId(0L, null);
+    doReturn(CommentLike.builder().comment(comment).user(user).build())
+        .when(commentLikeRepository).save(Mockito.any(CommentLike.class));
+    doReturn(1L).when(commentLikeRepository).countCommentLikeByCommentId(0L);
+
+    //When
+    CommentLikeResponse response = commentService.toggleCommentLike(0L, user);
+
+    //then
+    verify(commentUtilService).getComment(0L);
+    verify(commentLikeRepository).getCommentLikeByCommentIdAndUserId(0L, null);
+    verify(commentLikeRepository).save(Mockito.any(CommentLike.class));
+    verify(commentLikeRepository).countCommentLikeByCommentId(0L);
+    assertThat(response).hasFieldOrPropertyWithValue("commentId", 0L)
+        .hasFieldOrPropertyWithValue("isLiked", true)
+        .hasFieldOrPropertyWithValue("likeCount", 1L);
+  }
+
+  @Test
+  @DisplayName("댓글 좋아요 취소 토글 테스트")
+  void testToggleUnlikeComment() {
+    //Given
+    Comment comment = Comment.builder()
+        .user(user)
+        .review(review)
+        .content("안녕")
+        .build();
+    doReturn(comment).when(commentUtilService).getComment(0L);
+    doReturn(Optional.of(CommentLike.builder().comment(comment).user(user).build()))
+        .when(commentLikeRepository).getCommentLikeByCommentIdAndUserId(0L, null);
+    doNothing().when(commentLikeRepository).deleteCommentLikeByCommentIdAndUserId(0L, null);
+    doReturn(0L).when(commentLikeRepository).countCommentLikeByCommentId(0L);
+
+    //When
+    CommentLikeResponse response = commentService.toggleCommentLike(0L, user);
+
+    //then
+    verify(commentUtilService).getComment(0L);
+    verify(commentLikeRepository).getCommentLikeByCommentIdAndUserId(0L, null);
+    verify(commentLikeRepository).deleteCommentLikeByCommentIdAndUserId(0L, null);
+    verify(commentLikeRepository).countCommentLikeByCommentId(0L);
+    assertThat(response).hasFieldOrPropertyWithValue("commentId", 0L)
+        .hasFieldOrPropertyWithValue("isLiked", false)
+        .hasFieldOrPropertyWithValue("likeCount", 0L);
   }
 }

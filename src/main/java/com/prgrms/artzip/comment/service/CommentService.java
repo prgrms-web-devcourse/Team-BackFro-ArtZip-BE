@@ -51,7 +51,7 @@ public class CommentService {
   }
 
   public CommentResponse createComment(CommentCreateRequest request, Long reviewId, User user) {
-    if (Objects.isNull(user)) throw new NotFoundException(ErrorCode.USER_NOT_FOUND);
+    checkLogin(user);
     Review review = getReview(reviewId);
     Comment parent = null;
     if (Objects.nonNull(request.parentId())) {
@@ -69,7 +69,7 @@ public class CommentService {
   }
 
   public CommentResponse updateComment(CommentUpdateRequest request, Long commentId, User user) {
-    if (Objects.isNull(user)) throw new NotFoundException(ErrorCode.USER_NOT_FOUND);
+    checkLogin(user);
     Comment comment = commentUtilService.getComment(commentId);
     if (comment.getIsDeleted()) throw new DuplicateRequestException(ErrorCode.COMMENT_ALREADY_DELETED);
     checkOwner(comment, user);
@@ -79,7 +79,7 @@ public class CommentService {
   }
 
   public CommentResponse deleteComment(Long commentId, User user) {
-    if (Objects.isNull(user)) throw new NotFoundException(ErrorCode.USER_NOT_FOUND);
+    checkLogin(user);
     Comment comment = commentUtilService.getComment(commentId);
     checkOwner(comment, user);
     comment.softDelete();
@@ -101,6 +101,7 @@ public class CommentService {
   }
 
   public CommentLikeResponse toggleCommentLike(Long commentId, User user) {
+    checkLogin(user);
     Comment comment = commentUtilService.getComment(commentId);
     Optional<CommentLike> commentLike = commentLikeRepository
         .getCommentLikeByCommentIdAndUserId(commentId, user.getId());
@@ -133,6 +134,12 @@ public class CommentService {
   private void checkOwner(Comment comment, User user) {
     if (!Objects.equals(comment.getUser().getId(), user.getId())) {
       throw new AuthErrorException(ErrorCode.RESOURCE_PERMISSION_DENIED);
+    }
+  }
+
+  private void checkLogin(User user) {
+    if (Objects.isNull(user)) {
+      throw new NotFoundException(ErrorCode.USER_NOT_FOUND);
     }
   }
 }
