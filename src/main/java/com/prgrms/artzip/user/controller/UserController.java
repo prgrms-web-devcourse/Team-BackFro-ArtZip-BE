@@ -7,11 +7,16 @@ import static org.springframework.http.HttpStatus.OK;
 
 import com.prgrms.artzip.comment.service.CommentService;
 import com.prgrms.artzip.common.ApiResponse;
+import com.prgrms.artzip.common.PageResponse;
+import com.prgrms.artzip.common.entity.CurrentUser;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.jwt.JwtAuthenticationToken;
 import com.prgrms.artzip.common.jwt.JwtPrincipal;
 import com.prgrms.artzip.common.util.JwtService;
+import com.prgrms.artzip.exhibition.domain.ExhibitionLike;
+import com.prgrms.artzip.exhibition.dto.response.ExhibitionInfoResponse;
 import com.prgrms.artzip.exhibition.service.ExhibitionLikeService;
+import com.prgrms.artzip.exhibition.service.ExhibitionService;
 import com.prgrms.artzip.review.service.ReviewLikeService;
 import com.prgrms.artzip.review.service.ReviewService;
 import com.prgrms.artzip.user.domain.User;
@@ -34,6 +39,8 @@ import java.util.List;
 import java.util.function.Function;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -65,6 +72,8 @@ public class UserController {
   private final ReviewService reviewService;
 
   private final CommentService commentService;
+
+  private final ExhibitionService exhibitionService;
 
   private final ExhibitionLikeService exhibitionLikeService;
 
@@ -189,5 +198,26 @@ public class UserController {
         .status(OK.value())
         .build();
     return ResponseEntity.ok(apiResponse);
+  }
+
+  @ApiOperation(value = "유저가 좋아요 누른 전시회 조회", notes = "유저가 좋아요 누른 전시회를 조회합니다.")
+  @GetMapping("/{userId}/info/exhibitions/like")
+  public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfoResponse>>> getUserLikeExhibitions(
+      @CurrentUser User user,
+      @PathVariable("userId") Long userId,
+      @PageableDefault(page = 0, size = 4) Pageable pageable
+  ) {
+    ApiResponse apiResponse = ApiResponse.builder()
+        .message("유저가 좋아요 누른 전시회를 조회하였습니다.")
+        .status(OK.value())
+        .data(new PageResponse(
+            exhibitionService.getUserLikeExhibitions(
+                isNull(user) ? null : user.getId(), userId,
+                pageable)))
+        .build();
+
+    return ResponseEntity
+        .ok()
+        .body(apiResponse);
   }
 }
