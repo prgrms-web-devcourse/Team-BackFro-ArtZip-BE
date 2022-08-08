@@ -225,4 +225,20 @@ class CommentControllerTest {
         .andExpect(status().isBadRequest())
         .andDo(print());
   }
+
+  @Test
+  @DisplayName("댓글 좋아요 토글 테스트")
+  void testCommentLikeToggle() throws Exception {
+    //Given //When //Then
+    mockMvc.perform(patch("/api/v1/comments/{commentId}/like", comment.getId())
+            .header("accessToken", accessToken)
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andDo(print());
+    mockMvc.perform(patch("/api/v1/comments/{commentId}/like", comment.getId())
+            .header("accessToken", accessToken)
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andDo(print());
+  }
 }
