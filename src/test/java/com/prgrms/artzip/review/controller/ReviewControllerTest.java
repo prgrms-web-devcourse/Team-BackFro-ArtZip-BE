@@ -122,8 +122,8 @@ class ReviewControllerTest {
   }
 
   @Test
-  @DisplayName("후기 댓글 다건 조회 테스트")
-  void testGetComments() throws Exception {
+  @DisplayName("후기 댓글 다건 조회 테스트 (No Login)")
+  void testGetCommentsWithoutLogin() throws Exception {
     //Given //When //Then
     mockMvc.perform(get("/api/v1/reviews/{reviewId}/comments", review.getId())
             .header("accessToken", accessToken)
@@ -133,8 +133,32 @@ class ReviewControllerTest {
   }
 
   @Test
-  @DisplayName("댓글 생성 테스트")
-  void testCreateComment() throws Exception {
+  @DisplayName("후기 댓글 다건 조회 테스트 (Login)")
+  void testGetCommentsWithLogin() throws Exception {
+    //Given //When //Then
+    mockMvc.perform(get("/api/v1/reviews/{reviewId}/comments", review.getId())
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andDo(print());
+  }
+
+  @Test
+  @DisplayName("댓글 생성 테스트 (No Login)")
+  void testCreateCommentWithoutLogin() throws Exception {
+    //Given
+    CommentCreateRequest request = new CommentCreateRequest("너 누구야", null);
+
+    // When //Then
+    mockMvc.perform(post("/api/v1/reviews/{reviewId}/comments", review.getId())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isUnauthorized())
+        .andDo(print());
+  }
+
+  @Test
+  @DisplayName("댓글 생성 테스트 (Login)")
+  void testCreateCommentWithLogin() throws Exception {
     //Given
     CommentCreateRequest request = new CommentCreateRequest("너 누구야", null);
 

@@ -132,7 +132,7 @@ public class WebSecurityConfig {
             "/api/v1/exhibitions/**/likes",
             "api/v1/users/logout").hasAnyAuthority(USER.name(), ADMIN.name())
         .antMatchers(HttpMethod.POST,
-            "/api/v1/reviews", "/api/v1/comments/**").hasAnyAuthority(USER.name(), ADMIN.name())
+            "/api/v1/reviews", "/api/v1/comments/**", "/api/v1/reviews/**/comments").hasAnyAuthority(USER.name(), ADMIN.name())
         .antMatchers(HttpMethod.PATCH,
             "/api/v1/reviews/**", "/api/v1/reviews/**/like", "/api/v1/comments/**")
         .hasAnyAuthority(USER.name(), ADMIN.name())
