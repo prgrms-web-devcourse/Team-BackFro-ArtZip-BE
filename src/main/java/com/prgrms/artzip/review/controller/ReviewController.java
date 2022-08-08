@@ -56,13 +56,13 @@ public class ReviewController {
   @ApiOperation(value = "후기 생성", notes = "후기 등록을 요청합니다.")
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<ApiResponse<ReviewCreateResponse>> createReview(
-      @RequestParam(value = "userId") Long userId,
+      @CurrentUser User user,
       @ApiParam(value = "등록할 후기 데이터", required = true)
       @Parameter(name = "data", schema = @Schema(type = "string", format = "binary"))
       @RequestPart(value = "data") @Valid ReviewCreateRequest request,
       @RequestPart(required = false) List<MultipartFile> files) {
 
-    ReviewIdResponse response = reviewService.createReview(userId, request, files);
+    ReviewIdResponse response = reviewService.createReview(user.getId(), request, files);
 
     return ResponseEntity.created(URI.create("/api/v1/reviews/" + response.getReviewId()))
         .body(new ApiResponse(
@@ -94,11 +94,11 @@ public class ReviewController {
   @ApiOperation(value = "후기 좋아요 등록/해제", notes = "후기 좋아요 등록/해제를 요청합니다.")
   @PatchMapping("{reviewId}/like")
   public ResponseEntity<ApiResponse<ReviewLikeUpdateResponse>> updateReviewLike(
-      @RequestParam(value = "userId") final Long userId,
+      @CurrentUser User user,
       @ApiParam(value = "좋아요 등록/해제할 후기의 ID")
       @PathVariable(value = "reviewId") final Long reviewId) {
 
-    ReviewLikeUpdateResponse response = reviewLikeService.updateReviewLike(userId, reviewId);
+    ReviewLikeUpdateResponse response = reviewLikeService.updateReviewLike(user.getId(), reviewId);
 
     ApiResponse apiResponse = ApiResponse.builder()
         .message("후기 좋아요 등록/해제 성공")
@@ -146,14 +146,14 @@ public class ReviewController {
   @ApiOperation(value = "후기 수정", notes = "후기 수정을 요청합니다.")
   @PatchMapping(value = "/{reviewId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<ApiResponse> updateReview(
-      @RequestParam(value = "userId") Long userId,
+      @CurrentUser User user,
       @ApiParam(value = "수정할 후기의 ID")
       @PathVariable(value = "reviewId") Long reviewId,
       @Parameter(name = "data", schema = @Schema(type = "string", format = "binary"))
       @RequestPart(value = "data") @Valid ReviewUpdateRequest request,
       @RequestPart(required = false) List<MultipartFile> files) {
 
-    ReviewIdResponse response = reviewService.updateReview(userId, reviewId, request, files);
+    ReviewIdResponse response = reviewService.updateReview(user.getId(), reviewId, request, files);
 
     return ResponseEntity.ok()
         .body(ApiResponse.builder()
