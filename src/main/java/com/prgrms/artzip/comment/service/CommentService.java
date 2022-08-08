@@ -11,6 +11,7 @@ import com.prgrms.artzip.comment.repository.CommentLikeRepository;
 import com.prgrms.artzip.comment.repository.CommentRepository;
 import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.error.exception.AuthErrorException;
+import com.prgrms.artzip.common.error.exception.DuplicateRequestException;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
 import com.prgrms.artzip.review.domain.Review;
@@ -50,6 +51,7 @@ public class CommentService {
   }
 
   public CommentResponse createComment(CommentCreateRequest request, Long reviewId, User user) {
+    if (Objects.isNull(user)) throw new NotFoundException(ErrorCode.USER_NOT_FOUND);
     Review review = getReview(reviewId);
     Comment parent = null;
     if (Objects.nonNull(request.parentId())) {
@@ -67,7 +69,9 @@ public class CommentService {
   }
 
   public CommentResponse updateComment(CommentUpdateRequest request, Long commentId, User user) {
+    if (Objects.isNull(user)) throw new NotFoundException(ErrorCode.USER_NOT_FOUND);
     Comment comment = commentUtilService.getComment(commentId);
+    if (comment.getIsDeleted()) throw new DuplicateRequestException(ErrorCode.COMMENT_ALREADY_DELETED);
     checkOwner(comment, user);
     comment.setContent(request.content());
     List<Comment> children = commentRepository.getCommentsOfParents(List.of(commentId));
@@ -75,6 +79,7 @@ public class CommentService {
   }
 
   public CommentResponse deleteComment(Long commentId, User user) {
+    if (Objects.isNull(user)) throw new NotFoundException(ErrorCode.USER_NOT_FOUND);
     Comment comment = commentUtilService.getComment(commentId);
     checkOwner(comment, user);
     comment.softDelete();
