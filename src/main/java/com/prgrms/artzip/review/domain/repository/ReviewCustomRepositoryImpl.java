@@ -47,7 +47,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
         .from(review)
         .leftJoin(RL).on(RL.review.eq(review),
             alwaysFalse().or(reviewLikeUserIdEq(userId)))
-        .leftJoin(reviewLike).fetchJoin().on(review.id.eq(reviewLike.reviewLikeId.reviewId))
+        .leftJoin(reviewLike).on(review.id.eq(reviewLike.reviewLikeId.reviewId))
         .where(review.isDeleted.eq(false),
             review.id.eq(reviewId),
             filterIsNotPublic(userId))
