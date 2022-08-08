@@ -108,7 +108,7 @@ public class CommentService {
     Boolean isLiked;
     if (commentLike.isPresent()) {
       commentLikeRepository.deleteCommentLikeByCommentIdAndUserId(commentId, user.getId());
-      isLiked =  false;
+      isLiked = false;
     } else {
       commentLikeRepository.save(CommentLike.builder().comment(comment).user(user).build());
       isLiked = true;
@@ -118,6 +118,11 @@ public class CommentService {
         .isLiked(isLiked)
         .likeCount(commentLikeRepository.countCommentLikeByCommentId(commentId))
         .build();
+  }
+
+  @Transactional(readOnly = true)
+  public Long getCommentCountByReviewId(Long reviewId) {
+    return commentRepository.countByReviewId(reviewId);
   }
 
   private void checkChild(Comment parent) {

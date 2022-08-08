@@ -22,6 +22,7 @@ import com.prgrms.artzip.exhibition.dto.projection.ExhibitionBasicForSimpleQuery
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionForSimpleQuery;
 import com.prgrms.artzip.review.domain.Review;
+import com.prgrms.artzip.review.dto.response.ReviewExhibitionInfo;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import java.time.LocalDate;
@@ -773,5 +774,178 @@ class ExhibitionRepositoryTest {
           .hasFieldOrPropertyWithValue("name", "전시회 at 부산")
           .hasFieldOrPropertyWithValue("isLiked", true);
     }
+  }
+
+  @Nested
+  @DisplayName("findExhibitionForReview() 테스트")
+  class FindExhibitionForReviewTest {
+
+
+    private User user1;
+    private User user2;
+
+    private Exhibition exhibitionAtBusan;
+    private Exhibition exhibitionAtSeoul;
+
+    @BeforeEach
+    void setUp() {
+      Role role = new Role(Authority.USER);
+      em.persist(role);
+
+      user1 = new User("test@example.com", "Emily", List.of(role));
+      em.persist(user1);
+
+      user2 = new User("tes2t@example.com", "Jerry", List.of(role));
+      em.persist(user2);
+
+      exhibitionAtBusan = Exhibition.builder()
+          .seq(32)
+          .name("전시회 at 부산")
+          .startDate(LocalDate.of(LocalDate.now().getYear() - 1, 12, 21))
+          .endDate(LocalDate.of(LocalDate.now().getYear(), 3, 7))
+          .genre(Genre.FINEART)
+          .description("이것은 전시회 설명입니다.")
+          .latitude(36.22)
+          .longitude(128.02)
+          .area(BUSAN)
+          .place("미술관")
+          .address("부산 동구 중앙대로 11")
+          .inquiry("문의처 정보")
+          .fee("성인 20,000원")
+          .thumbnail("http://www.culture.go.kr/upload/rdf/22/07/show_2022072010193392447.jpg")
+          .url("https://www.example.com")
+          .placeUrl("https://www.place-example.com")
+          .build();
+      em.persist(exhibitionAtBusan);
+
+      exhibitionAtSeoul = Exhibition.builder()
+          .seq(33)
+          .name("전시회 at 서울")
+          .startDate(LocalDate.of(LocalDate.now().getYear(), 6, 1))
+          .endDate(LocalDate.of(LocalDate.now().getYear(), 8, 15))
+          .genre(Genre.FINEART)
+          .description("이것은 전시회 설명입니다.")
+          .latitude(37.22)
+          .longitude(129.02)
+          .area(SEOUL)
+          .place("미술관")
+          .address("서울 어딘가")
+          .inquiry("문의처 정보")
+          .fee("성인 20,000원")
+          .thumbnail("http://www.culture.go.kr/upload/rdf/22/07/show_2022072010193392447.jpg")
+          .url("https://www.example.com")
+          .placeUrl("https://www.place-example.com")
+          .build();
+      em.persist(exhibitionAtSeoul);
+
+      Review review1 = Review.builder()
+          .user(user1)
+          .exhibition(exhibitionAtBusan)
+          .content("이것은 리뷰 본문입니다.")
+          .title("이것은 리뷰 제목입니다.")
+          .date(LocalDate.now())
+          .isPublic(true)
+          .build();
+      em.persist(review1);
+
+      Review review2 = Review.builder()
+          .user(user1)
+          .exhibition(exhibitionAtBusan)
+          .content("이것은 리뷰 본문입니다.")
+          .title("이것은 리뷰 제목입니다.")
+          .date(LocalDate.now())
+          .isPublic(true)
+          .build();
+      em.persist(review2);
+
+      Review review3 = Review.builder()
+          .user(user1)
+          .exhibition(exhibitionAtBusan)
+          .content("이것은 리뷰 본문입니다.")
+          .title("이것은 리뷰 제목입니다.")
+          .date(LocalDate.now())
+          .isPublic(false)
+          .build();
+      em.persist(review3);
+
+      Review review4 = Review.builder()
+          .user(user1)
+          .exhibition(exhibitionAtSeoul)
+          .content("이것은 리뷰 본문입니다.")
+          .title("이것은 리뷰 제목입니다.")
+          .date(LocalDate.now())
+          .isPublic(true)
+          .build();
+      review4.updateIdDeleted(true);
+      em.persist(review4);
+
+      em.persist(new ExhibitionLike(user1, exhibitionAtBusan));
+      em.persist(new ExhibitionLike(user2, exhibitionAtBusan));
+      em.persist(new ExhibitionLike(user1, exhibitionAtSeoul));
+
+      em.flush();
+      em.clear();
+
+    }
+
+    @Test
+    @DisplayName("userId == null인 경우 전시회 정보, 전시회 좋아요 여부, 전시회 좋아요 개수, 전시회 후기 개수 조회 테스트")
+    void testFindExhibitionForReviewWhenUserIdNull() {
+      Optional<ReviewExhibitionInfo> maybeBusanExhibition = exhibitionRepository.findExhibitionForReview(
+          null, exhibitionAtBusan.getId());
+      Optional<ReviewExhibitionInfo> maybeSeoulExhibition = exhibitionRepository.findExhibitionForReview(
+          null, exhibitionAtSeoul.getId());
+
+      assertThat(maybeBusanExhibition.isPresent()).isTrue();
+      assertThat(maybeBusanExhibition.get().getExhibitionId()).isEqualTo(exhibitionAtBusan.getId());
+      assertThat(maybeBusanExhibition.get().getName()).isEqualTo(exhibitionAtBusan.getName());
+      assertThat(maybeBusanExhibition.get().getThumbnail()).isEqualTo(exhibitionAtBusan.getThumbnail());
+      assertThat(maybeBusanExhibition.get().getStartDate()).isEqualTo(exhibitionAtBusan.getPeriod().getStartDate());
+      assertThat(maybeBusanExhibition.get().getEndDate()).isEqualTo(exhibitionAtBusan.getPeriod().getEndDate());
+      assertThat(maybeBusanExhibition.get().getIsLiked()).isFalse();
+      assertThat(maybeBusanExhibition.get().getLikeCount()).isEqualTo(2);
+      assertThat(maybeBusanExhibition.get().getReviewCount()).isEqualTo(2);
+
+      assertThat(maybeSeoulExhibition.isPresent()).isTrue();
+      assertThat(maybeSeoulExhibition.get().getExhibitionId()).isEqualTo(exhibitionAtSeoul.getId());
+      assertThat(maybeSeoulExhibition.get().getName()).isEqualTo(exhibitionAtSeoul.getName());
+      assertThat(maybeSeoulExhibition.get().getThumbnail()).isEqualTo(exhibitionAtSeoul.getThumbnail());
+      assertThat(maybeSeoulExhibition.get().getStartDate()).isEqualTo(exhibitionAtSeoul.getPeriod().getStartDate());
+      assertThat(maybeSeoulExhibition.get().getEndDate()).isEqualTo(exhibitionAtSeoul.getPeriod().getEndDate());
+      assertThat(maybeSeoulExhibition.get().getIsLiked()).isFalse();
+      assertThat(maybeSeoulExhibition.get().getLikeCount()).isEqualTo(1);
+      assertThat(maybeSeoulExhibition.get().getReviewCount()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("userId != null인 경우 전시회 정보, 전시회 좋아요 여부, 전시회 좋아요 개수, 전시회 후기 개수 조회 테스트")
+    void testFindExhibitionForReviewWhenUserIdNotNull() {
+      Optional<ReviewExhibitionInfo> maybeBusanExhibition = exhibitionRepository.findExhibitionForReview(
+          user1.getId(), exhibitionAtBusan.getId());
+      Optional<ReviewExhibitionInfo> maybeSeoulExhibition = exhibitionRepository.findExhibitionForReview(
+          user2.getId(), exhibitionAtSeoul.getId());
+
+      assertThat(maybeBusanExhibition.isPresent()).isTrue();
+      assertThat(maybeBusanExhibition.get().getExhibitionId()).isEqualTo(exhibitionAtBusan.getId());
+      assertThat(maybeBusanExhibition.get().getName()).isEqualTo(exhibitionAtBusan.getName());
+      assertThat(maybeBusanExhibition.get().getThumbnail()).isEqualTo(exhibitionAtBusan.getThumbnail());
+      assertThat(maybeBusanExhibition.get().getStartDate()).isEqualTo(exhibitionAtBusan.getPeriod().getStartDate());
+      assertThat(maybeBusanExhibition.get().getEndDate()).isEqualTo(exhibitionAtBusan.getPeriod().getEndDate());
+      assertThat(maybeBusanExhibition.get().getIsLiked()).isTrue();
+      assertThat(maybeBusanExhibition.get().getLikeCount()).isEqualTo(2);
+      assertThat(maybeBusanExhibition.get().getReviewCount()).isEqualTo(2);
+
+      assertThat(maybeSeoulExhibition.isPresent()).isTrue();
+      assertThat(maybeSeoulExhibition.get().getExhibitionId()).isEqualTo(exhibitionAtSeoul.getId());
+      assertThat(maybeSeoulExhibition.get().getName()).isEqualTo(exhibitionAtSeoul.getName());
+      assertThat(maybeSeoulExhibition.get().getThumbnail()).isEqualTo(exhibitionAtSeoul.getThumbnail());
+      assertThat(maybeSeoulExhibition.get().getStartDate()).isEqualTo(exhibitionAtSeoul.getPeriod().getStartDate());
+      assertThat(maybeSeoulExhibition.get().getEndDate()).isEqualTo(exhibitionAtSeoul.getPeriod().getEndDate());
+      assertThat(maybeSeoulExhibition.get().getIsLiked()).isFalse();
+      assertThat(maybeSeoulExhibition.get().getLikeCount()).isEqualTo(1);
+      assertThat(maybeSeoulExhibition.get().getReviewCount()).isEqualTo(0);
+    }
+
+
   }
 }

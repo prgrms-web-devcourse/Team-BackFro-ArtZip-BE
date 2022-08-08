@@ -8,15 +8,16 @@ import com.prgrms.artzip.common.PageResponse;
 import com.prgrms.artzip.common.entity.CurrentUser;
 import com.prgrms.artzip.exhibition.service.ExhibitionSearchService;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
+import com.prgrms.artzip.review.dto.request.ReviewUpdateRequest;
 import com.prgrms.artzip.review.dto.response.ExhibitionsResponse;
 import com.prgrms.artzip.review.dto.response.ReviewCreateResponse;
-import com.prgrms.artzip.review.dto.response.ReviewLikeUpdateResponse;
-import com.prgrms.artzip.review.service.ReviewLikeService;
-import com.prgrms.artzip.review.dto.request.ReviewUpdateRequest;
 import com.prgrms.artzip.review.dto.response.ReviewIdResponse;
+import com.prgrms.artzip.review.dto.response.ReviewLikeUpdateResponse;
+import com.prgrms.artzip.review.dto.response.ReviewResponse;
+import com.prgrms.artzip.review.service.ReviewLikeService;
 import com.prgrms.artzip.review.service.ReviewService;
-import io.swagger.annotations.Api;
 import com.prgrms.artzip.user.domain.User;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -180,4 +181,22 @@ public class ReviewController {
             .data(response)
             .build());
   }
+
+  @ApiOperation(value = "후기 단건 조회", notes = "후기 단건 조회를 요청합니다.")
+  @GetMapping("/{reviewId}")
+  public ResponseEntity<ApiResponse<ReviewResponse>> getReview(
+      @CurrentUser User user,
+      @ApiParam(value = "조회할 후기의 ID")
+      @PathVariable(value = "reviewId") Long reviewId) {
+
+    ReviewResponse response = reviewService.getReview(user, reviewId);
+
+    return ResponseEntity.ok()
+        .body(ApiResponse.<ReviewResponse>builder()
+            .message("후기 단건 조회 성공")
+            .status(HttpStatus.OK.value())
+            .data(response)
+            .build());
+  }
+
 }
