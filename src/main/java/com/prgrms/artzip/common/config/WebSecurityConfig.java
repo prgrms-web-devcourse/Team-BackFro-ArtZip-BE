@@ -127,20 +127,17 @@ public class WebSecurityConfig {
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
         .authorizeRequests()
-        .antMatchers("/api/v1/comments/**/children", "/api/v1/reviews/**/comments").permitAll()
         .antMatchers(
             "/api/v1/users/me/**",
-            "/api/v1/comments/**",
-            "/api/v1/reviews/**/comments/new",
             "/api/v1/exhibitions/**/likes",
             "api/v1/users/logout").hasAnyAuthority(USER.name(), ADMIN.name())
         .antMatchers(HttpMethod.POST,
-            "/api/v1/reviews").hasAnyAuthority(USER.name(), ADMIN.name())
+            "/api/v1/reviews", "/api/v1/comments/**").hasAnyAuthority(USER.name(), ADMIN.name())
         .antMatchers(HttpMethod.PATCH,
-            "/api/v1/reviews/**", "/api/v1/reviews/**/like")
+            "/api/v1/reviews/**", "/api/v1/reviews/**/like", "/api/v1/comments/**")
         .hasAnyAuthority(USER.name(), ADMIN.name())
         .antMatchers(HttpMethod.DELETE,
-            "/api/v1/reviews/**").hasAnyAuthority(USER.name(), ADMIN.name())
+            "/api/v1/reviews/**", "/api/v1/comments/**").hasAnyAuthority(USER.name(), ADMIN.name())
         .anyRequest().permitAll()
         .and()
         .exceptionHandling()
