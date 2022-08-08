@@ -5,46 +5,45 @@ import com.prgrms.artzip.common.entity.BaseEntity;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.user.domain.User;
 import java.util.Objects;
-import javax.persistence.EmbeddedId;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.JoinColumnOrFormula;
 
 @Entity
-@Table(name = "review_like")
+@Table(name = "review_like",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"review_id", "user_id"})
+    }
+)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class ReviewLike extends BaseEntity {
 
-  @EmbeddedId
-  private ReviewLikeId reviewLikeId;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "review_like_id")
+  private Long id;
 
-  @MapsId("reviewId")
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumnOrFormula(column =
-  @JoinColumn(name = "review_id",
-      referencedColumnName = "review_id")
-  )
+  @JoinColumn(name = "review_id", referencedColumnName = "review_id")
   private Review review;
 
-  @MapsId("userId")
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumnOrFormula(column =
-  @JoinColumn(name = "user_id",
-      referencedColumnName = "user_id")
-  )
+  @JoinColumn(name = "user_id", referencedColumnName = "user_id")
   private User user;
 
   public ReviewLike(Review review, User user) {
     validateFields(review, user);
-    this.reviewLikeId = new ReviewLikeId(review.getId(), user.getId());
     setReview(review);
     this.user = user;
   }
@@ -68,7 +67,7 @@ public class ReviewLike extends BaseEntity {
 
   public void setReview(Review review) {
     validateReview(review);
-    if(Objects.nonNull(this.review)) {
+    if (Objects.nonNull(this.review)) {
       this.review.getReviewLikes().remove(this);
     }
 
