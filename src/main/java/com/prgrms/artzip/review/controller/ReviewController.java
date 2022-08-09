@@ -14,6 +14,7 @@ import com.prgrms.artzip.review.dto.response.ReviewCreateResponse;
 import com.prgrms.artzip.review.dto.response.ReviewIdResponse;
 import com.prgrms.artzip.review.dto.response.ReviewLikeUpdateResponse;
 import com.prgrms.artzip.review.dto.response.ReviewResponse;
+import com.prgrms.artzip.review.dto.response.ReviewsResponse;
 import com.prgrms.artzip.review.service.ReviewLikeService;
 import com.prgrms.artzip.review.service.ReviewService;
 import com.prgrms.artzip.user.domain.User;
@@ -27,6 +28,7 @@ import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -193,6 +195,22 @@ public class ReviewController {
     return ResponseEntity.ok()
         .body(ApiResponse.<ReviewResponse>builder()
             .message("후기 단건 조회 성공")
+            .status(HttpStatus.OK.value())
+            .data(response)
+            .build());
+  }
+
+  @GetMapping
+  public ResponseEntity<ApiResponse<PageResponse<ReviewsResponse>>> getReview(
+      @CurrentUser User user,
+      @RequestParam(value = "exhibitionId", required = false) Long exhibitionId,
+      @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+    PageResponse<ReviewsResponse> response = reviewService.getReviews(user, exhibitionId, pageable);
+
+    return ResponseEntity.ok()
+        .body(ApiResponse.<PageResponse<ReviewsResponse>>builder()
+            .message("후기 다건 조회 성공")
             .status(HttpStatus.OK.value())
             .data(response)
             .build());
