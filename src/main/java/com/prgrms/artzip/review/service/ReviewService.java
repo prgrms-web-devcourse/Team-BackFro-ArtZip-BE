@@ -1,9 +1,9 @@
 package com.prgrms.artzip.review.service;
 
 import com.prgrms.artzip.comment.dto.response.CommentResponse;
-import com.prgrms.artzip.comment.repository.CommentRepository;
 import com.prgrms.artzip.comment.service.CommentService;
 import com.prgrms.artzip.common.ErrorCode;
+import com.prgrms.artzip.common.PageResponse;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
 import com.prgrms.artzip.common.error.exception.PermissionDeniedException;
@@ -17,12 +17,15 @@ import com.prgrms.artzip.review.domain.ReviewPhoto;
 import com.prgrms.artzip.review.domain.repository.ReviewLikeRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewPhotoRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewRepository;
+import com.prgrms.artzip.review.dto.projection.ReviewExhibitionInfo;
+import com.prgrms.artzip.review.dto.projection.ReviewWithLikeAndCommentCount;
 import com.prgrms.artzip.review.dto.projection.ReviewWithLikeData;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
 import com.prgrms.artzip.review.dto.request.ReviewUpdateRequest;
-import com.prgrms.artzip.review.dto.response.ReviewExhibitionInfo;
+import com.prgrms.artzip.review.dto.response.ReviewExhibitionInfoResponse;
 import com.prgrms.artzip.review.dto.response.ReviewIdResponse;
 import com.prgrms.artzip.review.dto.response.ReviewResponse;
+import com.prgrms.artzip.review.dto.response.ReviewsResponse;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
 import java.io.IOException;
@@ -31,6 +34,7 @@ import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -146,7 +150,28 @@ public class ReviewService {
         reviewData,
         reviewPhotos,
         reviewUser,
-        reviewExhibitionInfo);
+        new ReviewExhibitionInfoResponse(reviewExhibitionInfo));
+  }
+
+  @Transactional(readOnly = true)
+  public PageResponse<ReviewsResponse> getReviews(
+      final User user, final Long exhibitionId, final Pageable pageable) {
+
+    Page<ReviewWithLikeAndCommentCount> reviews = reviewRepository.findReviewsByExhibitionIdAndUserId(
+        exhibitionId, Objects.isNull(user) ? null : user.getId(), pageable);
+
+    return new PageResponse<>(reviews.map(r -> {
+      Review review = reviewRepository.findById(r.getReviewId())
+          .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_NOT_FOUND));
+      List<ReviewPhoto> reviewPhotos = review.getReviewPhotos();
+      User reviewUser = review.getUser();
+      Exhibition exhibition = exhibitionRepository.findById(review.getExhibition().getId())
+          .orElseThrow(() -> new NotFoundException(ErrorCode.EXHB_NOT_FOUND));
+      Page<CommentResponse> comments = commentService.getCommentsByReviewId(
+          r.getReviewId(), PageRequest.of(0, 20));
+
+      return new ReviewsResponse(r, comments, reviewPhotos, reviewUser, exhibition);
+    }));
   }
 
   private void removeReviewPhotosById(List<Long> reviewPhotoIds) {
