@@ -119,8 +119,8 @@ class CommentControllerTest {
   }
 
   @Test
-  @DisplayName("자식 댓글 다건 조회 테스트")
-  void testGetChildren() throws Exception {
+  @DisplayName("자식 댓글 다건 조회 테스트 (No Login)")
+  void testGetChildrenWithoutLogin() throws Exception {
     //Given //When //Then
     mockMvc.perform(get("/api/v1/comments/{commentId}/children", comment.getId())
             .contentType(MediaType.APPLICATION_JSON))
@@ -129,8 +129,33 @@ class CommentControllerTest {
   }
 
   @Test
-  @DisplayName("댓글 수정 테스트")
-  void testUpdateComment() throws Exception {
+  @DisplayName("자식 댓글 다건 조회 테스트 (Login)")
+  void testGetChildrenWithLogin() throws Exception {
+    //Given //When //Then
+    mockMvc.perform(get("/api/v1/comments/{commentId}/children", comment.getId())
+            .header("accessToken", accessToken)
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andDo(print());
+  }
+
+  @Test
+  @DisplayName("댓글 수정 테스트 (No Login)")
+  void testUpdateCommentWithoutLogin() throws Exception {
+    //Given
+    CommentUpdateRequest request = new CommentUpdateRequest("너 누구야");
+
+    //When //Then
+    mockMvc.perform(patch("/api/v1/comments/{commentId}", comment.getId())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isUnauthorized())
+        .andDo(print());
+  }
+
+  @Test
+  @DisplayName("댓글 수정 테스트 (Login)")
+  void testUpdateCommentWithLogin() throws Exception {
     //Given
     CommentUpdateRequest request = new CommentUpdateRequest("너 누구야");
 
@@ -189,8 +214,18 @@ class CommentControllerTest {
   }
 
   @Test
-  @DisplayName("댓글 삭제 테스트")
-  void testDeleteComment() throws Exception {
+  @DisplayName("댓글 삭제 테스트 (No Login)")
+  void testDeleteCommentWithoutLogin() throws Exception {
+    //Given //When //Then
+    mockMvc.perform(delete("/api/v1/comments/{commentId}", comment.getId())
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isUnauthorized())
+        .andDo(print());
+  }
+
+  @Test
+  @DisplayName("댓글 삭제 테스트 (Login)")
+  void testDeleteCommentWithLogin() throws Exception {
     //Given //When //Then
     mockMvc.perform(delete("/api/v1/comments/{commentId}", comment.getId())
             .header("accessToken", accessToken)
@@ -223,6 +258,45 @@ class CommentControllerTest {
             .header("accessToken", accessToken)
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isBadRequest())
+        .andDo(print());
+  }
+
+  @Test
+  @DisplayName("댓글 좋아요 토글 테스트 (No Login)")
+  void testCommentLikeToggleWithoutLogin() throws Exception {
+    //Given //When //Then
+    mockMvc.perform(patch("/api/v1/comments/{commentId}/like", comment.getId())
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isUnauthorized())
+        .andDo(print());
+    mockMvc.perform(patch("/api/v1/comments/{commentId}/like", comment.getId())
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isUnauthorized())
+        .andDo(print());
+    mockMvc.perform(patch("/api/v1/comments/{commentId}/like", comment.getId())
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isUnauthorized())
+        .andDo(print());
+  }
+
+  @Test
+  @DisplayName("댓글 좋아요 토글 테스트 (Login)")
+  void testCommentLikeToggleWithLogin() throws Exception {
+    //Given //When //Then
+    mockMvc.perform(patch("/api/v1/comments/{commentId}/like", comment.getId())
+            .header("accessToken", accessToken)
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andDo(print());
+    mockMvc.perform(patch("/api/v1/comments/{commentId}/like", comment.getId())
+            .header("accessToken", accessToken)
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andDo(print());
+    mockMvc.perform(patch("/api/v1/comments/{commentId}/like", comment.getId())
+            .header("accessToken", accessToken)
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
         .andDo(print());
   }
 }

@@ -1,5 +1,8 @@
 package com.prgrms.artzip.review.service;
 
+import com.prgrms.artzip.comment.dto.response.CommentResponse;
+import com.prgrms.artzip.comment.repository.CommentRepository;
+import com.prgrms.artzip.comment.service.CommentService;
 import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
@@ -14,15 +17,20 @@ import com.prgrms.artzip.review.domain.ReviewPhoto;
 import com.prgrms.artzip.review.domain.repository.ReviewLikeRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewPhotoRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewRepository;
+import com.prgrms.artzip.review.dto.projection.ReviewWithLikeData;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
 import com.prgrms.artzip.review.dto.request.ReviewUpdateRequest;
+import com.prgrms.artzip.review.dto.response.ReviewExhibitionInfo;
 import com.prgrms.artzip.review.dto.response.ReviewIdResponse;
+import com.prgrms.artzip.review.dto.response.ReviewResponse;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,6 +41,8 @@ public class ReviewService {
 
   private static final String REVIEW_DIRECTORY_NAME = "review/";
   private static final int REVIEW_PHOTO_COUNT = 9;
+
+  private final CommentService commentService;
 
   private final ReviewRepository reviewRepository;
   private final ReviewPhotoRepository reviewPhotoRepository;
@@ -111,6 +121,32 @@ public class ReviewService {
 
   private void removeReviewLikes(List<ReviewLike> reviewLikes) {
     reviewLikeRepository.deleteAllInBatch(reviewLikes);
+  }
+
+  @Transactional(readOnly = true)
+  public ReviewResponse getReview(final User user, final Long reviewId) {
+    Review review = reviewRepository.findById(reviewId)
+        .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_NOT_FOUND));
+
+    ReviewWithLikeData reviewData = reviewRepository.findByReviewIdAndUserId(reviewId,
+            Objects.isNull(user) ? null : user.getId())
+        .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_NOT_FOUND));
+
+    List<ReviewPhoto> reviewPhotos = review.getReviewPhotos();
+    User reviewUser = review.getUser();
+    ReviewExhibitionInfo reviewExhibitionInfo = exhibitionRepository.findExhibitionForReview(
+            Objects.isNull(user) ? null : user.getId(), review.getExhibition().getId())
+        .orElseThrow(() -> new NotFoundException(ErrorCode.EXHB_NOT_FOUND));
+    Page<CommentResponse> comments = commentService.getCommentsByReviewId(
+        reviewId, user, PageRequest.of(0, 20));
+    Long reviewCommentCount = commentService.getCommentCountByReviewId(reviewId);
+
+    return new ReviewResponse(reviewCommentCount,
+        comments,
+        reviewData,
+        reviewPhotos,
+        reviewUser,
+        reviewExhibitionInfo);
   }
 
   private void removeReviewPhotosById(List<Long> reviewPhotoIds) {

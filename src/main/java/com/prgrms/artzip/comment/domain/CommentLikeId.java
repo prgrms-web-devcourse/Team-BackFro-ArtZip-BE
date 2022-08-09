@@ -1,20 +1,18 @@
-package com.prgrms.artzip.review.domain;
+package com.prgrms.artzip.comment.domain;
+
+import static lombok.AccessLevel.PROTECTED;
 
 import java.io.Serializable;
 import javax.persistence.Embeddable;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Embeddable
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = PROTECTED)
 @AllArgsConstructor
 @EqualsAndHashCode
-@Getter
-public class ReviewLikeId implements Serializable {
-
-  private Long reviewId;
+public class CommentLikeId implements Serializable {
+  private Long commentId;
   private Long userId;
 }

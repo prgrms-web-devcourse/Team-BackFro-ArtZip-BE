@@ -8,15 +8,16 @@ import com.prgrms.artzip.common.PageResponse;
 import com.prgrms.artzip.common.entity.CurrentUser;
 import com.prgrms.artzip.exhibition.service.ExhibitionSearchService;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
+import com.prgrms.artzip.review.dto.request.ReviewUpdateRequest;
 import com.prgrms.artzip.review.dto.response.ExhibitionsResponse;
 import com.prgrms.artzip.review.dto.response.ReviewCreateResponse;
-import com.prgrms.artzip.review.dto.response.ReviewLikeUpdateResponse;
-import com.prgrms.artzip.review.service.ReviewLikeService;
-import com.prgrms.artzip.review.dto.request.ReviewUpdateRequest;
 import com.prgrms.artzip.review.dto.response.ReviewIdResponse;
+import com.prgrms.artzip.review.dto.response.ReviewLikeUpdateResponse;
+import com.prgrms.artzip.review.dto.response.ReviewResponse;
+import com.prgrms.artzip.review.service.ReviewLikeService;
 import com.prgrms.artzip.review.service.ReviewService;
-import io.swagger.annotations.Api;
 import com.prgrms.artzip.user.domain.User;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -114,20 +115,21 @@ public class ReviewController {
 
   @ApiOperation(value = "후기 댓글 다건 조회", notes = "후기의 댓글들을 조회합니다.")
   @GetMapping("/{reviewId}/comments")
-  public ResponseEntity<ApiResponse<PageResponse<CommentResponse>>> getComment(
+  public ResponseEntity<ApiResponse<PageResponse<CommentResponse>>> getComments(
       @ApiParam(value = "조회할 후기의 ID")
       @PathVariable Long reviewId,
+      @CurrentUser User user,
       @PageableDefault Pageable pageable
   ) {
     PageResponse<CommentResponse> comments =
-        new PageResponse<>(commentService.getCommentsByReviewId(reviewId, pageable));
+        new PageResponse<>(commentService.getCommentsByReviewId(reviewId, user, pageable));
     ApiResponse<PageResponse<CommentResponse>> response
         = new ApiResponse<>("댓글 다건 조회 성공", HttpStatus.OK.value(), comments);
     return ResponseEntity.ok(response);
   }
 
   @ApiOperation(value = "리뷰 댓글 생성", notes = "리뷰에 댓글을 생성합니다.")
-  @PostMapping("/{reviewId}/comments/new")
+  @PostMapping("/{reviewId}/comments")
   public ResponseEntity<ApiResponse<CommentResponse>> createComment(
       @ApiParam(value = "댓글 생성할 후기의 ID")
       @PathVariable Long reviewId,
@@ -179,4 +181,22 @@ public class ReviewController {
             .data(response)
             .build());
   }
+
+  @ApiOperation(value = "후기 단건 조회", notes = "후기 단건 조회를 요청합니다.")
+  @GetMapping("/{reviewId}")
+  public ResponseEntity<ApiResponse<ReviewResponse>> getReview(
+      @CurrentUser User user,
+      @ApiParam(value = "조회할 후기의 ID")
+      @PathVariable(value = "reviewId") Long reviewId) {
+
+    ReviewResponse response = reviewService.getReview(user, reviewId);
+
+    return ResponseEntity.ok()
+        .body(ApiResponse.<ReviewResponse>builder()
+            .message("후기 단건 조회 성공")
+            .status(HttpStatus.OK.value())
+            .data(response)
+            .build());
+  }
+
 }

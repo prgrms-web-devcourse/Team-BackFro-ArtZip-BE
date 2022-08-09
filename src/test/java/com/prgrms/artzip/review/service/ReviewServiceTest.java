@@ -9,6 +9,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.prgrms.artzip.comment.domain.Comment;
+import com.prgrms.artzip.comment.repository.CommentRepository;
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
@@ -25,8 +27,10 @@ import com.prgrms.artzip.review.domain.ReviewPhoto;
 import com.prgrms.artzip.review.domain.repository.ReviewLikeRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewPhotoRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewRepository;
+import com.prgrms.artzip.review.dto.projection.ReviewWithLikeData;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
 import com.prgrms.artzip.review.dto.request.ReviewUpdateRequest;
+import com.prgrms.artzip.review.dto.response.ReviewExhibitionInfo;
 import com.prgrms.artzip.review.dto.response.ReviewIdResponse;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
@@ -68,6 +72,9 @@ class ReviewServiceTest {
 
   @Mock
   private ExhibitionRepository exhibitionRepository;
+
+  @Mock
+  private CommentRepository commentRepository;
 
   @Mock
   AmazonS3Uploader amazonS3Uploader;
@@ -668,6 +675,87 @@ class ReviewServiceTest {
           reviewService.removeReview(null, review.getId());
         }).isInstanceOf(PermissionDeniedException.class)
             .hasMessageContaining(ErrorCode.UNAUTHENTICATED_USER.getMessage());
+      }
+
+    }
+
+  }
+
+  @Nested
+  @DisplayName("후기 단건 조회")
+  class TestGetReview {
+
+    private ReviewWithLikeData reviewWithLikeData = mock(ReviewWithLikeData.class);
+    private ReviewExhibitionInfo reviewExhibitionInfo = mock(ReviewExhibitionInfo.class);
+
+    private List<Comment> parents = List.of(
+        Comment.builder()
+            .user(user)
+            .review(review)
+            .content("안녕")
+            .build()
+    );
+
+    @Nested
+    @DisplayName("실패")
+    class Failure {
+
+      @Test
+      @DisplayName("존재하지 않는 후기를 조회하는 경우 NotFoundException 발생")
+      void testReviewNotFoundException() {
+        // given
+        doThrow(new NotFoundException(ErrorCode.REVIEW_NOT_FOUND))
+            .when(reviewRepository).findById(any());
+
+        // when
+        // then
+        assertThatThrownBy(() -> {
+          reviewService.getReview(user, review.getId());
+        }).isInstanceOf(NotFoundException.class)
+            .hasMessageContaining(ErrorCode.REVIEW_NOT_FOUND.getMessage());
+      }
+
+      @Test
+      @DisplayName("삭제되거나 비공개인 후기를 조회하는 경우 NotFoundException 발생")
+      void testDeletedOrPrivateReviewNotFoundException() {
+        // given
+        Review privateReview = Review.builder()
+            .user(user)
+            .exhibition(exhibition)
+            .content("이것은 리뷰 본문입니다.")
+            .title("이것은 리뷰 제목입니다.")
+            .date(LocalDate.now())
+            .isPublic(false)
+            .build();
+
+        doReturn(Optional.of(privateReview)).when(reviewRepository).findById(privateReview.getId());
+        doThrow(new NotFoundException(ErrorCode.REVIEW_NOT_FOUND))
+            .when(reviewRepository).findByReviewIdAndUserId(privateReview.getId(), null);
+
+        // when
+        // then
+        assertThatThrownBy(() -> {
+          reviewService.getReview(user, review.getId());
+        }).isInstanceOf(NotFoundException.class)
+            .hasMessageContaining(ErrorCode.REVIEW_NOT_FOUND.getMessage());
+      }
+
+      @Test
+      @DisplayName("존재하지 않는 전시회를 조회하는 경우 NotFoundException 발생")
+      void testExhibitionNotFoundException() {
+        // given
+        doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
+        doReturn(Optional.of(reviewWithLikeData))
+            .when(reviewRepository).findByReviewIdAndUserId(review.getId(), null);
+        doThrow(new NotFoundException(ErrorCode.EXHB_NOT_FOUND))
+            .when(exhibitionRepository).findExhibitionForReview(any(), any());
+
+        // when
+        // then
+        assertThatThrownBy(() -> {
+          reviewService.getReview(user, review.getId());
+        }).isInstanceOf(NotFoundException.class)
+            .hasMessageContaining(ErrorCode.EXHB_NOT_FOUND.getMessage());
       }
 
     }
