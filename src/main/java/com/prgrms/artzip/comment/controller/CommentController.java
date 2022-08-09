@@ -13,6 +13,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +37,10 @@ public class CommentController {
   @GetMapping("/{commentId}/children")
   public ResponseEntity<ApiResponse<PageResponse<CommentInfo>>> getChildren(
       @PathVariable Long commentId,
-      @PageableDefault Pageable pageable,
+      @PageableDefault(
+          sort = {"createdAt"},
+          direction = Sort.Direction.DESC
+      ) Pageable pageable,
       @CurrentUser User user
   ) {
     PageResponse<CommentInfo> children =

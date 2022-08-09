@@ -27,10 +27,11 @@ import com.prgrms.artzip.review.domain.ReviewPhoto;
 import com.prgrms.artzip.review.domain.repository.ReviewLikeRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewPhotoRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewRepository;
+import com.prgrms.artzip.review.dto.projection.ReviewExhibitionInfo;
 import com.prgrms.artzip.review.dto.projection.ReviewWithLikeData;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
 import com.prgrms.artzip.review.dto.request.ReviewUpdateRequest;
-import com.prgrms.artzip.review.dto.response.ReviewExhibitionInfo;
+import com.prgrms.artzip.review.dto.response.ReviewExhibitionInfoResponse;
 import com.prgrms.artzip.review.dto.response.ReviewIdResponse;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
@@ -762,4 +763,30 @@ class ReviewServiceTest {
 
   }
 
+  @Nested
+  @DisplayName("후기 다건 조회")
+  class TestGetReviews {
+
+    @Nested
+    @DisplayName("실패")
+    class Failure {
+
+      @Test
+      @DisplayName("존재하지 않는 후기를 조회하는 경우 NotFoundException 발생")
+      void testReviewNotFoundException() {
+        // given
+        doThrow(new NotFoundException(ErrorCode.REVIEW_NOT_FOUND))
+            .when(reviewRepository).findById(any());
+
+        // when
+        // then
+        assertThatThrownBy(() -> {
+          reviewService.getReview(user, review.getId());
+        }).isInstanceOf(NotFoundException.class)
+            .hasMessageContaining(ErrorCode.REVIEW_NOT_FOUND.getMessage());
+      }
+
+    }
+
+  }
 }

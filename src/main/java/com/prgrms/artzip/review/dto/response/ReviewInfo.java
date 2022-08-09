@@ -42,4 +42,5 @@ public class ReviewInfo extends ReviewCommentInfo {
     this.likeCount = reviewData.getLikeCount();
     this.photos = photos.stream().map(ReviewPhotoInfo::new).collect(Collectors.toList());
   }
+
 }
