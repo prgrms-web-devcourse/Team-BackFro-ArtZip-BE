@@ -763,4 +763,30 @@ class ReviewServiceTest {
 
   }
 
+  @Nested
+  @DisplayName("후기 다건 조회")
+  class TestGetReviews {
+
+    @Nested
+    @DisplayName("실패")
+    class Failure {
+
+      @Test
+      @DisplayName("존재하지 않는 후기를 조회하는 경우 NotFoundException 발생")
+      void testReviewNotFoundException() {
+        // given
+        doThrow(new NotFoundException(ErrorCode.REVIEW_NOT_FOUND))
+            .when(reviewRepository).findById(any());
+
+        // when
+        // then
+        assertThatThrownBy(() -> {
+          reviewService.getReview(user, review.getId());
+        }).isInstanceOf(NotFoundException.class)
+            .hasMessageContaining(ErrorCode.REVIEW_NOT_FOUND.getMessage());
+      }
+
+    }
+
+  }
 }
