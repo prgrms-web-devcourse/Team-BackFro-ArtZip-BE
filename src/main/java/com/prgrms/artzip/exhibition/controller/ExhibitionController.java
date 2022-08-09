@@ -9,6 +9,7 @@ import com.prgrms.artzip.exhibition.dto.request.ExhibitionCustomConditionRequest
 import com.prgrms.artzip.exhibition.dto.response.ExhibitionDetailInfoResponse;
 import com.prgrms.artzip.exhibition.dto.response.ExhibitionInfoResponse;
 import com.prgrms.artzip.exhibition.dto.response.ExhibitionLikeResponse;
+import com.prgrms.artzip.exhibition.dto.response.ExhibitionsAroundMeResponse;
 import com.prgrms.artzip.exhibition.service.ExhibitionLikeService;
 import com.prgrms.artzip.exhibition.service.ExhibitionSearchService;
 import com.prgrms.artzip.exhibition.service.ExhibitionService;
@@ -145,6 +146,27 @@ public class ExhibitionController {
             exhibitionSearchService.getExhibitionsByCustomCondition(
                 isNull(user) ? null : user.getId(), exhibitionCustomConditionRequest, includeEnd,
                 pageable)))
+        .build();
+
+    return ResponseEntity
+        .ok()
+        .body(apiResponse);
+  }
+
+  @ApiOperation(value = "내 주변 전시회 조회", notes = "내 주변에 있는 전시회를 조회합니다.")
+  @GetMapping("/aroundme")
+  public ResponseEntity<ApiResponse<ExhibitionsAroundMeResponse>> getExhibitionsAroundMe(
+      @CurrentUser User user,
+      @RequestParam(value = "lat", required = false, defaultValue = "37.492001") double latitude,
+      @RequestParam(value = "lng", required = false, defaultValue = "127.029704") double longitude,
+      @RequestParam(value = "dist", required = false, defaultValue = "3") double distance
+  ) {
+    ApiResponse apiResponse = ApiResponse.builder()
+        .message("내 주변의 전시회 조회 성공")
+        .status(HttpStatus.OK.value())
+        .data(new ExhibitionsAroundMeResponse(
+            exhibitionService.getExhibitionsAroundMe(isNull(user) ? null : user.getId(), latitude,
+                longitude, distance)))
         .build();
 
     return ResponseEntity

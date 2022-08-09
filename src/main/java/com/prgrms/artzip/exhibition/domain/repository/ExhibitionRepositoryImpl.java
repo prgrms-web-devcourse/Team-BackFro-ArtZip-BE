@@ -217,6 +217,10 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
                 exhibition.id,
                 exhibition.name,
                 exhibition.thumbnail,
+                new CaseBuilder()
+                    .when(exhibitionLikeForIsLikedUserIdEq(userId))
+                    .then(true)
+                    .otherwise(false).as("isLiked"),
                 exhibition.period,
                 exhibitionLikeForLikeCount.id.countDistinct().as("likeCount"),
                 review.id.countDistinct().as("reviewCount"),
