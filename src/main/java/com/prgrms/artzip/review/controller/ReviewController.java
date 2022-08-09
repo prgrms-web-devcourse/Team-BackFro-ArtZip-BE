@@ -27,6 +27,7 @@ import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -119,7 +120,10 @@ public class ReviewController {
       @ApiParam(value = "조회할 후기의 ID")
       @PathVariable Long reviewId,
       @CurrentUser User user,
-      @PageableDefault Pageable pageable
+      @PageableDefault(
+          sort = {"createdAt"},
+          direction = Sort.Direction.DESC
+      ) Pageable pageable
   ) {
     PageResponse<CommentResponse> comments =
         new PageResponse<>(commentService.getCommentsByReviewId(reviewId, user, pageable));
