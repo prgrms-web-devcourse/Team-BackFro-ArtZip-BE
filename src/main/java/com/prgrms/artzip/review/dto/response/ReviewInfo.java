@@ -28,6 +28,22 @@ public class ReviewInfo extends ReviewCommentInfo {
   private Long likeCount;
   private List<ReviewPhotoInfo> photos;
 
+  public ReviewInfo(Long commentCount, Page<CommentResponse> comments,
+      ReviewWithLikeData reviewData, List<ReviewPhoto> photos) {
+    super(commentCount, comments);
+    this.reviewId = reviewData.getReviewId();
+    this.date = reviewData.getDate();
+    this.title = reviewData.getTitle();
+    this.content = reviewData.getContent();
+    this.createdAt = reviewData.getCreatedAt();
+    this.updatedAt = reviewData.getUpdatedAt();
+    this.isEdited = reviewData.getCreatedAt().isEqual(reviewData.getUpdatedAt()) ? false : true;
+    this.isLiked = reviewData.getIsLiked();
+    this.isPublic = reviewData.getIsPublic();
+    this.likeCount = reviewData.getLikeCount();
+    this.photos = photos.stream().map(ReviewPhotoInfo::new).collect(Collectors.toList());
+  }
+
   public ReviewInfo(ReviewWithLikeAndCommentCount review, List<ReviewPhoto> photos,
       Page<CommentResponse> comments) {
     super(review.getCommentCount(), comments);

@@ -1,6 +1,7 @@
 package com.prgrms.artzip.review.dto.response;
 
 import com.prgrms.artzip.comment.dto.response.CommentResponse;
+import com.prgrms.artzip.exhibition.domain.Exhibition;
 import com.prgrms.artzip.review.domain.ReviewPhoto;
 import com.prgrms.artzip.review.dto.projection.ReviewWithLikeAndCommentCount;
 import com.prgrms.artzip.user.domain.User;
@@ -13,10 +14,13 @@ public class ReviewsResponse extends ReviewInfo {
   private ReviewExhibitionBasicInfoResponse exhibition;
 
   public ReviewsResponse(ReviewWithLikeAndCommentCount review, Page<CommentResponse> comments,
-      List<ReviewPhoto> photos, User user, ReviewExhibitionBasicInfoResponse exhibition) {
+      List<ReviewPhoto> photos, User user, Exhibition exhibition) {
     super(review, photos, comments);
     this.user = new ReviewUserInfo(user);
-    this.exhibition = exhibition;
+    this.exhibition = new ReviewExhibitionBasicInfoResponse(
+        exhibition.getId(),
+        exhibition.getName(),
+        exhibition.getThumbnail());
   }
 
 }
