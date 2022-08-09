@@ -168,7 +168,7 @@ public class ReviewService {
       Exhibition exhibition = exhibitionRepository.findById(review.getExhibition().getId())
           .orElseThrow(() -> new NotFoundException(ErrorCode.EXHB_NOT_FOUND));
       Page<CommentResponse> comments = commentService.getCommentsByReviewId(
-          r.getReviewId(), PageRequest.of(0, 20));
+          r.getReviewId(), reviewUser, PageRequest.of(0, 20));
 
       return new ReviewsResponse(r, comments, reviewPhotos, reviewUser, exhibition);
     }));
