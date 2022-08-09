@@ -32,6 +32,11 @@ public class ExhibitionLikeService {
     }, () -> {
       Exhibition exhibition = exhibitionRepository.findById(exhibitionId)
           .orElseThrow(() -> new InvalidRequestException(EXHB_NOT_FOUND));
+
+      if (exhibition.getIsDeleted()) {
+        throw new InvalidRequestException(EXHB_NOT_FOUND);
+      }
+
       exhibitionLikeRepository.save(new ExhibitionLike(user, exhibition));
     });
 

@@ -94,6 +94,9 @@ public class Exhibition extends BaseEntity {
   @OneToMany(mappedBy = "exhibition")
   private List<Review> reviews = new ArrayList<>();
 
+  @Column(name = "is_deleted", nullable = false)
+  private Boolean isDeleted;
+
   @Builder
   public Exhibition(Integer seq, String name, LocalDate startDate, LocalDate endDate, Genre genre,
       String description, Double latitude, Double longitude, Area area, String place,
@@ -109,6 +112,11 @@ public class Exhibition extends BaseEntity {
     setThumbnail(thumbnail);
     setUrl(url);
     setPlaceUrl(placeUrl);
+    this.isDeleted = false;
+  }
+
+  public void deleteExhibition() {
+    this.isDeleted = true;
   }
 
   private void setSeq(Integer seq) {
