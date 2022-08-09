@@ -1,6 +1,8 @@
 package com.prgrms.artzip.exhibition.service;
 
 import static com.prgrms.artzip.common.ErrorCode.EXHB_NOT_FOUND;
+import static com.prgrms.artzip.common.ErrorCode.INVALID_COORDINATE;
+import static com.prgrms.artzip.common.ErrorCode.INVALID_DISTANCE;
 import static com.prgrms.artzip.exhibition.domain.enumType.Area.GYEONGGI;
 import static com.prgrms.artzip.exhibition.domain.enumType.Area.SEOUL;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -235,27 +237,73 @@ class ExhibitionServiceTest {
     verify(exhibitionRepository).findUserLikeExhibitions(userId, exhibitionLikeUserId, pageRequest);
   }
 
-  @Test
-  @DisplayName("사용자 주변에 있는 전시회 조회 테스트")
-  void testGetExhibitionsAroundMe() {
-    List<ExhibitionWithLocationForSimpleQuery> exhibitions = Arrays.asList(
-        ExhibitionWithLocationForSimpleQuery.builder()
-            .id(11L)
-            .name("요리조리 MOKA Garden")
-            .thumbnail("http://www.culture.go.kr/upload/rdf/22/07/show_2022071411402126915.png")
-            .isLiked(true)
-            .period(new Period(LocalDate.now().plusDays(1), LocalDate.now().plusDays(10)))
-            .likeCount(30)
-            .reviewCount(15)
-            .location(new Location(30.12, 128.12, SEOUL, "서울 어딘가 전시관", "서울특별시 마포구"))
-            .build()
-    );
 
-    when(exhibitionRepository.findExhibitionsAroundMe(null, 35.12, 128.12, 3))
-        .thenReturn(exhibitions);
+  @Nested
+  @DisplayName("getExhibitionsAroundMe() 테스트")
+  class GetExhibitionsAroundMeTest {
 
-    exhibitionService.getExhibitionsAroundMe(null, 35.12, 128.12, 3);
+    @Test
+    @DisplayName("위도 -100인 경우 테스트")
+    void testBelowMinLatitude() {
+      assertThatThrownBy(() -> exhibitionService.getExhibitionsAroundMe(null, -100, 128.12, 3))
+          .isInstanceOf(InvalidRequestException.class)
+          .hasMessage(INVALID_COORDINATE.getMessage());
+    }
 
-    verify(exhibitionRepository).findExhibitionsAroundMe(null, 35.12, 128.12, 3);
+    @Test
+    @DisplayName("위도 100인 경우 테스트")
+    void testOverMaxLatitude() {
+      assertThatThrownBy(() -> exhibitionService.getExhibitionsAroundMe(null, 100, 128.12, 3))
+          .isInstanceOf(InvalidRequestException.class)
+          .hasMessage(INVALID_COORDINATE.getMessage());
+    }
+
+    @Test
+    @DisplayName("위도 -200인 경우 테스트")
+    void testBelowMinLongitude() {
+      assertThatThrownBy(() -> exhibitionService.getExhibitionsAroundMe(null, 35.12, -200, 3))
+          .isInstanceOf(InvalidRequestException.class)
+          .hasMessage(INVALID_COORDINATE.getMessage());
+    }
+
+    @Test
+    @DisplayName("위도 200인 경우 테스트")
+    void testOverMaxLongitude() {
+      assertThatThrownBy(() -> exhibitionService.getExhibitionsAroundMe(null, 35.12, 200, 3))
+          .isInstanceOf(InvalidRequestException.class)
+          .hasMessage(INVALID_COORDINATE.getMessage());
+    }
+
+    @Test
+    @DisplayName("거리 -5인 경우 테스트")
+    void testWrongDistance() {
+      assertThatThrownBy(() -> exhibitionService.getExhibitionsAroundMe(null, 35.12, 128.12, -5))
+          .isInstanceOf(InvalidRequestException.class)
+          .hasMessage(INVALID_DISTANCE.getMessage());
+    }
+
+    @Test
+    @DisplayName("사용자 주변에 있는 전시회 조회 테스트")
+    void testGetExhibitionsAroundMe() {
+      List<ExhibitionWithLocationForSimpleQuery> exhibitions = Arrays.asList(
+          ExhibitionWithLocationForSimpleQuery.builder()
+              .id(11L)
+              .name("요리조리 MOKA Garden")
+              .thumbnail("http://www.culture.go.kr/upload/rdf/22/07/show_2022071411402126915.png")
+              .isLiked(true)
+              .period(new Period(LocalDate.now().plusDays(1), LocalDate.now().plusDays(10)))
+              .likeCount(30)
+              .reviewCount(15)
+              .location(new Location(30.12, 128.12, SEOUL, "서울 어딘가 전시관", "서울특별시 마포구"))
+              .build()
+      );
+
+      when(exhibitionRepository.findExhibitionsAroundMe(null, 35.12, 128.12, 3))
+          .thenReturn(exhibitions);
+
+      exhibitionService.getExhibitionsAroundMe(null, 35.12, 128.12, 3);
+
+      verify(exhibitionRepository).findExhibitionsAroundMe(null, 35.12, 128.12, 3);
+    }
   }
 }
