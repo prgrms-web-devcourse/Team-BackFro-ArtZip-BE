@@ -26,6 +26,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -60,6 +61,9 @@ public class Comment extends BaseEntity {
 
   @OneToMany(mappedBy = "comment")
   private List<CommentLike> commentLikes = new ArrayList<>();
+
+  @Formula("(select count(*) from comment_like where comment_like.comment_id=comment_id)")
+  private Long likeCount;
 
   @Builder
   public Comment(String content, User user, Comment parent, Review review) {

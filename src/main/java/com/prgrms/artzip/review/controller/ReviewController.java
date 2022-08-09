@@ -121,7 +121,10 @@ public class ReviewController {
       @ApiParam(value = "조회할 후기의 ID")
       @PathVariable Long reviewId,
       @CurrentUser User user,
-      @PageableDefault Pageable pageable
+      @PageableDefault(
+          sort = {"createdAt"},
+          direction = Sort.Direction.DESC
+      ) Pageable pageable
   ) {
     PageResponse<CommentResponse> comments =
         new PageResponse<>(commentService.getCommentsByReviewId(reviewId, user, pageable));
