@@ -21,7 +21,7 @@ class ExhibitionLikeTest {
       .name("전시회 제목")
       .startDate(LocalDate.now())
       .endDate(LocalDate.now())
-      .latitude(123.321)
+      .latitude(35.321)
       .longitude(123.123)
       .area(GYEONGGI)
       .place("전시관")

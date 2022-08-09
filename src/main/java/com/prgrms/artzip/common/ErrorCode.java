@@ -51,11 +51,10 @@ public enum ErrorCode {
   /**
    * Exhibition Domain
    */
-  INVALID_EXHBN_SEQ(400, "EX001", "전시회 seq는 필수입니다."),
   INVALID_EXHBN_NAME(400, "EX002", "전시회 이름은 필수입니다.(1 <= 전시회 이름 <= 70)"),
   INVALID_EXHBN_PERIOD(400, "EX003", "전시회 기간 정보는 필수입니다.(startDate <= endDate)"),
   INVALID_EXHBN_DESCRIPTION(400, "EX004", "전시회 설명은 최대 1000자 입니다."),
-  INVALID_EXHBN_COORDINATE(400, "EX005", "전시회 좌표는 필수입니다."),
+  INVALID_EXHBN_COORDINATE(400, "EX005", "전시회 좌표는 필수입니다.(-90 <= 위도 <= 90, -180 <= 경도 <= 180)"),
   INVALID_EXHB_AREA(400, "EX006", "전시회 지역은 필수입니다."),
   INVALID_EXHB_PLACE(400, "EX007", "전시회 장소는 필수입니다.(1 <= 전시회 장소 <= 20)"),
   INVALID_EXHB_ADDRESS(400, "EX008", "전시회 상세 주소는 필수입니다.(1 <= 전시회 주소 <= 100)"),
