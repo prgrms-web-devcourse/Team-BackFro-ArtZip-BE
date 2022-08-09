@@ -8,7 +8,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.Getter;
 
+@Getter
 public class ReviewsResponse {
 
   private Long reviewId;

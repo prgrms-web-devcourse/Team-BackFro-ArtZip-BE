@@ -1,5 +1,8 @@
 package com.prgrms.artzip.review.dto.response;
 
+import lombok.Getter;
+
+@Getter
 public class ReviewExhibitionBasicInfoResponse {
 
   private Long exhibitionId;
