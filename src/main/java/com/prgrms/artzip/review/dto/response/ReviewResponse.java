@@ -14,11 +14,11 @@ import org.springframework.data.domain.Page;
 public class ReviewResponse extends ReviewInfo {
 
   private ReviewUserInfo user;
-  private ReviewExhibitionInfo exhibition;
+  private ReviewExhibitionInfoResponse exhibition;
 
   public ReviewResponse(Long commentCount, Page<CommentResponse> comments,
       ReviewWithLikeData reviewData, List<ReviewPhoto> photos,
-      User user, ReviewExhibitionInfo exhibition) {
+      User user, ReviewExhibitionInfoResponse exhibition) {
     super(commentCount, comments, reviewData, photos);
     this.user = new ReviewUserInfo(user);
     this.exhibition = exhibition;

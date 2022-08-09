@@ -7,30 +7,16 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Getter
-public class ReviewWithLikeData {
+public class ReviewWithLikeData extends ReviewData {
 
-  private Long reviewId;
-  private LocalDate date;
-  private String title;
-  private String content;
-  private LocalDateTime createdAt;
-  private LocalDateTime updatedAt;
   private Boolean isLiked;
-  private Boolean isPublic;
   private Long likeCount;
 
   public ReviewWithLikeData(Long reviewId, LocalDate date, String title, String content,
-      LocalDateTime createdAt, LocalDateTime updatedAt, Boolean isLiked, Boolean isPublic,
+      LocalDateTime createdAt, LocalDateTime updatedAt, Boolean isPublic, Boolean isLiked,
       Long likeCount) {
-    this.reviewId = reviewId;
-    this.date = date;
-    this.title = title;
-    this.content = content;
-    this.createdAt = createdAt;
-    this.updatedAt = updatedAt;
+    super(reviewId, date, title, content, createdAt, updatedAt, isPublic);
     this.isLiked = isLiked;
-    this.isPublic = isPublic;
     this.likeCount = likeCount;
   }
-
 }

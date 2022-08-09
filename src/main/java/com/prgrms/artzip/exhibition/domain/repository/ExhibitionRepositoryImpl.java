@@ -18,7 +18,7 @@ import com.prgrms.artzip.exhibition.dto.projection.ExhibitionBasicForSimpleQuery
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionWithLocationForSimpleQuery;
-import com.prgrms.artzip.review.dto.response.ReviewExhibitionInfo;
+import com.prgrms.artzip.review.dto.projection.ReviewExhibitionInfo;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;

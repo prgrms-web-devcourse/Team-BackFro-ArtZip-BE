@@ -23,7 +23,7 @@ import com.prgrms.artzip.exhibition.dto.projection.ExhibitionDetailForSimpleQuer
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionWithLocationForSimpleQuery;
 import com.prgrms.artzip.review.domain.Review;
-import com.prgrms.artzip.review.dto.response.ReviewExhibitionInfo;
+import com.prgrms.artzip.review.dto.projection.ReviewExhibitionInfo;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import java.time.LocalDate;
