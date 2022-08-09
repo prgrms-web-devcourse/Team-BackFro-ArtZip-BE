@@ -109,7 +109,10 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
             exhibitionLikeForIsLikedUserIdEq(userId))
         .leftJoin(exhibitionLikeForLikeCount)
         .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
-        .where(exhibition.id.eq(exhibitionId))
+        .where(
+            exhibition.id.eq(exhibitionId),
+            exhibitionIsDeletedIsFalse()
+        )
         .groupBy(exhibition.id)
         .fetchOne());
   }
@@ -177,7 +180,10 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
         .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
         .leftJoin(review)
         .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse())
-        .where(exhibitionLikeForExhibitionLikeUser.user.id.eq(exhibitionLikeUserId))
+        .where(
+            exhibitionLikeForExhibitionLikeUser.user.id.eq(exhibitionLikeUserId),
+            exhibitionIsDeletedIsFalse()
+        )
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize())
         .groupBy(exhibition.id, exhibitionLikeForExhibitionLikeUser.createdAt)
@@ -188,7 +194,10 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
         .select(exhibition.count())
         .from(exhibition)
         .join(exhibition.exhibitionLikes, exhibitionLikeForExhibitionLikeUser)
-        .where(exhibitionLikeForExhibitionLikeUser.user.id.eq(exhibitionLikeUserId));
+        .where(
+            exhibitionLikeForExhibitionLikeUser.user.id.eq(exhibitionLikeUserId),
+            exhibitionIsDeletedIsFalse()
+        );
 
     return PageableExecutionUtils.getPage(exhibitions, pageable, countQuery::fetchOne);
   }
@@ -270,7 +279,10 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
         .on(review.exhibition.eq(exhibition),
             review.isDeleted.isFalse(),
             review.isPublic.isTrue())
-        .where(exhibition.id.eq(exhibitionId))
+        .where(
+            exhibition.id.eq(exhibitionId),
+            exhibitionIsDeletedIsFalse()
+        )
         .groupBy(exhibition.id)
         .fetchOne();
 
@@ -320,7 +332,9 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
     BooleanBuilder upcomingCondition = new BooleanBuilder();
     LocalDate today = LocalDate.now();
 
-    upcomingCondition.and(exhibition.period.startDate.goe(today));
+    upcomingCondition
+        .and(exhibition.period.startDate.goe(today))
+        .and(exhibitionIsDeletedIsFalse());
 
     return upcomingCondition;
   }
@@ -329,7 +343,8 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
     BooleanBuilder mostLikeCondition = new BooleanBuilder();
 
     mostLikeCondition
-        .and(!includeEnd ? exhibitionEndDateGoe() : null);
+        .and(!includeEnd ? exhibitionEndDateGoe() : null)
+        .and(exhibitionIsDeletedIsFalse());
 
     return mostLikeCondition;
   }
@@ -339,7 +354,8 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
 
     exhibitionsByQueryCondition
         .and(exhibitionNameContains(query))
-        .and(!includeEnd ? exhibitionEndDateGoe() : null);
+        .and(!includeEnd ? exhibitionEndDateGoe() : null)
+        .and(exhibitionIsDeletedIsFalse());
 
     return exhibitionsByQueryCondition;
   }
@@ -348,7 +364,8 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
     BooleanBuilder exhibitionsForReviewCondition = new BooleanBuilder();
 
     exhibitionsForReviewCondition
-        .and(exhibitionNameContains(query));
+        .and(exhibitionNameContains(query))
+        .and(exhibitionIsDeletedIsFalse());
 
     return exhibitionsForReviewCondition;
   }
@@ -384,7 +401,8 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
     }
 
     customCondition
-        .and(!exhibitionCustomCondition.getIncludeEnd() ? exhibitionEndDateGoe() : null);
+        .and(!exhibitionCustomCondition.getIncludeEnd() ? exhibitionEndDateGoe() : null)
+        .and(exhibitionIsDeletedIsFalse());
 
     return customCondition;
   }
@@ -403,9 +421,14 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
 
     aroundMeCondition
         .and(exhibitionEndDateGoe())
-        .and(distanceExpression.loe(distance));
+        .and(distanceExpression.loe(distance))
+        .and(exhibitionIsDeletedIsFalse());
 
     return aroundMeCondition;
+  }
+
+  private BooleanExpression exhibitionIsDeletedIsFalse() {
+    return exhibition.isDeleted.isFalse();
   }
 
   private BooleanExpression exhibitionLikeForIsLikedUserIdEq(Long userId) {

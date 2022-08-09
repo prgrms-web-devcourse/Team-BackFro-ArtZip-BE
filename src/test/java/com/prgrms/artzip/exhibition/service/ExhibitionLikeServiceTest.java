@@ -85,6 +85,45 @@ class ExhibitionLikeServiceTest {
   }
 
   @Test
+  @DisplayName("삭제된 전시회에 좋아요를 추가하는 경우 테스트")
+  void testAddLikeDeletedExhibition() {
+    Exhibition deletedExhibition = Exhibition.builder()
+        .seq(32)
+        .name("전시회 제목")
+        .startDate(LocalDate.of(2022, 4, 11))
+        .endDate(LocalDate.of(2022, 6, 2))
+        .genre(Genre.FINEART)
+        .description("이것은 전시회 설명입니다.")
+        .latitude(36.22)
+        .longitude(128.02)
+        .area(Area.BUSAN)
+        .place("미술관")
+        .address("부산 동구 중앙대로 11")
+        .inquiry("문의처 정보")
+        .fee("성인 20,000원")
+        .thumbnail("https://www.image-example.com")
+        .url("https://www.example.com")
+        .placeUrl("https://www.place-example.com")
+        .build();
+    deletedExhibition.deleteExhibition();
+
+    when(exhibitionLikeRepository.findByUserIdAndExhibitionId(user.getId(), exhibitionId))
+        .thenReturn(Optional.empty());
+    when(exhibitionRepository.findById(exhibitionId)).thenReturn(Optional.of(deletedExhibition));
+
+    assertThatThrownBy(() -> exhibitionLikeService.updateExhibitionLike(user, exhibitionId))
+        .isInstanceOf(InvalidRequestException.class)
+        .hasMessage(EXHB_NOT_FOUND.getMessage());
+
+    verify(exhibitionLikeRepository).findByUserIdAndExhibitionId(user.getId(), exhibitionId);
+    verify(exhibitionRepository).findById(exhibitionId);
+
+    verify(exhibitionLikeRepository, never()).delete(any());
+    verify(exhibitionLikeRepository, never()).save(any());
+    verify(exhibitionLikeRepository, never()).countByExhibitionId(exhibitionId);
+  }
+
+  @Test
   @DisplayName("좋아요 추가 테스트")
   void testAddLike() {
     when(exhibitionLikeRepository.findByUserIdAndExhibitionId(user.getId(), exhibitionId))

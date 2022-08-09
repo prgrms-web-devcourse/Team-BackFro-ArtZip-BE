@@ -4,7 +4,6 @@ import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHBN_COORDINATE;
 import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHBN_DESCRIPTION;
 import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHBN_NAME;
 import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHBN_PERIOD;
-import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHBN_SEQ;
 import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHB_ADDRESS;
 import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHB_AREA;
 import static com.prgrms.artzip.common.ErrorCode.INVALID_EXHB_FEE;
@@ -94,11 +93,14 @@ public class Exhibition extends BaseEntity {
   @OneToMany(mappedBy = "exhibition")
   private List<Review> reviews = new ArrayList<>();
 
+  @Column(name = "is_deleted", nullable = false)
+  private Boolean isDeleted;
+
   @Builder
   public Exhibition(Integer seq, String name, LocalDate startDate, LocalDate endDate, Genre genre,
       String description, Double latitude, Double longitude, Area area, String place,
       String address, String inquiry, String fee, String thumbnail, String url, String placeUrl) {
-    setSeq(seq);
+    this.seq = seq;
     setName(name);
     setPeriod(startDate, endDate);
     this.genre = genre;
@@ -109,14 +111,11 @@ public class Exhibition extends BaseEntity {
     setThumbnail(thumbnail);
     setUrl(url);
     setPlaceUrl(placeUrl);
+    this.isDeleted = false;
   }
 
-  private void setSeq(Integer seq) {
-    if (isNull(seq)) {
-      throw new InvalidRequestException(INVALID_EXHBN_SEQ);
-    } else {
-      this.seq = seq;
-    }
+  public void deleteExhibition() {
+    this.isDeleted = true;
   }
 
   private void setName(String name) {
@@ -145,7 +144,8 @@ public class Exhibition extends BaseEntity {
 
   private void setLocation(Double latitude, Double longitude, Area area, String place,
       String address) {
-    if (isNull(latitude) || isNull(longitude)) {
+    if (isNull(latitude) || isNull(longitude) || latitude < -90 || latitude > 90 || longitude < -180
+        || longitude > 180) {
       throw new InvalidRequestException(INVALID_EXHBN_COORDINATE);
     } else if (isNull(area)) {
       throw new InvalidRequestException(INVALID_EXHB_AREA);
