@@ -142,7 +142,7 @@ public class ReviewService {
             Objects.isNull(user) ? null : user.getId(), review.getExhibition().getId())
         .orElseThrow(() -> new NotFoundException(ErrorCode.EXHB_NOT_FOUND));
     Page<CommentResponse> comments = commentService.getCommentsByReviewId(
-        reviewId, PageRequest.of(0, 20));
+        reviewId, user, PageRequest.of(0, 20));
     Long reviewCommentCount = commentService.getCommentCountByReviewId(reviewId);
 
     return new ReviewResponse(reviewCommentCount,

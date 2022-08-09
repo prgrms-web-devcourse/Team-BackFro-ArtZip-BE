@@ -7,6 +7,8 @@ import com.prgrms.artzip.common.error.exception.DuplicateRequestException;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.review.domain.Review;
 import com.prgrms.artzip.user.domain.User;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,6 +18,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.prgrms.artzip.user.domain.User;
@@ -55,6 +58,9 @@ public class Comment extends BaseEntity {
   @JoinColumn(name = "review_id")
   private Review review;
 
+  @OneToMany(mappedBy = "comment")
+  private List<CommentLike> commentLikes = new ArrayList<>();
+
   @Builder
   public Comment(String content, User user, Comment parent, Review review) {
     setContent(content);
@@ -73,17 +79,21 @@ public class Comment extends BaseEntity {
     this.content = content;
   }
 
-  private void setUser(User user) {
-    if (Objects.isNull(user)) {
-      throw new InvalidRequestException(ErrorCode.COMMENT_USER_IS_REQUIRED);
-    }
-    this.user = user;
-  }
-
   public void softDelete() {
     if (this.isDeleted) {
       throw new DuplicateRequestException(ErrorCode.COMMENT_ALREADY_DELETED);
     }
     this.isDeleted = true;
+  }
+
+  public void addLike(CommentLike commentLike) {
+    this.commentLikes.add(commentLike);
+  }
+
+  private void setUser(User user) {
+    if (Objects.isNull(user)) {
+      throw new InvalidRequestException(ErrorCode.COMMENT_USER_IS_REQUIRED);
+    }
+    this.user = user;
   }
 }

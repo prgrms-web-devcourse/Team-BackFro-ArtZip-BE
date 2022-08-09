@@ -117,20 +117,21 @@ public class ReviewController {
 
   @ApiOperation(value = "후기 댓글 다건 조회", notes = "후기의 댓글들을 조회합니다.")
   @GetMapping("/{reviewId}/comments")
-  public ResponseEntity<ApiResponse<PageResponse<CommentResponse>>> getComment(
+  public ResponseEntity<ApiResponse<PageResponse<CommentResponse>>> getComments(
       @ApiParam(value = "조회할 후기의 ID")
       @PathVariable Long reviewId,
+      @CurrentUser User user,
       @PageableDefault Pageable pageable
   ) {
     PageResponse<CommentResponse> comments =
-        new PageResponse<>(commentService.getCommentsByReviewId(reviewId, pageable));
+        new PageResponse<>(commentService.getCommentsByReviewId(reviewId, user, pageable));
     ApiResponse<PageResponse<CommentResponse>> response
         = new ApiResponse<>("댓글 다건 조회 성공", HttpStatus.OK.value(), comments);
     return ResponseEntity.ok(response);
   }
 
   @ApiOperation(value = "리뷰 댓글 생성", notes = "리뷰에 댓글을 생성합니다.")
-  @PostMapping("/{reviewId}/comments/new")
+  @PostMapping("/{reviewId}/comments")
   public ResponseEntity<ApiResponse<CommentResponse>> createComment(
       @ApiParam(value = "댓글 생성할 후기의 ID")
       @PathVariable Long reviewId,
