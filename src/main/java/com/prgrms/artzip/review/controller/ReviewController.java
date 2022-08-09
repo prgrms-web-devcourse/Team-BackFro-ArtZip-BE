@@ -200,9 +200,11 @@ public class ReviewController {
             .build());
   }
 
+  @ApiOperation(value = "후기 다건 조회", notes = "후기 다건 조회를 요청합니다.")
   @GetMapping
   public ResponseEntity<ApiResponse<PageResponse<ReviewsResponse>>> getReview(
       @CurrentUser User user,
+      @ApiParam(value = "전시회 ID")
       @RequestParam(value = "exhibitionId", required = false) Long exhibitionId,
       @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
