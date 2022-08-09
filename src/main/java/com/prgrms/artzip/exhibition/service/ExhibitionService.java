@@ -7,8 +7,11 @@ import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.exhibition.domain.repository.ExhibitionRepository;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionForSimpleQuery;
+import com.prgrms.artzip.exhibition.dto.projection.ExhibitionWithLocationForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.response.ExhibitionDetailInfoResponse;
 import com.prgrms.artzip.exhibition.dto.response.ExhibitionInfoResponse;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -69,5 +72,16 @@ public class ExhibitionService {
         .findUserLikeExhibitions(userId, exhibitionLikeUserId, pageable);
 
     return exhibitionsPagingResult.map(ExhibitionInfoResponse::new);
+  }
+
+
+  public List<ExhibitionInfoResponse> getExhibitionsAroundMe(Long userId, double latitude,
+      double longitude, double distance) {
+    List<ExhibitionWithLocationForSimpleQuery> exhibitions = exhibitionRepository.findExhibitionsAroundMe(
+        userId, latitude, longitude, distance);
+
+    return exhibitions.stream()
+        .map(ExhibitionInfoResponse::new)
+        .collect(Collectors.toList());
   }
 }

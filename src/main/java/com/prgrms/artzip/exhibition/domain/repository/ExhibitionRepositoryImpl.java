@@ -208,7 +208,7 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
   }
 
   @Override
-  public List<ExhibitionWithLocationForSimpleQuery> findExhibitionAroundMe(Long userId,
+  public List<ExhibitionWithLocationForSimpleQuery> findExhibitionsAroundMe(Long userId,
       double latitude, double longitude, double distance) {
     BooleanBuilder aroundMeCondition = getAroundMeCondition(latitude, longitude, distance);
 

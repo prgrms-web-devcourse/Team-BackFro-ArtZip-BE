@@ -851,7 +851,7 @@ class ExhibitionRepositoryTest {
     @DisplayName("내 주변 전시회 3KM 조건 테스트")
     void testAroundMe3KM() {
       List<ExhibitionWithLocationForSimpleQuery> exhibitions = exhibitionRepository
-          .findExhibitionAroundMe(null, 37.492001, 127.029704, 3);
+          .findExhibitionsAroundMe(null, 37.492001, 127.029704, 3);
 
       assertThat(exhibitions).hasSize(1);
       assertThat(exhibitions.get(0))

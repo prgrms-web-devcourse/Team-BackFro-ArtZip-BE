@@ -31,7 +31,7 @@ public interface ExhibitionCustomRepository {
   Page<ExhibitionForSimpleQuery> findExhibitionsByCustomCondition(Long userId,
       ExhibitionCustomCondition exhibitionCustomCondition, Pageable pageable);
 
-  List<ExhibitionWithLocationForSimpleQuery> findExhibitionAroundMe(Long userId, double latitude,
+  List<ExhibitionWithLocationForSimpleQuery> findExhibitionsAroundMe(Long userId, double latitude,
       double longitude, double distance);
 
   Optional<ReviewExhibitionInfo> findExhibitionForReview(Long userId, Long exhibitionId);

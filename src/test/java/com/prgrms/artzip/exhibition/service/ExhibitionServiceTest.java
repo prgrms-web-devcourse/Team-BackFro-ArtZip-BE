@@ -2,6 +2,7 @@ package com.prgrms.artzip.exhibition.service;
 
 import static com.prgrms.artzip.common.ErrorCode.EXHB_NOT_FOUND;
 import static com.prgrms.artzip.exhibition.domain.enumType.Area.GYEONGGI;
+import static com.prgrms.artzip.exhibition.domain.enumType.Area.SEOUL;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -11,16 +12,17 @@ import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.exhibition.domain.Exhibition;
 import com.prgrms.artzip.exhibition.domain.enumType.Area;
 import com.prgrms.artzip.exhibition.domain.enumType.Genre;
-import com.prgrms.artzip.exhibition.domain.repository.ExhibitionLikeRepository;
 import com.prgrms.artzip.exhibition.domain.repository.ExhibitionRepository;
 import com.prgrms.artzip.exhibition.domain.vo.Location;
 import com.prgrms.artzip.exhibition.domain.vo.Period;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionForSimpleQuery;
+import com.prgrms.artzip.exhibition.dto.projection.ExhibitionWithLocationForSimpleQuery;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -40,9 +42,6 @@ class ExhibitionServiceTest {
 
   @Mock
   private ExhibitionRepository exhibitionRepository;
-
-  @Mock
-  private ExhibitionLikeRepository exhibitionLikeRepository;
 
   @InjectMocks
   private ExhibitionService exhibitionService;
@@ -234,5 +233,29 @@ class ExhibitionServiceTest {
 
     // then
     verify(exhibitionRepository).findUserLikeExhibitions(userId, exhibitionLikeUserId, pageRequest);
+  }
+
+  @Test
+  @DisplayName("사용자 주변에 있는 전시회 조회 테스트")
+  void testGetExhibitionsAroundMe() {
+    List<ExhibitionWithLocationForSimpleQuery> exhibitions = Arrays.asList(
+        ExhibitionWithLocationForSimpleQuery.builder()
+            .id(11L)
+            .name("요리조리 MOKA Garden")
+            .thumbnail("http://www.culture.go.kr/upload/rdf/22/07/show_2022071411402126915.png")
+            .isLiked(true)
+            .period(new Period(LocalDate.now().plusDays(1), LocalDate.now().plusDays(10)))
+            .likeCount(30)
+            .reviewCount(15)
+            .location(new Location(30.12, 128.12, SEOUL, "서울 어딘가 전시관", "서울특별시 마포구"))
+            .build()
+    );
+
+    when(exhibitionRepository.findExhibitionsAroundMe(null, 35.12, 128.12, 3))
+        .thenReturn(exhibitions);
+
+    exhibitionService.getExhibitionsAroundMe(null, 35.12, 128.12, 3);
+
+    verify(exhibitionRepository).findExhibitionsAroundMe(null, 35.12, 128.12, 3);
   }
 }
