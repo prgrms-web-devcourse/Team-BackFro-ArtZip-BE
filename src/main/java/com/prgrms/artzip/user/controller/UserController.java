@@ -174,7 +174,7 @@ public class UserController {
   }
 
   @ApiOperation(value = "토큰 재발행", notes = "토큰을 재발행합니다.")
-  @GetMapping("/token/reissue")
+  @PostMapping("/token/reissue")
   public ResponseEntity<ApiResponse<LoginResponse>> reissueAccessToken(@RequestBody @Valid
   TokenReissueRequest request) {
     User user = userUtilService.getUserById(request.getUserId());
