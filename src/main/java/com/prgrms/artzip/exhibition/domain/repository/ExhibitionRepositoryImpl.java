@@ -3,6 +3,10 @@ package com.prgrms.artzip.exhibition.domain.repository;
 import static com.prgrms.artzip.exhibition.domain.QExhibition.exhibition;
 import static com.prgrms.artzip.exhibition.domain.QExhibitionLike.exhibitionLike;
 import static com.prgrms.artzip.review.domain.QReview.review;
+import static com.querydsl.core.types.dsl.MathExpressions.acos;
+import static com.querydsl.core.types.dsl.MathExpressions.cos;
+import static com.querydsl.core.types.dsl.MathExpressions.radians;
+import static com.querydsl.core.types.dsl.MathExpressions.sin;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
@@ -13,6 +17,7 @@ import com.prgrms.artzip.exhibition.dto.ExhibitionCustomCondition;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionBasicForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionForSimpleQuery;
+import com.prgrms.artzip.exhibition.dto.projection.ExhibitionWithLocationForSimpleQuery;
 import com.prgrms.artzip.review.dto.response.ReviewExhibitionInfo;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
@@ -21,6 +26,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
@@ -202,6 +208,40 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
   }
 
   @Override
+  public List<ExhibitionWithLocationForSimpleQuery> findExhibitionsAroundMe(Long userId,
+      double latitude, double longitude, double distance) {
+    BooleanBuilder aroundMeCondition = getAroundMeCondition(latitude, longitude, distance);
+
+    return queryFactory
+        .select(Projections.fields(ExhibitionWithLocationForSimpleQuery.class,
+                exhibition.id,
+                exhibition.name,
+                exhibition.thumbnail,
+                new CaseBuilder()
+                    .when(exhibitionLikeForIsLikedUserIdEq(userId))
+                    .then(true)
+                    .otherwise(false).as("isLiked"),
+                exhibition.period,
+                exhibitionLikeForLikeCount.id.countDistinct().as("likeCount"),
+                review.id.countDistinct().as("reviewCount"),
+                exhibition.location
+            )
+        )
+        .from(exhibition)
+        .where(aroundMeCondition)
+        .leftJoin(exhibitionLikeForIsLiked)
+        .on(exhibitionLikeForIsLiked.exhibition.eq(exhibition),
+            exhibitionLikeForIsLikedUserIdEq(userId))
+        .leftJoin(exhibitionLikeForLikeCount)
+        .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
+        .leftJoin(review)
+        .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse())
+        .groupBy(exhibition.id)
+        .fetch();
+  }
+
+
+  @Override
   public Optional<ReviewExhibitionInfo> findExhibitionForReview(
       Long userId, Long exhibitionId) {
 
@@ -216,7 +256,7 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
                     .when(exhibitionLikeForIsLikedUserIdEq(userId))
                     .then(true)
                     .otherwise(false).as("isLiked"),
-            exhibitionLike.id.countDistinct().as("likeCount"),
+                exhibitionLike.id.countDistinct().as("likeCount"),
                 review.id.countDistinct().as("reviewCount")
             )
         )
@@ -347,6 +387,25 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
         .and(!exhibitionCustomCondition.getIncludeEnd() ? exhibitionEndDateGoe() : null);
 
     return customCondition;
+  }
+
+  private BooleanBuilder getAroundMeCondition(double latitude, double longitude, double distance) {
+    BooleanBuilder aroundMeCondition = new BooleanBuilder();
+
+    NumberExpression<Double> distanceExpression = acos(
+        sin(radians(Expressions.constant(latitude)))
+            .multiply(sin(radians(exhibition.location.latitude)))
+            .add(cos(radians(Expressions.constant(latitude)))
+                .multiply(cos(radians(exhibition.location.latitude)))
+                .multiply(cos(radians(Expressions.constant(longitude))
+                    .subtract(radians(exhibition.location.longitude)))))
+    ).multiply(6371);
+
+    aroundMeCondition
+        .and(exhibitionEndDateGoe())
+        .and(distanceExpression.loe(distance));
+
+    return aroundMeCondition;
   }
 
   private BooleanExpression exhibitionLikeForIsLikedUserIdEq(Long userId) {

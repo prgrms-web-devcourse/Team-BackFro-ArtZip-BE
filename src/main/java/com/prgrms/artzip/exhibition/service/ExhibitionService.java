@@ -1,14 +1,20 @@
 package com.prgrms.artzip.exhibition.service;
 
 import static com.prgrms.artzip.common.ErrorCode.EXHB_NOT_FOUND;
+import static com.prgrms.artzip.common.ErrorCode.INVALID_COORDINATE;
+import static com.prgrms.artzip.common.ErrorCode.INVALID_DISTANCE;
 import static org.springframework.util.StringUtils.hasText;
 
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.exhibition.domain.repository.ExhibitionRepository;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionForSimpleQuery;
+import com.prgrms.artzip.exhibition.dto.projection.ExhibitionWithLocationForSimpleQuery;
+import com.prgrms.artzip.exhibition.dto.response.ExhibitionAroundMeInfoResponse;
 import com.prgrms.artzip.exhibition.dto.response.ExhibitionDetailInfoResponse;
 import com.prgrms.artzip.exhibition.dto.response.ExhibitionInfoResponse;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -69,5 +75,30 @@ public class ExhibitionService {
         .findUserLikeExhibitions(userId, exhibitionLikeUserId, pageable);
 
     return exhibitionsPagingResult.map(ExhibitionInfoResponse::new);
+  }
+
+  public List<ExhibitionAroundMeInfoResponse> getExhibitionsAroundMe(Long userId, double latitude,
+      double longitude, double distance) {
+    validateCoordinate(latitude, longitude);
+    validateDistance(distance);
+
+    List<ExhibitionWithLocationForSimpleQuery> exhibitions = exhibitionRepository.findExhibitionsAroundMe(
+        userId, latitude, longitude, distance);
+
+    return exhibitions.stream()
+        .map(ExhibitionAroundMeInfoResponse::new)
+        .collect(Collectors.toList());
+  }
+
+  private void validateCoordinate(double latitude, double longitude) {
+    if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+      throw new InvalidRequestException(INVALID_COORDINATE);
+    }
+  }
+
+  private void validateDistance(double distance) {
+    if (distance <= 0) {
+      throw new InvalidRequestException(INVALID_DISTANCE);
+    }
   }
 }
