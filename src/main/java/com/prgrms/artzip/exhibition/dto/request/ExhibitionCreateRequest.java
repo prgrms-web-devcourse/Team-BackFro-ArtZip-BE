@@ -4,9 +4,7 @@ import com.prgrms.artzip.exhibition.domain.enumType.Area;
 import com.prgrms.artzip.exhibition.domain.enumType.Genre;
 import java.time.LocalDate;
 import javax.validation.constraints.NotNull;
-import lombok.Getter;
 
-@Getter
 public record ExhibitionCreateRequest(@NotNull String name, String description,
                                       @NotNull String fee,
                                       Genre genre,
