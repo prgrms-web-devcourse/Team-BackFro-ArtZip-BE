@@ -116,7 +116,7 @@ public class UserController {
 
   @ApiOperation(value = "유저 정보 조회", notes = "유저 정보를 조회합니다.")
   @GetMapping("/{userId}/info")
-  public ResponseEntity<ApiResponse<UserRepository>> getUserInfo(
+  public ResponseEntity<ApiResponse<UserResponse>> getUserInfo(
       @PathVariable("userId") Long userId) {
     User user = userUtilService.getUserById(userId);
     UserResponse userResponse = UserResponse.builder()
