@@ -494,11 +494,6 @@ class ExhibitionRepositoryTest {
           .build();
       em.persist(exhibitionGyeonggi);
 
-      System.out.println("시발");
-      System.out.println(LocalDate.now());
-      System.out.println(exhibitionAtBusan.getPeriod().getStartDate());
-      System.out.println(exhibitionGyeonggi.getPeriod().getStartDate());
-
       em.flush();
       em.clear();
     }
