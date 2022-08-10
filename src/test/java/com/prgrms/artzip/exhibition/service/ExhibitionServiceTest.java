@@ -6,8 +6,6 @@ import static com.prgrms.artzip.common.ErrorCode.INVALID_DISTANCE;
 import static com.prgrms.artzip.exhibition.domain.enumType.Area.GYEONGGI;
 import static com.prgrms.artzip.exhibition.domain.enumType.Area.SEOUL;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -22,15 +20,17 @@ import com.prgrms.artzip.exhibition.domain.vo.Period;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionWithLocationForSimpleQuery;
-import com.prgrms.artzip.review.domain.repository.ReviewRepository;
-import com.prgrms.artzip.review.dto.projection.ReviewWithLikeAndCommentCount;
+import com.prgrms.artzip.review.domain.Review;
+import com.prgrms.artzip.review.domain.ReviewPhoto;
+import com.prgrms.artzip.review.dto.response.ReviewPhotoInfo;
+import com.prgrms.artzip.review.dto.response.ReviewUserInfo;
 import com.prgrms.artzip.review.dto.response.ReviewsResponseForExhibitionDetail;
+import com.prgrms.artzip.review.service.ReviewService;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -43,7 +43,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ExhibitionService 테스트")
@@ -53,7 +52,7 @@ class ExhibitionServiceTest {
   private ExhibitionRepository exhibitionRepository;
 
   @Mock
-  private ReviewRepository reviewRepository;
+  private ReviewService reviewService;
 
   @InjectMocks
   private ExhibitionService exhibitionService;
@@ -185,6 +184,31 @@ class ExhibitionServiceTest {
         .likeCount(5)
         .build();
 
+    Review review = new Review(user,
+        exhibition,
+        "리뷰 내용",
+        "리뷰 제목",
+        LocalDate.now(),
+        true);
+
+    List<ReviewsResponseForExhibitionDetail> reviews = Arrays.asList(
+        ReviewsResponseForExhibitionDetail.builder()
+            .reviewId(1L)
+            .user(new ReviewUserInfo(user))
+            .date(review.getDate())
+            .title(review.getTitle())
+            .content(review.getContent())
+            .createdAt(review.getCreatedAt())
+            .updatedAt(review.getUpdatedAt())
+            .isEdited(false)
+            .isPublic(review.getIsPublic())
+            .isLiked(true)
+            .likeCount(1L)
+            .commentCount(0L)
+            .photos(Arrays.asList(new ReviewPhotoInfo(
+                new ReviewPhoto(review, "https://www.review-photo-path"))))
+            .build());
+
     @Test
     @DisplayName("존재하지 않는 게시물인 경우")
     void testExhibitionNotFound() {
@@ -198,31 +222,29 @@ class ExhibitionServiceTest {
     @Test
     @DisplayName("인증된 사용자이며 좋아요를 누른 경우")
     void testAuthorizedLike() {
-      Page<ReviewWithLikeAndCommentCount> reviews = Page.empty();
       when(exhibitionRepository.findExhibition(userId, exhibitionId))
           .thenReturn(Optional.of(exhibitionDetail1));
-      when(reviewRepository.findReviewsByExhibitionIdAndUserId(exhibitionId, userId,
-          PageRequest.of(0, 4, Sort.by("reviewLikeCount").descending())))
+      when(reviewService.getReviewsForExhibition(userId, exhibitionId))
           .thenReturn(reviews);
 
       exhibitionService.getExhibition(userId, exhibitionId);
 
       verify(exhibitionRepository).findExhibition(userId, exhibitionId);
+      verify(reviewService).getReviewsForExhibition(userId, exhibitionId);
     }
 
     @Test
     @DisplayName("인증된 사용자이며 좋아요를 누르지 않은 경우")
     void testAuthorizedNotLike() {
-      Page<ReviewWithLikeAndCommentCount> reviews = Page.empty();
       when(exhibitionRepository.findExhibition(null, exhibitionId))
           .thenReturn(Optional.of(exhibitionDetail2));
-      when(reviewRepository.findReviewsByExhibitionIdAndUserId(exhibitionId, null,
-          PageRequest.of(0, 4, Sort.by("reviewLikeCount").descending())))
+      when(reviewService.getReviewsForExhibition(null, exhibitionId))
           .thenReturn(reviews);
 
       exhibitionService.getExhibition(null, exhibitionId);
 
       verify(exhibitionRepository).findExhibition(null, exhibitionId);
+      verify(reviewService).getReviewsForExhibition(null, exhibitionId);
     }
   }
 

@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
 public class ReviewsResponseForExhibitionDetail {
 
   private Long reviewId;
@@ -43,5 +43,26 @@ public class ReviewsResponseForExhibitionDetail {
     this.likeCount = review.getLikeCount();
     this.commentCount = review.getCommentCount();
     this.photos = photos.stream().map(ReviewPhotoInfo::new).collect(Collectors.toList());
+  }
+
+  @Builder
+  public ReviewsResponseForExhibitionDetail(Long reviewId,
+      ReviewUserInfo user, LocalDate date, String title, String content,
+      LocalDateTime createdAt, LocalDateTime updatedAt, Boolean isEdited, Boolean isLiked,
+      Boolean isPublic, Long likeCount, Long commentCount,
+      List<ReviewPhotoInfo> photos) {
+    this.reviewId = reviewId;
+    this.user = user;
+    this.date = date;
+    this.title = title;
+    this.content = content;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+    this.isEdited = isEdited;
+    this.isLiked = isLiked;
+    this.isPublic = isPublic;
+    this.likeCount = likeCount;
+    this.commentCount = commentCount;
+    this.photos = photos;
   }
 }
