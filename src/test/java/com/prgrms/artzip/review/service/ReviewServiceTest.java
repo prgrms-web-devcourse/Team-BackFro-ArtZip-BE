@@ -3,6 +3,7 @@ package com.prgrms.artzip.review.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -13,6 +14,8 @@ import com.prgrms.artzip.comment.domain.Comment;
 import com.prgrms.artzip.comment.repository.CommentRepository;
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.ErrorCode;
+import com.prgrms.artzip.common.PageResponse;
+import com.prgrms.artzip.common.entity.BaseEntity;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
 import com.prgrms.artzip.common.error.exception.PermissionDeniedException;
@@ -33,14 +36,13 @@ import com.prgrms.artzip.review.dto.projection.ReviewWithLikeData;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
 import com.prgrms.artzip.review.dto.request.ReviewUpdateRequest;
 import com.prgrms.artzip.review.dto.response.ReviewIdResponse;
-import com.prgrms.artzip.review.dto.response.ReviewPhotoInfo;
-import com.prgrms.artzip.review.dto.response.ReviewUserInfo;
-import com.prgrms.artzip.review.dto.response.ReviewsResponseForExhibitionDetail;
+import com.prgrms.artzip.review.dto.response.ReviewsResponse;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -60,6 +62,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
@@ -776,26 +779,270 @@ class ReviewServiceTest {
   @DisplayName("후기 다건 조회")
   class TestGetReviews {
 
-    Page<ReviewWithLikeAndCommentCount> reviews = new PageImpl<>(Arrays.asList(
-        new ReviewWithLikeAndCommentCount(
+    Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+
+    @Nested
+    @DisplayName("성공")
+    class Success {
+
+      @Test
+      @DisplayName("user == null인 경우 후기 다건 조회 성공 (좋아요 여부 포함X)")
+      void testUserIsNull() {
+        User reflectionUser = new User(
+            "test@example.com",
+            "Emily",
+            List.of(new Role(Authority.USER)));
+        ReflectionTestUtils.setField(
+            reflectionUser,
+            User.class,
+            "id",
             1L,
-            review.getDate(),
-            review.getTitle(),
-            review.getContent(),
-            review.getCreatedAt(),
-            review.getUpdatedAt(),
-            true,
-            false,
-            0L,
-            0L
-        )
-    ));
+            Long.class
+        );
+
+        Exhibition reflectionExhibition = Exhibition.builder()
+            .seq(32)
+            .name("전시회 제목")
+            .startDate(LocalDate.of(2022, 4, 11))
+            .endDate(LocalDate.of(2022, 6, 2))
+            .genre(Genre.FINEART)
+            .description("이것은 전시회 설명입니다.")
+            .latitude(36.22)
+            .longitude(128.02)
+            .area(Area.BUSAN)
+            .place("미술관")
+            .address("부산 동구 중앙대로 11")
+            .inquiry("문의처 정보")
+            .fee("성인 20,000원")
+            .thumbnail("https://www.image-example.com")
+            .url("https://www.example.com")
+            .placeUrl("https://www.place-example.com")
+            .build();
+        ReflectionTestUtils.setField(
+            reflectionExhibition,
+            Exhibition.class,
+            "id",
+            1L,
+            Long.class
+        );
+        ReflectionTestUtils.setField(
+            reflectionExhibition,
+            BaseEntity.class,
+            "createdAt",
+            LocalDateTime.of(2022, 4, 11, 1, 36),
+            LocalDateTime.class
+        );
+        ReflectionTestUtils.setField(
+            reflectionExhibition,
+            BaseEntity.class,
+            "updatedAt",
+            LocalDateTime.of(2022, 4, 11, 1, 36),
+            LocalDateTime.class
+        );
+
+        Review reflectionReview =  Review.builder()
+            .user(reflectionUser)
+            .exhibition(reflectionExhibition)
+            .content("이것은 리뷰 본문입니다.")
+            .title("이것은 리뷰 제목입니다.")
+            .date(LocalDate.now())
+            .isPublic(true)
+            .build();
+        ReflectionTestUtils.setField(
+            reflectionReview,
+            Review.class,
+            "id",
+            1L,
+            Long.class
+        );
+        ReflectionTestUtils.setField(
+            reflectionReview,
+            BaseEntity.class,
+            "createdAt",
+            LocalDateTime.of(2022, 5, 5, 15, 6),
+            LocalDateTime.class
+        );
+        ReflectionTestUtils.setField(
+            reflectionReview,
+            BaseEntity.class,
+            "updatedAt",
+            LocalDateTime.of(2022, 5, 5, 15, 6),
+            LocalDateTime.class
+        );
+
+        List<ReviewWithLikeAndCommentCount> contents = Arrays.asList(
+            new ReviewWithLikeAndCommentCount(
+                1L,
+                reflectionReview.getDate(),
+                reflectionReview.getTitle(),
+                reflectionReview.getContent(),
+                reflectionReview.getCreatedAt(),
+                reflectionReview.getUpdatedAt(),
+                true,
+                false,
+                0L,
+                0L
+            ));
+
+        Page<ReviewWithLikeAndCommentCount> reflectionReviews = new PageImpl<>(contents,
+            pageable,
+            1L
+        );
+
+        given(reviewRepository.findReviewsByExhibitionIdAndUserId(
+            reflectionExhibition.getId(), null, pageable))
+            .willReturn(reflectionReviews);
+        given(reviewRepository.findById(reflectionReviews.getContent().get(0).getReviewId()))
+            .willReturn(Optional.of(reflectionReview));
+        given(exhibitionRepository.findById(reflectionReview.getExhibition().getId()))
+            .willReturn(Optional.of(reflectionExhibition));
+
+        reviewService.getReviews(null, reflectionExhibition.getId(), pageable);
+
+        verify(reviewRepository).findReviewsByExhibitionIdAndUserId(reflectionExhibition.getId(), null, pageable);
+        verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(reflectionReview.getId());
+        verify(exhibitionRepository, times(reflectionReviews.getContent().size())).findById(reflectionExhibition.getId());
+      }
+
+      @Test
+      @DisplayName("user == null인 경우 후기 다건 조회 성공 (좋아요 여부 포함O)")
+      void testUserIsNotNull() {
+        User reflectionUser = new User(
+            "test@example.com",
+            "Emily",
+            List.of(new Role(Authority.USER)));
+        ReflectionTestUtils.setField(
+            reflectionUser,
+            User.class,
+            "id",
+            1L,
+            Long.class
+        );
+
+        Exhibition reflectionExhibition = Exhibition.builder()
+            .seq(32)
+            .name("전시회 제목")
+            .startDate(LocalDate.of(2022, 4, 11))
+            .endDate(LocalDate.of(2022, 6, 2))
+            .genre(Genre.FINEART)
+            .description("이것은 전시회 설명입니다.")
+            .latitude(36.22)
+            .longitude(128.02)
+            .area(Area.BUSAN)
+            .place("미술관")
+            .address("부산 동구 중앙대로 11")
+            .inquiry("문의처 정보")
+            .fee("성인 20,000원")
+            .thumbnail("https://www.image-example.com")
+            .url("https://www.example.com")
+            .placeUrl("https://www.place-example.com")
+            .build();
+        ReflectionTestUtils.setField(
+            reflectionExhibition,
+            Exhibition.class,
+            "id",
+            1L,
+            Long.class
+        );
+        ReflectionTestUtils.setField(
+            reflectionExhibition,
+            BaseEntity.class,
+            "createdAt",
+            LocalDateTime.of(2022, 4, 11, 1, 36),
+            LocalDateTime.class
+        );
+        ReflectionTestUtils.setField(
+            reflectionExhibition,
+            BaseEntity.class,
+            "updatedAt",
+            LocalDateTime.of(2022, 4, 11, 1, 36),
+            LocalDateTime.class
+        );
+
+        Review reflectionReview =  Review.builder()
+            .user(reflectionUser)
+            .exhibition(reflectionExhibition)
+            .content("이것은 리뷰 본문입니다.")
+            .title("이것은 리뷰 제목입니다.")
+            .date(LocalDate.now())
+            .isPublic(true)
+            .build();
+        ReflectionTestUtils.setField(
+            reflectionReview,
+            Review.class,
+            "id",
+            1L,
+            Long.class
+        );
+        ReflectionTestUtils.setField(
+            reflectionReview,
+            BaseEntity.class,
+            "createdAt",
+            LocalDateTime.of(2022, 5, 5, 15, 6),
+            LocalDateTime.class
+        );
+        ReflectionTestUtils.setField(
+            reflectionReview,
+            BaseEntity.class,
+            "updatedAt",
+            LocalDateTime.of(2022, 5, 5, 15, 6),
+            LocalDateTime.class
+        );
+
+        List<ReviewWithLikeAndCommentCount> contents = Arrays.asList(
+            new ReviewWithLikeAndCommentCount(
+                1L,
+                reflectionReview.getDate(),
+                reflectionReview.getTitle(),
+                reflectionReview.getContent(),
+                reflectionReview.getCreatedAt(),
+                reflectionReview.getUpdatedAt(),
+                true,
+                false,
+                0L,
+                0L
+            ));
+
+        Page<ReviewWithLikeAndCommentCount> reflectionReviews = new PageImpl<>(contents,
+            pageable,
+            1L
+        );
+
+        given(reviewRepository.findReviewsByExhibitionIdAndUserId(
+            reflectionExhibition.getId(), reflectionUser.getId(), pageable))
+            .willReturn(reflectionReviews);
+        given(reviewRepository.findById(reflectionReviews.getContent().get(0).getReviewId()))
+            .willReturn(Optional.of(reflectionReview));
+        given(exhibitionRepository.findById(reflectionReview.getExhibition().getId()))
+            .willReturn(Optional.of(reflectionExhibition));
+
+        reviewService.getReviews(reflectionUser, reflectionExhibition.getId(), pageable);
+
+        verify(reviewRepository).findReviewsByExhibitionIdAndUserId(reflectionExhibition.getId(), reflectionUser.getId(), pageable);
+        verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(reflectionReview.getId());
+        verify(exhibitionRepository, times(reflectionReviews.getContent().size())).findById(reflectionExhibition.getId());
+      }
+
+    }
 
     @Nested
     @DisplayName("실패")
     class Failure {
 
-      Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+      Page<ReviewWithLikeAndCommentCount> reviews = new PageImpl<>(Arrays.asList(
+          new ReviewWithLikeAndCommentCount(
+              1L,
+              review.getDate(),
+              review.getTitle(),
+              review.getContent(),
+              review.getCreatedAt(),
+              review.getUpdatedAt(),
+              true,
+              false,
+              0L,
+              0L
+          )
+      ));
 
       @Test
       @DisplayName("존재하지 않는 후기를 조회하는 경우 NotFoundException 발생")
@@ -825,32 +1072,269 @@ class ReviewServiceTest {
 
     Pageable pageable = PageRequest.of(0, 4, Sort.by("reviewLikeCount").descending());
 
-    Review review = new Review(user,
-        exhibition,
-        "리뷰 내용",
-        "리뷰 제목",
-        LocalDate.now(),
-        true);
+    @Nested
+    @DisplayName("성공")
+    class Success {
 
-    Page<ReviewWithLikeAndCommentCount> reviews = new PageImpl<>(Arrays.asList(
-        new ReviewWithLikeAndCommentCount(
+      @Test
+      @DisplayName("user == null인 경우 후기 다건 조회 성공 (좋아요 여부 포함X)")
+      void testUserIsNull() {
+        User reflectionUser = new User(
+            "test@example.com",
+            "Emily",
+            List.of(new Role(Authority.USER)));
+        ReflectionTestUtils.setField(
+            reflectionUser,
+            User.class,
+            "id",
             1L,
-            review.getDate(),
-            review.getTitle(),
-            review.getContent(),
-            review.getCreatedAt(),
-            review.getUpdatedAt(),
-            true,
-            false,
-            0L,
-            0L
-        )
-    ));
+            Long.class
+        );
 
+        Exhibition reflectionExhibition = Exhibition.builder()
+            .seq(32)
+            .name("전시회 제목")
+            .startDate(LocalDate.of(2022, 4, 11))
+            .endDate(LocalDate.of(2022, 6, 2))
+            .genre(Genre.FINEART)
+            .description("이것은 전시회 설명입니다.")
+            .latitude(36.22)
+            .longitude(128.02)
+            .area(Area.BUSAN)
+            .place("미술관")
+            .address("부산 동구 중앙대로 11")
+            .inquiry("문의처 정보")
+            .fee("성인 20,000원")
+            .thumbnail("https://www.image-example.com")
+            .url("https://www.example.com")
+            .placeUrl("https://www.place-example.com")
+            .build();
+        ReflectionTestUtils.setField(
+            reflectionExhibition,
+            Exhibition.class,
+            "id",
+            1L,
+            Long.class
+        );
+        ReflectionTestUtils.setField(
+            reflectionExhibition,
+            BaseEntity.class,
+            "createdAt",
+            LocalDateTime.of(2022, 4, 11, 1, 36),
+            LocalDateTime.class
+        );
+        ReflectionTestUtils.setField(
+            reflectionExhibition,
+            BaseEntity.class,
+            "updatedAt",
+            LocalDateTime.of(2022, 4, 11, 1, 36),
+            LocalDateTime.class
+        );
+
+        Review reflectionReview =  Review.builder()
+            .user(reflectionUser)
+            .exhibition(reflectionExhibition)
+            .content("이것은 리뷰 본문입니다.")
+            .title("이것은 리뷰 제목입니다.")
+            .date(LocalDate.now())
+            .isPublic(true)
+            .build();
+        ReflectionTestUtils.setField(
+            reflectionReview,
+            Review.class,
+            "id",
+            1L,
+            Long.class
+        );
+        ReflectionTestUtils.setField(
+            reflectionReview,
+            BaseEntity.class,
+            "createdAt",
+            LocalDateTime.of(2022, 5, 5, 15, 6),
+            LocalDateTime.class
+        );
+        ReflectionTestUtils.setField(
+            reflectionReview,
+            BaseEntity.class,
+            "updatedAt",
+            LocalDateTime.of(2022, 5, 5, 15, 6),
+            LocalDateTime.class
+        );
+
+        List<ReviewWithLikeAndCommentCount> contents = Arrays.asList(
+            new ReviewWithLikeAndCommentCount(
+                1L,
+                reflectionReview.getDate(),
+                reflectionReview.getTitle(),
+                reflectionReview.getContent(),
+                reflectionReview.getCreatedAt(),
+                reflectionReview.getUpdatedAt(),
+                true,
+                false,
+                0L,
+                0L
+            ));
+
+        Page<ReviewWithLikeAndCommentCount> reflectionReviews = new PageImpl<>(contents,
+            pageable,
+            1L
+        );
+
+        given(reviewRepository.findReviewsByExhibitionIdAndUserId(
+            reflectionExhibition.getId(), null, pageable))
+            .willReturn(reflectionReviews);
+        given(reviewRepository.findById(reflectionReviews.getContent().get(0).getReviewId()))
+            .willReturn(Optional.of(reflectionReview));
+
+        reviewService.getReviewsForExhibition(null, reflectionExhibition.getId());
+
+        verify(reviewRepository).findReviewsByExhibitionIdAndUserId(reflectionExhibition.getId(), null, pageable);
+        verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(reflectionReview.getId());
+      }
+
+      @Test
+      @DisplayName("user == null인 경우 후기 다건 조회 성공 (좋아요 여부 포함O)")
+      void testUserIsNotNull() {
+        User reflectionUser = new User(
+            "test@example.com",
+            "Emily",
+            List.of(new Role(Authority.USER)));
+        ReflectionTestUtils.setField(
+            reflectionUser,
+            User.class,
+            "id",
+            1L,
+            Long.class
+        );
+
+        Exhibition reflectionExhibition = Exhibition.builder()
+            .seq(32)
+            .name("전시회 제목")
+            .startDate(LocalDate.of(2022, 4, 11))
+            .endDate(LocalDate.of(2022, 6, 2))
+            .genre(Genre.FINEART)
+            .description("이것은 전시회 설명입니다.")
+            .latitude(36.22)
+            .longitude(128.02)
+            .area(Area.BUSAN)
+            .place("미술관")
+            .address("부산 동구 중앙대로 11")
+            .inquiry("문의처 정보")
+            .fee("성인 20,000원")
+            .thumbnail("https://www.image-example.com")
+            .url("https://www.example.com")
+            .placeUrl("https://www.place-example.com")
+            .build();
+        ReflectionTestUtils.setField(
+            reflectionExhibition,
+            Exhibition.class,
+            "id",
+            1L,
+            Long.class
+        );
+        ReflectionTestUtils.setField(
+            reflectionExhibition,
+            BaseEntity.class,
+            "createdAt",
+            LocalDateTime.of(2022, 4, 11, 1, 36),
+            LocalDateTime.class
+        );
+        ReflectionTestUtils.setField(
+            reflectionExhibition,
+            BaseEntity.class,
+            "updatedAt",
+            LocalDateTime.of(2022, 4, 11, 1, 36),
+            LocalDateTime.class
+        );
+
+        Review reflectionReview =  Review.builder()
+            .user(reflectionUser)
+            .exhibition(reflectionExhibition)
+            .content("이것은 리뷰 본문입니다.")
+            .title("이것은 리뷰 제목입니다.")
+            .date(LocalDate.now())
+            .isPublic(true)
+            .build();
+        ReflectionTestUtils.setField(
+            reflectionReview,
+            Review.class,
+            "id",
+            1L,
+            Long.class
+        );
+        ReflectionTestUtils.setField(
+            reflectionReview,
+            BaseEntity.class,
+            "createdAt",
+            LocalDateTime.of(2022, 5, 5, 15, 6),
+            LocalDateTime.class
+        );
+        ReflectionTestUtils.setField(
+            reflectionReview,
+            BaseEntity.class,
+            "updatedAt",
+            LocalDateTime.of(2022, 5, 5, 15, 6),
+            LocalDateTime.class
+        );
+
+        List<ReviewWithLikeAndCommentCount> contents = Arrays.asList(
+            new ReviewWithLikeAndCommentCount(
+                1L,
+                reflectionReview.getDate(),
+                reflectionReview.getTitle(),
+                reflectionReview.getContent(),
+                reflectionReview.getCreatedAt(),
+                reflectionReview.getUpdatedAt(),
+                true,
+                false,
+                0L,
+                0L
+            ));
+
+        Page<ReviewWithLikeAndCommentCount> reflectionReviews = new PageImpl<>(contents,
+            pageable,
+            1L
+        );
+
+        given(reviewRepository.findReviewsByExhibitionIdAndUserId(
+            reflectionExhibition.getId(), reflectionUser.getId(), pageable))
+            .willReturn(reflectionReviews);
+        given(reviewRepository.findById(reflectionReviews.getContent().get(0).getReviewId()))
+            .willReturn(Optional.of(reflectionReview));
+
+        reviewService.getReviewsForExhibition(reflectionUser.getId(), reflectionExhibition.getId());
+
+        verify(reviewRepository).findReviewsByExhibitionIdAndUserId(reflectionExhibition.getId(), reflectionUser.getId(), pageable);
+        verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(reflectionReview.getId());
+      }
+
+    }
 
     @Nested
     @DisplayName("실패")
     class Failure {
+
+      Review review = new Review(user,
+          exhibition,
+          "리뷰 내용",
+          "리뷰 제목",
+          LocalDate.now(),
+          true);
+
+      Page<ReviewWithLikeAndCommentCount> reviews = new PageImpl<>(Arrays.asList(
+          new ReviewWithLikeAndCommentCount(
+              1L,
+              review.getDate(),
+              review.getTitle(),
+              review.getContent(),
+              review.getCreatedAt(),
+              review.getUpdatedAt(),
+              true,
+              false,
+              0L,
+              0L
+          )
+      ));
 
       @Test
       @DisplayName("존재하지 않는 후기를 조회하는 경우 NotFoundException 발생")
