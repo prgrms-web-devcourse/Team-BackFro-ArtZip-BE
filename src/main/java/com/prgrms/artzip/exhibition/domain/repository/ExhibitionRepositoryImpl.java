@@ -365,6 +365,7 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
 
     exhibitionsForReviewCondition
         .and(exhibitionNameContains(query))
+        .and(exhibitionStartDateGt())
         .and(exhibitionIsDeletedIsFalse());
 
     return exhibitionsForReviewCondition;
@@ -437,6 +438,10 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
     } else {
       return exhibitionLikeForIsLiked.user.id.eq(userId);
     }
+  }
+
+  private BooleanExpression exhibitionStartDateGt() {
+    return exhibition.period.startDate.loe(LocalDate.now());
   }
 
   private BooleanExpression exhibitionEndDateGoe() {
