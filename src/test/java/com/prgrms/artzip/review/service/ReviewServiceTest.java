@@ -28,16 +28,20 @@ import com.prgrms.artzip.review.domain.repository.ReviewLikeRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewPhotoRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewRepository;
 import com.prgrms.artzip.review.dto.projection.ReviewExhibitionInfo;
+import com.prgrms.artzip.review.dto.projection.ReviewWithLikeAndCommentCount;
 import com.prgrms.artzip.review.dto.projection.ReviewWithLikeData;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
 import com.prgrms.artzip.review.dto.request.ReviewUpdateRequest;
-import com.prgrms.artzip.review.dto.response.ReviewExhibitionInfoResponse;
 import com.prgrms.artzip.review.dto.response.ReviewIdResponse;
+import com.prgrms.artzip.review.dto.response.ReviewPhotoInfo;
+import com.prgrms.artzip.review.dto.response.ReviewUserInfo;
+import com.prgrms.artzip.review.dto.response.ReviewsResponseForExhibitionDetail;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -49,6 +53,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
@@ -767,6 +776,78 @@ class ReviewServiceTest {
   @DisplayName("후기 다건 조회")
   class TestGetReviews {
 
+    Page<ReviewWithLikeAndCommentCount> reviews = new PageImpl<>(Arrays.asList(
+        new ReviewWithLikeAndCommentCount(
+            1L,
+            review.getDate(),
+            review.getTitle(),
+            review.getContent(),
+            review.getCreatedAt(),
+            review.getUpdatedAt(),
+            true,
+            false,
+            0L,
+            0L
+        )
+    ));
+
+    @Nested
+    @DisplayName("실패")
+    class Failure {
+
+      Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+
+      @Test
+      @DisplayName("존재하지 않는 후기를 조회하는 경우 NotFoundException 발생")
+      void testReviewNotFoundException() {
+        // given
+        doReturn(reviews)
+            .when(reviewRepository).findReviewsByExhibitionIdAndUserId(
+                exhibition.getId(), null, pageable);
+        doThrow(new NotFoundException(ErrorCode.REVIEW_NOT_FOUND))
+            .when(reviewRepository).findById(any());
+
+        // when
+        // then
+        assertThatThrownBy(() -> {
+          reviewService.getReviews(user, exhibition.getId(),pageable);
+        }).isInstanceOf(NotFoundException.class)
+            .hasMessageContaining(ErrorCode.REVIEW_NOT_FOUND.getMessage());
+      }
+
+    }
+
+  }
+
+  @Nested
+  @DisplayName("전시회 상세를 위한 후기 다건 조회")
+  class TestGetReviewsForExhibition {
+
+    Pageable pageable = PageRequest.of(0, 4, Sort.by("reviewLikeCount").descending());
+
+    Review review = new Review(user,
+        exhibition,
+        "리뷰 내용",
+        "리뷰 제목",
+        LocalDate.now(),
+        true);
+
+    Page<ReviewWithLikeAndCommentCount> reviews = new PageImpl<>(Arrays.asList(
+        new ReviewWithLikeAndCommentCount(
+            1L,
+            review.getDate(),
+            review.getTitle(),
+            review.getContent(),
+            review.getCreatedAt(),
+            review.getUpdatedAt(),
+            true,
+            false,
+            0L,
+            0L
+        )
+    ));
+
+
     @Nested
     @DisplayName("실패")
     class Failure {
@@ -775,13 +856,16 @@ class ReviewServiceTest {
       @DisplayName("존재하지 않는 후기를 조회하는 경우 NotFoundException 발생")
       void testReviewNotFoundException() {
         // given
+        doReturn(reviews)
+            .when(reviewRepository).findReviewsByExhibitionIdAndUserId(
+                exhibition.getId(), null, pageable);
         doThrow(new NotFoundException(ErrorCode.REVIEW_NOT_FOUND))
             .when(reviewRepository).findById(any());
 
         // when
         // then
         assertThatThrownBy(() -> {
-          reviewService.getReview(user, review.getId());
+          reviewService.getReviewsForExhibition(user.getId(), exhibition.getId());
         }).isInstanceOf(NotFoundException.class)
             .hasMessageContaining(ErrorCode.REVIEW_NOT_FOUND.getMessage());
       }
