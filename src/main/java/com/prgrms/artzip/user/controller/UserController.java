@@ -17,6 +17,7 @@ import com.prgrms.artzip.exhibition.domain.ExhibitionLike;
 import com.prgrms.artzip.exhibition.dto.response.ExhibitionInfoResponse;
 import com.prgrms.artzip.exhibition.service.ExhibitionLikeService;
 import com.prgrms.artzip.exhibition.service.ExhibitionService;
+import com.prgrms.artzip.review.dto.response.ReviewsResponse;
 import com.prgrms.artzip.review.service.ReviewLikeService;
 import com.prgrms.artzip.review.service.ReviewService;
 import com.prgrms.artzip.user.domain.User;
@@ -40,7 +41,9 @@ import java.util.function.Function;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -219,5 +222,21 @@ public class UserController {
     return ResponseEntity
         .ok()
         .body(apiResponse);
+  }
+
+  @GetMapping("{userId}/info/review/like")
+  public ResponseEntity<ApiResponse<PageResponse<ReviewsResponse>>> getUserLikeReviews(
+      @CurrentUser User user,
+      @PathVariable("userId") Long userId,
+      @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+    PageResponse<ReviewsResponse> response = reviewService.getReviewsForMyLikes(user, userId, pageable);
+
+    return ResponseEntity.ok()
+        .body(ApiResponse.<PageResponse<ReviewsResponse>>builder()
+            .message("유저가 좋아요 누른 후기 리스트 조회 성공")
+            .status(HttpStatus.OK.value())
+            .data(response)
+            .build());
   }
 }
