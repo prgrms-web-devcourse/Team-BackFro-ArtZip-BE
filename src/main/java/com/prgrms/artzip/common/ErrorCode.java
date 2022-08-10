@@ -9,23 +9,22 @@ import lombok.Getter;
 
 @Getter
 public enum ErrorCode {
-  // Internal Server Error
-  INTERNAL_SERVER_ERROR(500, "C000", "서버에 문제가 생겼습니다."),
+  // Server Error
+  INTERNAL_SERVER_ERROR(500, "S000", "서버에 문제가 생겼습니다."),
+  AMAZON_S3_ERROR(500, "S001", "AWS S3와의 연동에 문제가 생겼습니다."),
 
-  // 400 Client Error
-  METHOD_NOT_ALLOWED(405, "C001", "적절하지 않은 HTTP 메소드입니다."),
-  INVALID_TYPE_VALUE(400, "C002", "요청 값의 타입이 잘못되었습니다."),
-  INVALID_INPUT_VALUE(400, "C003", "적절하지 않은 값입니다."),
-  NOT_FOUND(404, "C004", "해당 리소스를 찾을 수 없습니다."),
-  BAD_REQUEST(400, "C005", "잘못된 요청입니다."),
-  MISSING_REQUEST_PARAMETER(400, "C006", "필수 파라미터가 누락되었습니다."),
-  INVALID_LENGTH(400, "C007", "올바르지 않은 길이입니다."),
-  INVALID_FILE_EXTENSION(400, "C008", "올바르지 않은 파일 확장자입니다. (png, jpg, jpeg 가능)"),
-  MAX_UPLOAD_SIZE_EXCEEDED(400, "C009", "최대 파일 크기(5MB)보다 큰 파일입니다."),
-  RESOURCE_PERMISSION_DENIED(400, "C010", "해당 리소스에 대한 작업 권한이 없습니다."),
-
+  // Client Error
+  METHOD_NOT_ALLOWED(405, "C000", "적절하지 않은 HTTP 메소드입니다."),
+  INVALID_TYPE_VALUE(400, "C001", "요청 값의 타입이 잘못되었습니다."),
+  INVALID_INPUT_VALUE(400, "C002", "적절하지 않은 값입니다."),
+  NOT_FOUND(404, "C003", "해당 리소스를 찾을 수 없습니다."),
+  BAD_REQUEST(400, "C004", "잘못된 요청입니다."),
+  MISSING_REQUEST_PARAMETER(400, "C005", "필수 파라미터가 누락되었습니다."),
+  INVALID_LENGTH(400, "C006", "올바르지 않은 길이입니다."),
+  INVALID_FILE_EXTENSION(400, "C007", "올바르지 않은 파일 확장자입니다. (png, jpg, jpeg 가능)"),
+  MAX_UPLOAD_SIZE_EXCEEDED(400, "C008", "최대 파일 크기(5MB)보다 큰 파일입니다."),
+  RESOURCE_PERMISSION_DENIED(400, "C009", "해당 리소스에 대한 작업 권한이 없습니다."),
   ACCESS_DENIED(403, "C010", "요청 권한이 없습니다."),
-
   UNAUTHENTICATED_USER(401, "C011", "인증되지 않은 사용자입니다."),
 
   /**
