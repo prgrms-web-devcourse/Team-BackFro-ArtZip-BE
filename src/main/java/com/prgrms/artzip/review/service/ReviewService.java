@@ -190,6 +190,23 @@ public class ReviewService {
     }).collect(Collectors.toList());
   }
 
+  @Transactional(readOnly = true)
+  public PageResponse<ReviewsResponse> getReviewsForMyLikes(User currentUser, Long targetUserId, Pageable pageable) {
+    Page<ReviewWithLikeAndCommentCount> reviews = reviewRepository.findReviewsByCurrentUserIdAndTargetUserId(
+        Objects.isNull(currentUser) ? null : currentUser.getId(), targetUserId, pageable);
+
+    return new PageResponse<>(reviews.map(r -> {
+      Review review = reviewRepository.findById(r.getReviewId())
+          .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_NOT_FOUND));
+      List<ReviewPhoto> reviewPhotos = review.getReviewPhotos();
+      User reviewUser = review.getUser();
+      Exhibition exhibition = exhibitionRepository.findById(review.getExhibition().getId())
+          .orElseThrow(() -> new NotFoundException(ErrorCode.EXHB_NOT_FOUND));
+
+      return new ReviewsResponse(r, reviewPhotos, reviewUser, exhibition);
+    }));
+  }
+
   private void removeReviewPhotosById(List<Long> reviewPhotoIds) {
     reviewPhotoIds.forEach(photoId -> {
       ReviewPhoto reviewPhoto = reviewPhotoRepository.findById(photoId)
