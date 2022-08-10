@@ -2,7 +2,9 @@ package com.prgrms.artzip.exhibition.dto.response;
 
 import com.prgrms.artzip.exhibition.domain.enumType.Area;
 import com.prgrms.artzip.exhibition.domain.enumType.Genre;
+import com.prgrms.artzip.review.dto.response.ReviewsResponseForExhibitionDetail;
 import java.time.LocalDate;
+import java.util.List;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
@@ -23,12 +25,12 @@ public class ExhibitionDetailInfoResponse extends ExhibitionBasicInfoResponse {
   private double lat;
   private double lng;
   private Boolean isLiked;
-  // reviews
+  private List<ReviewsResponseForExhibitionDetail> reviews;
 
   public ExhibitionDetailInfoResponse(Long exhibitionId, String name, String thumbnail,
       LocalDate startDate, LocalDate endDate, Area area, String url, String placeUrl,
       String inquiry, Genre genre, String description, long likeCount, String placeAddress,
-      double lat, double lng, boolean isLiked) {
+      double lat, double lng, boolean isLiked, List<ReviewsResponseForExhibitionDetail> reviews) {
     super(exhibitionId, name, thumbnail);
     this.startDate = startDate;
     this.endDate = endDate;
@@ -43,5 +45,6 @@ public class ExhibitionDetailInfoResponse extends ExhibitionBasicInfoResponse {
     this.lat = lat;
     this.lng = lng;
     this.isLiked = isLiked;
+    this.reviews = reviews;
   }
 }

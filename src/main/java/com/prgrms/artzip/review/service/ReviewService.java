@@ -26,15 +26,18 @@ import com.prgrms.artzip.review.dto.response.ReviewExhibitionInfoResponse;
 import com.prgrms.artzip.review.dto.response.ReviewIdResponse;
 import com.prgrms.artzip.review.dto.response.ReviewResponse;
 import com.prgrms.artzip.review.dto.response.ReviewsResponse;
+import com.prgrms.artzip.review.dto.response.ReviewsResponseForExhibitionDetail;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -170,6 +173,21 @@ public class ReviewService {
 
       return new ReviewsResponse(r, reviewPhotos, reviewUser, exhibition);
     }));
+  }
+
+  @Transactional(readOnly = true)
+  public List<ReviewsResponseForExhibitionDetail> getReviewsForExhibition(Long userId, Long exhibitionId) {
+    List<ReviewWithLikeAndCommentCount> reviews = reviewRepository.findReviewsByExhibitionIdAndUserId(
+        exhibitionId, Objects.isNull(userId) ? null : userId,
+        PageRequest.of(0, 4, Sort.by("reviewLikeCount").descending())).getContent();
+
+    return reviews.stream().map(r -> {
+      Review review = reviewRepository.findById(r.getReviewId())
+          .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_NOT_FOUND));
+      List<ReviewPhoto> reviewPhotos = review.getReviewPhotos();
+      User reviewUser = review.getUser();
+      return new ReviewsResponseForExhibitionDetail(r, reviewPhotos, reviewUser);
+    }).collect(Collectors.toList());
   }
 
   private void removeReviewPhotosById(List<Long> reviewPhotoIds) {

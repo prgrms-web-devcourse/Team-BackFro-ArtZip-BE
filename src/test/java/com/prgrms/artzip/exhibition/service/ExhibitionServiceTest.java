@@ -20,6 +20,12 @@ import com.prgrms.artzip.exhibition.domain.vo.Period;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionWithLocationForSimpleQuery;
+import com.prgrms.artzip.review.domain.Review;
+import com.prgrms.artzip.review.domain.ReviewPhoto;
+import com.prgrms.artzip.review.dto.response.ReviewPhotoInfo;
+import com.prgrms.artzip.review.dto.response.ReviewUserInfo;
+import com.prgrms.artzip.review.dto.response.ReviewsResponseForExhibitionDetail;
+import com.prgrms.artzip.review.service.ReviewService;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import java.time.LocalDate;
@@ -44,6 +50,9 @@ class ExhibitionServiceTest {
 
   @Mock
   private ExhibitionRepository exhibitionRepository;
+
+  @Mock
+  private ReviewService reviewService;
 
   @InjectMocks
   private ExhibitionService exhibitionService;
@@ -175,6 +184,31 @@ class ExhibitionServiceTest {
         .likeCount(5)
         .build();
 
+    Review review = new Review(user,
+        exhibition,
+        "리뷰 내용",
+        "리뷰 제목",
+        LocalDate.now(),
+        true);
+
+    List<ReviewsResponseForExhibitionDetail> reviews = Arrays.asList(
+        ReviewsResponseForExhibitionDetail.builder()
+            .reviewId(1L)
+            .user(new ReviewUserInfo(user))
+            .date(review.getDate())
+            .title(review.getTitle())
+            .content(review.getContent())
+            .createdAt(review.getCreatedAt())
+            .updatedAt(review.getUpdatedAt())
+            .isEdited(false)
+            .isPublic(review.getIsPublic())
+            .isLiked(true)
+            .likeCount(1L)
+            .commentCount(0L)
+            .photos(Arrays.asList(new ReviewPhotoInfo(
+                new ReviewPhoto(review, "https://www.review-photo-path"))))
+            .build());
+
     @Test
     @DisplayName("존재하지 않는 게시물인 경우")
     void testExhibitionNotFound() {
@@ -190,10 +224,13 @@ class ExhibitionServiceTest {
     void testAuthorizedLike() {
       when(exhibitionRepository.findExhibition(userId, exhibitionId))
           .thenReturn(Optional.of(exhibitionDetail1));
+      when(reviewService.getReviewsForExhibition(userId, exhibitionId))
+          .thenReturn(reviews);
 
       exhibitionService.getExhibition(userId, exhibitionId);
 
       verify(exhibitionRepository).findExhibition(userId, exhibitionId);
+      verify(reviewService).getReviewsForExhibition(userId, exhibitionId);
     }
 
     @Test
@@ -201,10 +238,13 @@ class ExhibitionServiceTest {
     void testAuthorizedNotLike() {
       when(exhibitionRepository.findExhibition(null, exhibitionId))
           .thenReturn(Optional.of(exhibitionDetail2));
+      when(reviewService.getReviewsForExhibition(null, exhibitionId))
+          .thenReturn(reviews);
 
       exhibitionService.getExhibition(null, exhibitionId);
 
       verify(exhibitionRepository).findExhibition(null, exhibitionId);
+      verify(reviewService).getReviewsForExhibition(null, exhibitionId);
     }
   }
 

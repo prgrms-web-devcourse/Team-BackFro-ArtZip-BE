@@ -13,6 +13,8 @@ import com.prgrms.artzip.exhibition.dto.projection.ExhibitionWithLocationForSimp
 import com.prgrms.artzip.exhibition.dto.response.ExhibitionAroundMeInfoResponse;
 import com.prgrms.artzip.exhibition.dto.response.ExhibitionDetailInfoResponse;
 import com.prgrms.artzip.exhibition.dto.response.ExhibitionInfoResponse;
+import com.prgrms.artzip.review.dto.response.ReviewsResponseForExhibitionDetail;
+import com.prgrms.artzip.review.service.ReviewService;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,8 @@ import org.springframework.stereotype.Service;
 public class ExhibitionService {
 
   private final ExhibitionRepository exhibitionRepository;
+
+  private final ReviewService reviewService;
 
   public Page<ExhibitionInfoResponse> getUpcomingExhibitions(Long userId,
       Pageable pageable) {
@@ -45,7 +49,8 @@ public class ExhibitionService {
         .findExhibition(userId, exhibitionId)
         .orElseThrow(() -> new InvalidRequestException(EXHB_NOT_FOUND));
 
-    // getReviews()
+    List<ReviewsResponseForExhibitionDetail> reviews = reviewService.getReviewsForExhibition(userId,
+        exhibitionId);
 
     return ExhibitionDetailInfoResponse.builder()
         .exhibitionId(exhibition.getId())
@@ -64,6 +69,7 @@ public class ExhibitionService {
         .lat(exhibition.getLocation().getLatitude())
         .lng(exhibition.getLocation().getLongitude())
         .isLiked(exhibition.getIsLiked())
+        .reviews(reviews)
         .build();
   }
 
@@ -100,4 +106,5 @@ public class ExhibitionService {
       throw new InvalidRequestException(INVALID_DISTANCE);
     }
   }
+
 }
