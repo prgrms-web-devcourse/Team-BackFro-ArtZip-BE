@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
 public class ReviewsResponseForExhibitionDetail {
 
   private Long reviewId;
@@ -24,9 +25,9 @@ public class ReviewsResponseForExhibitionDetail {
   private Boolean isLiked;
   private Boolean isPublic;
   private Long likeCount;
+  private Long commentCount;
   private List<ReviewPhotoInfo> photos;
 
-  @Builder
   public ReviewsResponseForExhibitionDetail(ReviewWithLikeAndCommentCount review,
       List<ReviewPhoto> photos, User user) {
     this.reviewId = review.getReviewId();
@@ -40,6 +41,7 @@ public class ReviewsResponseForExhibitionDetail {
     this.isLiked = review.getIsLiked();
     this.isPublic = review.getIsPublic();
     this.likeCount = review.getLikeCount();
+    this.commentCount = review.getCommentCount();
     this.photos = photos.stream().map(ReviewPhotoInfo::new).collect(Collectors.toList());
   }
 }
