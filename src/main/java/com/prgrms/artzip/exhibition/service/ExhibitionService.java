@@ -33,8 +33,7 @@ public class ExhibitionService {
     return exhibitionsPagingResult.map(ExhibitionInfoResponse::new);
   }
 
-  public Page<ExhibitionInfoResponse> getMostLikeExhibitions(Long userId,
-      boolean includeEnd,
+  public Page<ExhibitionInfoResponse> getMostLikeExhibitions(Long userId, boolean includeEnd,
       Pageable pageable) {
     Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
         .findMostLikeExhibitions(userId, includeEnd, pageable);
