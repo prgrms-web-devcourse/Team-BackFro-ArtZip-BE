@@ -98,8 +98,9 @@ public class Exhibition extends BaseEntity {
 
   @Builder
   public Exhibition(Integer seq, String name, LocalDate startDate, LocalDate endDate, Genre genre,
-      String description, Double latitude, Double longitude, Area area, String place,
-      String address, String inquiry, String fee, String thumbnail, String url, String placeUrl) {
+      String description, Double latitude, Double longitude, Area area,
+      String place, String address, String inquiry, String fee, String thumbnail, String url,
+      String placeUrl) {
     this.seq = seq;
     setName(name);
     setPeriod(startDate, endDate);

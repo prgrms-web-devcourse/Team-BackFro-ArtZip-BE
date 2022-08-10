@@ -403,7 +403,7 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
     customCondition
         .and(!exhibitionCustomCondition.getIncludeEnd() ? exhibitionEndDateGoe() : null)
         .and(exhibitionIsDeletedIsFalse());
-
+    
     return customCondition;
   }
 
