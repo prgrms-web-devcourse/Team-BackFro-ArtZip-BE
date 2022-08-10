@@ -31,7 +31,6 @@ import com.prgrms.artzip.review.dto.projection.ReviewExhibitionInfo;
 import com.prgrms.artzip.review.dto.projection.ReviewWithLikeData;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
 import com.prgrms.artzip.review.dto.request.ReviewUpdateRequest;
-import com.prgrms.artzip.review.dto.response.ReviewExhibitionInfoResponse;
 import com.prgrms.artzip.review.dto.response.ReviewIdResponse;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
@@ -89,7 +88,7 @@ class ReviewServiceTest {
       .name("전시회 제목")
       .startDate(LocalDate.of(2022, 4, 11))
       .endDate(LocalDate.of(2022, 6, 2))
-      .genre(Genre.FINEART)
+      .genre(Genre.PAINTING)
       .description("이것은 전시회 설명입니다.")
       .latitude(36.22)
       .longitude(128.02)

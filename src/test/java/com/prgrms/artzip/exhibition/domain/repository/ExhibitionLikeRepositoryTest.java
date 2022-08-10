@@ -56,7 +56,7 @@ class ExhibitionLikeRepositoryTest {
         .name("전시회 at 부산")
         .startDate(LocalDate.now().plusDays(10))
         .endDate(LocalDate.now().plusDays(15))
-        .genre(Genre.FINEART)
+        .genre(Genre.PAINTING)
         .description("이것은 전시회 설명입니다.")
         .latitude(36.22)
         .longitude(128.02)
