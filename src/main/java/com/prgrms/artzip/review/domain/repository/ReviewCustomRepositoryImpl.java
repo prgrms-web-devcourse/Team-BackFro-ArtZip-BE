@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 
 public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
@@ -130,13 +131,15 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
   }
 
   private List<OrderSpecifier> getAllOrderSpecifiers(Pageable pageable) {
-    if (Objects.nonNull(pageable.getSort())) {
-      return pageable.getSort().get().map(order -> ReviewSortType.valueOf(order.getProperty())
-          .getOrderSpecifier(order.getDirection().isAscending() ? Order.ASC : Order.DESC))
-          .collect(Collectors.toList());
+    if (pageable.getSort().isEmpty()) {
+      return Collections.emptyList();
     }
 
-    return Collections.emptyList();
+    return pageable.getSort().stream()
+        .filter(order -> ReviewSortType.getReviewSortType(order.getProperty()).isPresent())
+        .map(order -> ReviewSortType.getReviewSortType(order.getProperty()).get()
+            .getOrderSpecifier(order.getDirection().isAscending() ? Order.ASC : Order.DESC))
+        .collect(Collectors.toList());
   }
 
 }

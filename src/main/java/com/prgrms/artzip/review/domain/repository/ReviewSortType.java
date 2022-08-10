@@ -7,6 +7,8 @@ import static com.prgrms.artzip.review.domain.QReviewLike.reviewLike;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import java.util.Arrays;
+import java.util.Optional;
 
 public enum ReviewSortType {
 
@@ -24,6 +26,14 @@ public enum ReviewSortType {
 
   public OrderSpecifier<?> getOrderSpecifier(Order direction) {
     return new OrderSpecifier(direction, this.target);
+  }
+
+  public static Optional<ReviewSortType> getReviewSortType(String property) {
+    return Optional.ofNullable(
+        Arrays.stream(ReviewSortType.values())
+            .filter(reviewSortType -> reviewSortType.property.equals(property))
+            .findAny()
+            .orElse(null));
   }
 
 }
