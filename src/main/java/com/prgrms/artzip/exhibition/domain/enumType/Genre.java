@@ -1,5 +1,5 @@
 package com.prgrms.artzip.exhibition.domain.enumType;
 
 public enum Genre {
-  ALL, PAINTING, PHOTO, PLASTIC_ART, INSATALLATION_ART, MEDIA, SHOW, RELICS
+  ALL, PAINTING, PHOTO, MOLDINGS, INSATALLATION, MEDIA, SHOW, RELICS
 }
