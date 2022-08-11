@@ -14,7 +14,6 @@ import com.prgrms.artzip.comment.domain.Comment;
 import com.prgrms.artzip.comment.repository.CommentRepository;
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.ErrorCode;
-import com.prgrms.artzip.common.PageResponse;
 import com.prgrms.artzip.common.entity.BaseEntity;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
@@ -37,7 +36,6 @@ import com.prgrms.artzip.review.dto.projection.ReviewWithLikeData;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
 import com.prgrms.artzip.review.dto.request.ReviewUpdateRequest;
 import com.prgrms.artzip.review.dto.response.ReviewIdResponse;
-import com.prgrms.artzip.review.dto.response.ReviewsResponse;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
@@ -1495,7 +1493,7 @@ class ReviewServiceTest {
         );
 
         // given
-        given(reviewRepository.findReviewsByCurrentUserIdAndTargetUserId(
+        given(reviewRepository.findMyLikesReviews(
             null, reflectionTargetUser.getId(), pageable))
             .willReturn(reflectionReviews);
         given(reviewRepository.findById(reflectionReviews.getContent().get(0).getReviewId()))
@@ -1507,7 +1505,7 @@ class ReviewServiceTest {
         reviewService.getReviewsForMyLikes(null, reflectionTargetUser.getId(), pageable);
 
         // when
-        verify(reviewRepository).findReviewsByCurrentUserIdAndTargetUserId(
+        verify(reviewRepository).findMyLikesReviews(
             null, reflectionTargetUser.getId(), pageable);
         verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(reflectionReview.getId());
         verify(exhibitionRepository, times(reflectionReviews.getContent().size())).findById(reflectionExhibition.getId());
@@ -1639,7 +1637,7 @@ class ReviewServiceTest {
         );
 
         // given
-        given(reviewRepository.findReviewsByCurrentUserIdAndTargetUserId(
+        given(reviewRepository.findMyLikesReviews(
             reflectionCurrentUser.getId(), null, pageable))
             .willReturn(reflectionReviews);
         given(reviewRepository.findById(reflectionReviews.getContent().get(0).getReviewId()))
@@ -1651,7 +1649,7 @@ class ReviewServiceTest {
         reviewService.getReviewsForMyLikes(reflectionCurrentUser, null, pageable);
 
         // when
-        verify(reviewRepository).findReviewsByCurrentUserIdAndTargetUserId(
+        verify(reviewRepository).findMyLikesReviews(
             reflectionCurrentUser.getId(), null, pageable);
         verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(reflectionReview.getId());
         verify(exhibitionRepository, times(reflectionReviews.getContent().size())).findById(reflectionExhibition.getId());
@@ -1683,7 +1681,7 @@ class ReviewServiceTest {
       void testReviewNotFoundException() {
         // given
         doReturn(reviews)
-            .when(reviewRepository).findReviewsByCurrentUserIdAndTargetUserId(
+            .when(reviewRepository).findMyLikesReviews(
                 null, user.getId(), pageable);
         doThrow(new NotFoundException(ErrorCode.REVIEW_NOT_FOUND))
             .when(reviewRepository).findById(any());
@@ -1692,6 +1690,347 @@ class ReviewServiceTest {
         // then
         assertThatThrownBy(() -> {
           reviewService.getReviewsForMyLikes(null, user.getId(), pageable);
+        }).isInstanceOf(NotFoundException.class)
+            .hasMessageContaining(ErrorCode.REVIEW_NOT_FOUND.getMessage());
+      }
+
+    }
+
+  }
+
+  @Nested
+  @DisplayName("특정 유저가 작성한 후기 다건 조회")
+  class TestGetMyReviews {
+
+    Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+
+    @Nested
+    @DisplayName("성공")
+    class Success {
+
+      @Test
+      @DisplayName("user == null인 경우 후기 다건 조회 성공 (좋아요 여부 포함X)")
+      void testUserIsNull() {
+        User reflectionCurrentUser = new User(
+            "test1@example.com",
+            "Emily",
+            List.of(new Role(Authority.USER)));
+        ReflectionTestUtils.setField(
+            reflectionCurrentUser,
+            User.class,
+            "id",
+            1L,
+            Long.class
+        );
+
+        User reflectionTargetUser = new User(
+            "test2@example.com",
+            "choonsik",
+            List.of(new Role(Authority.USER)));
+        ReflectionTestUtils.setField(
+            reflectionTargetUser,
+            User.class,
+            "id",
+            2L,
+            Long.class
+        );
+
+        Exhibition reflectionExhibition = Exhibition.builder()
+            .seq(32)
+            .name("전시회 제목")
+            .startDate(LocalDate.of(2022, 4, 11))
+            .endDate(LocalDate.of(2022, 6, 2))
+            .genre(Genre.FINEART)
+            .description("이것은 전시회 설명입니다.")
+            .latitude(36.22)
+            .longitude(128.02)
+            .area(Area.BUSAN)
+            .place("미술관")
+            .address("부산 동구 중앙대로 11")
+            .inquiry("문의처 정보")
+            .fee("성인 20,000원")
+            .thumbnail("https://www.image-example.com")
+            .url("https://www.example.com")
+            .placeUrl("https://www.place-example.com")
+            .build();
+        ReflectionTestUtils.setField(
+            reflectionExhibition,
+            Exhibition.class,
+            "id",
+            1L,
+            Long.class
+        );
+        ReflectionTestUtils.setField(
+            reflectionExhibition,
+            BaseEntity.class,
+            "createdAt",
+            LocalDateTime.of(2022, 4, 11, 1, 36),
+            LocalDateTime.class
+        );
+        ReflectionTestUtils.setField(
+            reflectionExhibition,
+            BaseEntity.class,
+            "updatedAt",
+            LocalDateTime.of(2022, 4, 11, 1, 36),
+            LocalDateTime.class
+        );
+
+        Review reflectionReview =  Review.builder()
+            .user(reflectionCurrentUser)
+            .exhibition(reflectionExhibition)
+            .content("이것은 리뷰 본문입니다.")
+            .title("이것은 리뷰 제목입니다.")
+            .date(LocalDate.now())
+            .isPublic(true)
+            .build();
+        ReflectionTestUtils.setField(
+            reflectionReview,
+            Review.class,
+            "id",
+            1L,
+            Long.class
+        );
+        ReflectionTestUtils.setField(
+            reflectionReview,
+            BaseEntity.class,
+            "createdAt",
+            LocalDateTime.of(2022, 5, 5, 15, 6),
+            LocalDateTime.class
+        );
+        ReflectionTestUtils.setField(
+            reflectionReview,
+            BaseEntity.class,
+            "updatedAt",
+            LocalDateTime.of(2022, 5, 5, 15, 6),
+            LocalDateTime.class
+        );
+
+        List<ReviewWithLikeAndCommentCount> contents = Arrays.asList(
+            new ReviewWithLikeAndCommentCount(
+                1L,
+                reflectionReview.getDate(),
+                reflectionReview.getTitle(),
+                reflectionReview.getContent(),
+                reflectionReview.getCreatedAt(),
+                reflectionReview.getUpdatedAt(),
+                true,
+                false,
+                0L,
+                0L
+            ));
+
+        Page<ReviewWithLikeAndCommentCount> reflectionReviews = new PageImpl<>(contents,
+            pageable,
+            1L
+        );
+
+        ReviewLike reviewLikeOfTarget = new ReviewLike(reflectionReview, reflectionTargetUser);
+        ReflectionTestUtils.setField(
+            reviewLikeOfTarget,
+            ReviewLike.class,
+            "id",
+            1L,
+            Long.class
+        );
+
+        // given
+        given(reviewRepository.findMyReviews(
+            null, reflectionTargetUser.getId(), pageable))
+            .willReturn(reflectionReviews);
+        given(reviewRepository.findById(reflectionReviews.getContent().get(0).getReviewId()))
+            .willReturn(Optional.of(reflectionReview));
+        given(exhibitionRepository.findById(reflectionReview.getExhibition().getId()))
+            .willReturn(Optional.of(reflectionExhibition));
+
+        // when
+        reviewService.getMyReviews(null, reflectionTargetUser.getId(), pageable);
+
+        // when
+        verify(reviewRepository).findMyReviews(
+            null, reflectionTargetUser.getId(), pageable);
+        verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(reflectionReview.getId());
+        verify(exhibitionRepository, times(reflectionReviews.getContent().size())).findById(reflectionExhibition.getId());
+      }
+
+      @Test
+      @DisplayName("user == null인 경우 후기 다건 조회 성공 (좋아요 여부 포함O)")
+      void testUserIsNotNull() {
+        User reflectionCurrentUser = new User(
+            "test1@example.com",
+            "Emily",
+            List.of(new Role(Authority.USER)));
+        ReflectionTestUtils.setField(
+            reflectionCurrentUser,
+            User.class,
+            "id",
+            1L,
+            Long.class
+        );
+
+        User reflectionTargetUser = new User(
+            "test2@example.com",
+            "choonsik",
+            List.of(new Role(Authority.USER)));
+        ReflectionTestUtils.setField(
+            reflectionTargetUser,
+            User.class,
+            "id",
+            2L,
+            Long.class
+        );
+
+        Exhibition reflectionExhibition = Exhibition.builder()
+            .seq(32)
+            .name("전시회 제목")
+            .startDate(LocalDate.of(2022, 4, 11))
+            .endDate(LocalDate.of(2022, 6, 2))
+            .genre(Genre.FINEART)
+            .description("이것은 전시회 설명입니다.")
+            .latitude(36.22)
+            .longitude(128.02)
+            .area(Area.BUSAN)
+            .place("미술관")
+            .address("부산 동구 중앙대로 11")
+            .inquiry("문의처 정보")
+            .fee("성인 20,000원")
+            .thumbnail("https://www.image-example.com")
+            .url("https://www.example.com")
+            .placeUrl("https://www.place-example.com")
+            .build();
+        ReflectionTestUtils.setField(
+            reflectionExhibition,
+            Exhibition.class,
+            "id",
+            1L,
+            Long.class
+        );
+        ReflectionTestUtils.setField(
+            reflectionExhibition,
+            BaseEntity.class,
+            "createdAt",
+            LocalDateTime.of(2022, 4, 11, 1, 36),
+            LocalDateTime.class
+        );
+        ReflectionTestUtils.setField(
+            reflectionExhibition,
+            BaseEntity.class,
+            "updatedAt",
+            LocalDateTime.of(2022, 4, 11, 1, 36),
+            LocalDateTime.class
+        );
+
+        Review reflectionReview =  Review.builder()
+            .user(reflectionCurrentUser)
+            .exhibition(reflectionExhibition)
+            .content("이것은 리뷰 본문입니다.")
+            .title("이것은 리뷰 제목입니다.")
+            .date(LocalDate.now())
+            .isPublic(true)
+            .build();
+        ReflectionTestUtils.setField(
+            reflectionReview,
+            Review.class,
+            "id",
+            1L,
+            Long.class
+        );
+        ReflectionTestUtils.setField(
+            reflectionReview,
+            BaseEntity.class,
+            "createdAt",
+            LocalDateTime.of(2022, 5, 5, 15, 6),
+            LocalDateTime.class
+        );
+        ReflectionTestUtils.setField(
+            reflectionReview,
+            BaseEntity.class,
+            "updatedAt",
+            LocalDateTime.of(2022, 5, 5, 15, 6),
+            LocalDateTime.class
+        );
+
+        List<ReviewWithLikeAndCommentCount> contents = Arrays.asList(
+            new ReviewWithLikeAndCommentCount(
+                1L,
+                reflectionReview.getDate(),
+                reflectionReview.getTitle(),
+                reflectionReview.getContent(),
+                reflectionReview.getCreatedAt(),
+                reflectionReview.getUpdatedAt(),
+                true,
+                false,
+                0L,
+                0L
+            ));
+
+        Page<ReviewWithLikeAndCommentCount> reflectionReviews = new PageImpl<>(contents,
+            pageable,
+            1L
+        );
+
+        ReviewLike reviewLikeOfTarget = new ReviewLike(reflectionReview, reflectionTargetUser);
+        ReflectionTestUtils.setField(
+            reviewLikeOfTarget,
+            ReviewLike.class,
+            "id",
+            1L,
+            Long.class
+        );
+
+        // given
+        given(reviewRepository.findMyReviews(
+            reflectionCurrentUser.getId(), null, pageable))
+            .willReturn(reflectionReviews);
+        given(reviewRepository.findById(reflectionReviews.getContent().get(0).getReviewId()))
+            .willReturn(Optional.of(reflectionReview));
+        given(exhibitionRepository.findById(reflectionReview.getExhibition().getId()))
+            .willReturn(Optional.of(reflectionExhibition));
+
+        // when
+        reviewService.getMyReviews(reflectionCurrentUser, null, pageable);
+
+        // when
+        verify(reviewRepository).findMyReviews(
+            reflectionCurrentUser.getId(), null, pageable);
+        verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(reflectionReview.getId());
+        verify(exhibitionRepository, times(reflectionReviews.getContent().size())).findById(reflectionExhibition.getId());
+      }
+
+    }
+
+    @Nested
+    @DisplayName("실패")
+    class Failure {
+
+      Page<ReviewWithLikeAndCommentCount> reviews = new PageImpl<>(Arrays.asList(
+          new ReviewWithLikeAndCommentCount(
+              1L,
+              review.getDate(),
+              review.getTitle(),
+              review.getContent(),
+              review.getCreatedAt(),
+              review.getUpdatedAt(),
+              true,
+              false,
+              0L,
+              0L
+          )
+      ));
+
+      @Test
+      @DisplayName("존재하지 않는 후기를 조회하는 경우 NotFoundException 발생")
+      void testReviewNotFoundException() {
+        // given
+        doReturn(reviews)
+            .when(reviewRepository).findMyReviews(
+                null, user.getId(), pageable);
+        doThrow(new NotFoundException(ErrorCode.REVIEW_NOT_FOUND))
+            .when(reviewRepository).findById(any());
+
+        // when
+        // then
+        assertThatThrownBy(() -> {
+          reviewService.getMyReviews(null, user.getId(), pageable);
         }).isInstanceOf(NotFoundException.class)
             .hasMessageContaining(ErrorCode.REVIEW_NOT_FOUND.getMessage());
       }
