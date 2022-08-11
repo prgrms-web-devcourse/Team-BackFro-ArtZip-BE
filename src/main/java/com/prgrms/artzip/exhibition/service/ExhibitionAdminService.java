@@ -3,23 +3,24 @@ package com.prgrms.artzip.exhibition.service;
 import static com.prgrms.artzip.common.ErrorCode.AMAZON_S3_ERROR;
 import static org.springframework.util.StringUtils.hasText;
 
+import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.error.exception.AWSException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
+import com.prgrms.artzip.common.util.AmazonS3Remover;
 import com.prgrms.artzip.common.util.AmazonS3Uploader;
 import com.prgrms.artzip.exhibition.domain.Exhibition;
 import com.prgrms.artzip.exhibition.domain.repository.ExhibitionRepository;
 import com.prgrms.artzip.exhibition.domain.repository.ExhibitionRepositoryImpl;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionForSimpleQuery;
-import com.prgrms.artzip.exhibition.dto.request.ExhibitionCreateRequest;
+import com.prgrms.artzip.exhibition.dto.request.ExhibitionCreateOrUpdateRequest;
 import com.prgrms.artzip.exhibition.dto.response.ExhibitionDetailInfoResponse;
 import com.prgrms.artzip.exhibition.dto.response.ExhibitionInfoResponse;
-import com.prgrms.artzip.review.dto.response.ReviewsResponseForExhibitionDetail;
 import com.prgrms.artzip.review.service.ReviewService;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,13 +34,16 @@ import org.springframework.web.multipart.MultipartFile;
 public class ExhibitionAdminService {
 
   private final ExhibitionRepository exhibitionRepository;
-  private final AmazonS3Uploader amazonS3Uploader;
   private final ExhibitionRepositoryImpl exhibitionRepositoryImpl;
   private final ReviewService reviewService;
+  private final AmazonS3Uploader amazonS3Uploader;
+  private final AmazonS3Remover amazonS3Remover;
 
-  public Long createExhibition(ExhibitionCreateRequest request, MultipartFile thumbnail) {
+  private final String s3DirName = "exhibition";
+
+  public Long createExhibition(ExhibitionCreateOrUpdateRequest request, MultipartFile thumbnail) {
     try {
-      String thumbnailAddress = amazonS3Uploader.upload(thumbnail, "exhibition");
+      String thumbnailAddress = amazonS3Uploader.upload(thumbnail, s3DirName);
       Exhibition exhibition = exhibitionRepository.save(Exhibition.builder()
           .area(request.getArea())
           .description(request.getDescription())
@@ -95,5 +99,22 @@ public class ExhibitionAdminService {
         .isLiked(exhibition.getIsLiked())
         .reviews(new ArrayList<>())
         .build();
+  }
+
+  public void updateExhibition(Long exhibitionId, ExhibitionCreateOrUpdateRequest request, MultipartFile thumbnail) {
+    Exhibition exhibition = exhibitionRepository
+        .findById(exhibitionId)
+        .orElseThrow(() -> new NotFoundException(ErrorCode.EXHB_NOT_FOUND));
+    exhibition.update(request);
+    if (Objects.nonNull(thumbnail)) {
+      try {
+        String prevThumbnailPath = exhibition.getThumbnail();
+        String newThumbnailPath = amazonS3Uploader.upload(thumbnail, s3DirName);
+        exhibition.changeThumbnail(newThumbnailPath);
+        amazonS3Remover.removeFile(exhibition.getThumbnail(), s3DirName);
+      } catch (IOException e) {
+        throw new AWSException(AMAZON_S3_ERROR);
+      }
+    }
   }
 }

@@ -1,6 +1,5 @@
 package com.prgrms.artzip.exhibition.service;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
@@ -10,7 +9,7 @@ import com.prgrms.artzip.exhibition.domain.Exhibition;
 import com.prgrms.artzip.exhibition.domain.enumType.Area;
 import com.prgrms.artzip.exhibition.domain.enumType.Genre;
 import com.prgrms.artzip.exhibition.domain.repository.ExhibitionRepository;
-import com.prgrms.artzip.exhibition.dto.request.ExhibitionCreateRequest;
+import com.prgrms.artzip.exhibition.dto.request.ExhibitionCreateOrUpdateRequest;
 import com.prgrms.artzip.user.domain.LocalUser;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
@@ -71,7 +70,7 @@ class ExhibitionAdminServiceTest {
   @DisplayName("전시회 생성 테스트")
   void createExhibition() throws IOException {
     //given
-    ExhibitionCreateRequest request = ExhibitionCreateRequest.builder()
+    ExhibitionCreateOrUpdateRequest request = ExhibitionCreateOrUpdateRequest.builder()
         .name("전시회 제목")
         .startDate(LocalDate.of(2022, 4, 11))
         .endDate(LocalDate.of(2022, 6, 2))

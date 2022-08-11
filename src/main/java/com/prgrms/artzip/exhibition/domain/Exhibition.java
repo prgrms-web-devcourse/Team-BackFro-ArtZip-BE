@@ -24,6 +24,7 @@ import com.prgrms.artzip.exhibition.domain.enumType.Area;
 import com.prgrms.artzip.exhibition.domain.enumType.Genre;
 import com.prgrms.artzip.exhibition.domain.vo.Location;
 import com.prgrms.artzip.exhibition.domain.vo.Period;
+import com.prgrms.artzip.exhibition.dto.request.ExhibitionCreateOrUpdateRequest;
 import com.prgrms.artzip.review.domain.Review;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -113,6 +114,28 @@ public class Exhibition extends BaseEntity {
     setUrl(url);
     setPlaceUrl(placeUrl);
     this.isDeleted = false;
+  }
+
+  public void update(ExhibitionCreateOrUpdateRequest updateRequest) {
+    setName(updateRequest.getName());
+    setPeriod(updateRequest.getStartDate(), updateRequest.getEndDate());
+    this.genre = updateRequest.getGenre();
+    setDescription(updateRequest.getDescription());
+    setLocation(
+        updateRequest.getLatitude(),
+        updateRequest.getLongitude(),
+        updateRequest.getArea(),
+        updateRequest.getPlace(),
+        updateRequest.getAddress()
+    );
+    setInquiry(updateRequest.getInquiry());
+    setFee(updateRequest.getFee());
+    setUrl(updateRequest.getUrl());
+    setPlaceUrl(updateRequest.getPlaceUrl());
+  }
+
+  public void changeThumbnail(String thumbnailPath) {
+    setThumbnail(thumbnailPath);
   }
 
   public void deleteExhibition() {

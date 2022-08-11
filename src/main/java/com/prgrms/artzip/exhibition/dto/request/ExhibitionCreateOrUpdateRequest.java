@@ -7,10 +7,9 @@ import javax.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.multipart.MultipartFile;
 
 @Getter
-public class ExhibitionCreateRequest {
+public class ExhibitionCreateOrUpdateRequest {
   @NotNull
   private final String name;
   private final String description;
@@ -34,12 +33,10 @@ public class ExhibitionCreateRequest {
   private final LocalDate endDate;
   private final String placeUrl;
   private final String url;
-//  @NotNull
-//  private final MultipartFile thumbnail;
   private final String place;
 
   @Builder
-  public ExhibitionCreateRequest(String name, String description,
+  public ExhibitionCreateOrUpdateRequest(String name, String description,
       String fee, Genre genre, String inquiry, String address,
       Area area, Double latitude, Double longitude, LocalDate startDate, LocalDate endDate,
       String placeUrl, String url, String place) {
@@ -56,7 +53,6 @@ public class ExhibitionCreateRequest {
     this.endDate = endDate;
     this.placeUrl = placeUrl;
     this.url = url;
-//    this.thumbnail = thumbnail;
     this.place = place;
   }
 }
