@@ -17,6 +17,7 @@ import com.prgrms.artzip.exhibition.domain.ExhibitionLike;
 import com.prgrms.artzip.exhibition.dto.response.ExhibitionInfoResponse;
 import com.prgrms.artzip.exhibition.service.ExhibitionLikeService;
 import com.prgrms.artzip.exhibition.service.ExhibitionService;
+import com.prgrms.artzip.review.dto.response.ReviewsResponse;
 import com.prgrms.artzip.review.service.ReviewLikeService;
 import com.prgrms.artzip.review.service.ReviewService;
 import com.prgrms.artzip.user.domain.User;
@@ -33,6 +34,7 @@ import com.prgrms.artzip.user.service.UserService;
 import com.prgrms.artzip.user.service.UserUtilService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +42,9 @@ import java.util.function.Function;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -116,7 +120,7 @@ public class UserController {
 
   @ApiOperation(value = "유저 정보 조회", notes = "유저 정보를 조회합니다.")
   @GetMapping("/{userId}/info")
-  public ResponseEntity<ApiResponse<UserRepository>> getUserInfo(
+  public ResponseEntity<ApiResponse<UserResponse>> getUserInfo(
       @PathVariable("userId") Long userId) {
     User user = userUtilService.getUserById(userId);
     UserResponse userResponse = UserResponse.builder()
@@ -204,6 +208,7 @@ public class UserController {
   @GetMapping("/{userId}/info/exhibitions/like")
   public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfoResponse>>> getUserLikeExhibitions(
       @CurrentUser User user,
+      @ApiParam(value = "조회할 유저 ID")
       @PathVariable("userId") Long userId,
       @PageableDefault(page = 0, size = 4) Pageable pageable
   ) {
@@ -219,5 +224,41 @@ public class UserController {
     return ResponseEntity
         .ok()
         .body(apiResponse);
+  }
+
+  @ApiOperation(value = "유저가 좋아요 누른 후기 조회", notes = "유저가 좋아요 누른 후기를 조회합니다.")
+  @GetMapping("/{userId}/info/reviews/like")
+  public ResponseEntity<ApiResponse<PageResponse<ReviewsResponse>>> getUserLikeReviews(
+      @CurrentUser User user,
+      @ApiParam(value = "조회할 유저 ID")
+      @PathVariable("userId") Long userId,
+      @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+    PageResponse<ReviewsResponse> response = reviewService.getReviewsForMyLikes(user, userId, pageable);
+
+    return ResponseEntity.ok()
+        .body(ApiResponse.<PageResponse<ReviewsResponse>>builder()
+            .message("유저가 좋아요 누른 후기 리스트 조회 성공")
+            .status(HttpStatus.OK.value())
+            .data(response)
+            .build());
+  }
+
+  @ApiOperation(value = "유저가 작성한 후기 조회", notes = "유저가 작성한 후기를 조회합니다.")
+  @GetMapping("/{userId}/info/my/reviews")
+  public ResponseEntity<ApiResponse<PageResponse<ReviewsResponse>>> getUserMyReviews(
+      @CurrentUser User user,
+      @ApiParam(value = "조회할 유저 ID")
+      @PathVariable("userId") Long userId,
+      @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+    PageResponse<ReviewsResponse> response = reviewService.getMyReviews(user, userId, pageable);
+
+    return ResponseEntity.ok()
+        .body(ApiResponse.<PageResponse<ReviewsResponse>>builder()
+            .message("유저가 작성한 후기 리스트 조회 성공")
+            .status(HttpStatus.OK.value())
+            .data(response)
+            .build());
   }
 }

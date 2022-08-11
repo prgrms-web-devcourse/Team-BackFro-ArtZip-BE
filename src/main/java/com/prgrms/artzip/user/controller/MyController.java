@@ -6,8 +6,11 @@ import com.prgrms.artzip.common.ApiResponse;
 import com.prgrms.artzip.common.entity.CurrentUser;
 import com.prgrms.artzip.user.domain.LocalUser;
 import com.prgrms.artzip.user.domain.User;
+import com.prgrms.artzip.user.domain.repository.UserRepository;
 import com.prgrms.artzip.user.dto.request.PasswordUpdateRequest;
 import com.prgrms.artzip.user.dto.request.UserUpdateRequest;
+import com.prgrms.artzip.user.dto.response.SimpleUserResponse;
+import com.prgrms.artzip.user.dto.response.UserResponse;
 import com.prgrms.artzip.user.dto.response.UserUpdateResponse;
 import com.prgrms.artzip.user.service.UserService;
 import io.swagger.annotations.Api;
@@ -17,7 +20,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -57,6 +62,19 @@ public class MyController {
     ApiResponse apiResponse = ApiResponse.builder()
         .message("유저의 비밀번호가 변경되었습니다.")
         .status(OK.value())
+        .build();
+    return ResponseEntity.ok(apiResponse);
+  }
+
+  @ApiOperation(value = "내 정보 조회", notes = "로그인한 유저의 정보를 조회합니다.")
+  @GetMapping("/info")
+  public ResponseEntity<ApiResponse<Object>> getUserInfo(
+      @CurrentUser User user) {
+
+    ApiResponse apiResponse = ApiResponse.builder()
+        .message("내 정보를 조회하였습니다.")
+        .status(OK.value())
+        .data(new SimpleUserResponse(user.getId()))
         .build();
     return ResponseEntity.ok(apiResponse);
   }

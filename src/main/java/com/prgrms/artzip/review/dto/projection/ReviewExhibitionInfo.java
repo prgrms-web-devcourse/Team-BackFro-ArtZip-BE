@@ -1,5 +1,4 @@
-package com.prgrms.artzip.review.dto.response;
-
+package com.prgrms.artzip.review.dto.projection;
 import java.time.LocalDate;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -5,7 +5,7 @@ import com.prgrms.artzip.exhibition.dto.projection.ExhibitionBasicForSimpleQuery
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionWithLocationForSimpleQuery;
-import com.prgrms.artzip.review.dto.response.ReviewExhibitionInfo;
+import com.prgrms.artzip.review.dto.projection.ReviewExhibitionInfo;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
