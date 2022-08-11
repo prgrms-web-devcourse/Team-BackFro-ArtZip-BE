@@ -483,7 +483,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 경기")
           .startDate(LocalDate.now().plusDays(20))
           .endDate(LocalDate.now().plusDays(30))
-          .genre(Genre.FINEART)
+          .genre(INSATALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.22)
           .longitude(129.02)

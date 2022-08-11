@@ -14,7 +14,6 @@ import com.prgrms.artzip.comment.domain.Comment;
 import com.prgrms.artzip.comment.repository.CommentRepository;
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.ErrorCode;
-import com.prgrms.artzip.common.PageResponse;
 import com.prgrms.artzip.common.entity.BaseEntity;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
@@ -37,7 +36,6 @@ import com.prgrms.artzip.review.dto.projection.ReviewWithLikeData;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
 import com.prgrms.artzip.review.dto.request.ReviewUpdateRequest;
 import com.prgrms.artzip.review.dto.response.ReviewIdResponse;
-import com.prgrms.artzip.review.dto.response.ReviewsResponse;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
@@ -806,7 +804,7 @@ class ReviewServiceTest {
             .name("전시회 제목")
             .startDate(LocalDate.of(2022, 4, 11))
             .endDate(LocalDate.of(2022, 6, 2))
-            .genre(Genre.FINEART)
+            .genre(Genre.INSATALLATION)
             .description("이것은 전시회 설명입니다.")
             .latitude(36.22)
             .longitude(128.02)
@@ -841,7 +839,7 @@ class ReviewServiceTest {
             LocalDateTime.class
         );
 
-        Review reflectionReview =  Review.builder()
+        Review reflectionReview = Review.builder()
             .user(reflectionUser)
             .exhibition(reflectionExhibition)
             .content("이것은 리뷰 본문입니다.")
@@ -900,9 +898,12 @@ class ReviewServiceTest {
 
         reviewService.getReviews(null, reflectionExhibition.getId(), pageable);
 
-        verify(reviewRepository).findReviewsByExhibitionIdAndUserId(reflectionExhibition.getId(), null, pageable);
-        verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(reflectionReview.getId());
-        verify(exhibitionRepository, times(reflectionReviews.getContent().size())).findById(reflectionExhibition.getId());
+        verify(reviewRepository).findReviewsByExhibitionIdAndUserId(reflectionExhibition.getId(),
+            null, pageable);
+        verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(
+            reflectionReview.getId());
+        verify(exhibitionRepository, times(reflectionReviews.getContent().size())).findById(
+            reflectionExhibition.getId());
       }
 
       @Test
@@ -925,7 +926,7 @@ class ReviewServiceTest {
             .name("전시회 제목")
             .startDate(LocalDate.of(2022, 4, 11))
             .endDate(LocalDate.of(2022, 6, 2))
-            .genre(Genre.FINEART)
+            .genre(Genre.INSATALLATION)
             .description("이것은 전시회 설명입니다.")
             .latitude(36.22)
             .longitude(128.02)
@@ -960,7 +961,7 @@ class ReviewServiceTest {
             LocalDateTime.class
         );
 
-        Review reflectionReview =  Review.builder()
+        Review reflectionReview = Review.builder()
             .user(reflectionUser)
             .exhibition(reflectionExhibition)
             .content("이것은 리뷰 본문입니다.")
@@ -1019,9 +1020,12 @@ class ReviewServiceTest {
 
         reviewService.getReviews(reflectionUser, reflectionExhibition.getId(), pageable);
 
-        verify(reviewRepository).findReviewsByExhibitionIdAndUserId(reflectionExhibition.getId(), reflectionUser.getId(), pageable);
-        verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(reflectionReview.getId());
-        verify(exhibitionRepository, times(reflectionReviews.getContent().size())).findById(reflectionExhibition.getId());
+        verify(reviewRepository).findReviewsByExhibitionIdAndUserId(reflectionExhibition.getId(),
+            reflectionUser.getId(), pageable);
+        verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(
+            reflectionReview.getId());
+        verify(exhibitionRepository, times(reflectionReviews.getContent().size())).findById(
+            reflectionExhibition.getId());
       }
 
     }
@@ -1058,7 +1062,7 @@ class ReviewServiceTest {
         // when
         // then
         assertThatThrownBy(() -> {
-          reviewService.getReviews(user, exhibition.getId(),pageable);
+          reviewService.getReviews(user, exhibition.getId(), pageable);
         }).isInstanceOf(NotFoundException.class)
             .hasMessageContaining(ErrorCode.REVIEW_NOT_FOUND.getMessage());
       }
@@ -1097,7 +1101,7 @@ class ReviewServiceTest {
             .name("전시회 제목")
             .startDate(LocalDate.of(2022, 4, 11))
             .endDate(LocalDate.of(2022, 6, 2))
-            .genre(Genre.FINEART)
+            .genre(Genre.INSATALLATION)
             .description("이것은 전시회 설명입니다.")
             .latitude(36.22)
             .longitude(128.02)
@@ -1132,7 +1136,7 @@ class ReviewServiceTest {
             LocalDateTime.class
         );
 
-        Review reflectionReview =  Review.builder()
+        Review reflectionReview = Review.builder()
             .user(reflectionUser)
             .exhibition(reflectionExhibition)
             .content("이것은 리뷰 본문입니다.")
@@ -1189,8 +1193,10 @@ class ReviewServiceTest {
 
         reviewService.getReviewsForExhibition(null, reflectionExhibition.getId());
 
-        verify(reviewRepository).findReviewsByExhibitionIdAndUserId(reflectionExhibition.getId(), null, pageable);
-        verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(reflectionReview.getId());
+        verify(reviewRepository).findReviewsByExhibitionIdAndUserId(reflectionExhibition.getId(),
+            null, pageable);
+        verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(
+            reflectionReview.getId());
       }
 
       @Test
@@ -1213,7 +1219,7 @@ class ReviewServiceTest {
             .name("전시회 제목")
             .startDate(LocalDate.of(2022, 4, 11))
             .endDate(LocalDate.of(2022, 6, 2))
-            .genre(Genre.FINEART)
+            .genre(Genre.INSATALLATION)
             .description("이것은 전시회 설명입니다.")
             .latitude(36.22)
             .longitude(128.02)
@@ -1248,7 +1254,7 @@ class ReviewServiceTest {
             LocalDateTime.class
         );
 
-        Review reflectionReview =  Review.builder()
+        Review reflectionReview = Review.builder()
             .user(reflectionUser)
             .exhibition(reflectionExhibition)
             .content("이것은 리뷰 본문입니다.")
@@ -1305,8 +1311,10 @@ class ReviewServiceTest {
 
         reviewService.getReviewsForExhibition(reflectionUser.getId(), reflectionExhibition.getId());
 
-        verify(reviewRepository).findReviewsByExhibitionIdAndUserId(reflectionExhibition.getId(), reflectionUser.getId(), pageable);
-        verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(reflectionReview.getId());
+        verify(reviewRepository).findReviewsByExhibitionIdAndUserId(reflectionExhibition.getId(),
+            reflectionUser.getId(), pageable);
+        verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(
+            reflectionReview.getId());
       }
 
     }
@@ -1401,7 +1409,7 @@ class ReviewServiceTest {
             .name("전시회 제목")
             .startDate(LocalDate.of(2022, 4, 11))
             .endDate(LocalDate.of(2022, 6, 2))
-            .genre(Genre.FINEART)
+            .genre(Genre.INSATALLATION)
             .description("이것은 전시회 설명입니다.")
             .latitude(36.22)
             .longitude(128.02)
@@ -1436,7 +1444,7 @@ class ReviewServiceTest {
             LocalDateTime.class
         );
 
-        Review reflectionReview =  Review.builder()
+        Review reflectionReview = Review.builder()
             .user(reflectionCurrentUser)
             .exhibition(reflectionExhibition)
             .content("이것은 리뷰 본문입니다.")
@@ -1509,8 +1517,10 @@ class ReviewServiceTest {
         // when
         verify(reviewRepository).findReviewsByCurrentUserIdAndTargetUserId(
             null, reflectionTargetUser.getId(), pageable);
-        verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(reflectionReview.getId());
-        verify(exhibitionRepository, times(reflectionReviews.getContent().size())).findById(reflectionExhibition.getId());
+        verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(
+            reflectionReview.getId());
+        verify(exhibitionRepository, times(reflectionReviews.getContent().size())).findById(
+            reflectionExhibition.getId());
       }
 
       @Test
@@ -1545,7 +1555,7 @@ class ReviewServiceTest {
             .name("전시회 제목")
             .startDate(LocalDate.of(2022, 4, 11))
             .endDate(LocalDate.of(2022, 6, 2))
-            .genre(Genre.FINEART)
+            .genre(Genre.INSATALLATION)
             .description("이것은 전시회 설명입니다.")
             .latitude(36.22)
             .longitude(128.02)
@@ -1580,7 +1590,7 @@ class ReviewServiceTest {
             LocalDateTime.class
         );
 
-        Review reflectionReview =  Review.builder()
+        Review reflectionReview = Review.builder()
             .user(reflectionCurrentUser)
             .exhibition(reflectionExhibition)
             .content("이것은 리뷰 본문입니다.")
@@ -1653,8 +1663,10 @@ class ReviewServiceTest {
         // when
         verify(reviewRepository).findReviewsByCurrentUserIdAndTargetUserId(
             reflectionCurrentUser.getId(), null, pageable);
-        verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(reflectionReview.getId());
-        verify(exhibitionRepository, times(reflectionReviews.getContent().size())).findById(reflectionExhibition.getId());
+        verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(
+            reflectionReview.getId());
+        verify(exhibitionRepository, times(reflectionReviews.getContent().size())).findById(
+            reflectionExhibition.getId());
       }
 
     }
