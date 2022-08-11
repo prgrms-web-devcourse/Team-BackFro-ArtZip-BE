@@ -3,7 +3,11 @@ package com.prgrms.artzip.review.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.ErrorCode;
@@ -50,7 +54,7 @@ class ReviewLikeServiceTest {
       .name("전시회 제목")
       .startDate(LocalDate.of(2022, 4, 11))
       .endDate(LocalDate.of(2022, 6, 2))
-      .genre(Genre.FINEART)
+      .genre(Genre.INSATALLATION)
       .description("이것은 전시회 설명입니다.")
       .latitude(36.22)
       .longitude(128.02)

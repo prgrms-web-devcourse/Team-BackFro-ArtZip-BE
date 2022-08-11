@@ -12,6 +12,7 @@ import static java.util.Objects.nonNull;
 
 import com.prgrms.artzip.exhibition.domain.QExhibitionLike;
 import com.prgrms.artzip.exhibition.domain.enumType.Area;
+import com.prgrms.artzip.exhibition.domain.enumType.Genre;
 import com.prgrms.artzip.exhibition.domain.enumType.Month;
 import com.prgrms.artzip.exhibition.dto.ExhibitionCustomCondition;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionBasicForSimpleQuery;
@@ -412,6 +413,13 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
       });
 
       customCondition.and(monthCondition);
+    }
+
+    Set<Genre> genres = exhibitionCustomCondition.getGenres();
+    if (nonNull(genres) && !genres.isEmpty() && !genres.contains(Genre.ALL)) {
+      BooleanBuilder genreCondition = new BooleanBuilder();
+      genres.forEach(genre -> genreCondition.or(exhibition.genre.eq(genre)));
+      customCondition.and(genreCondition);
     }
 
     customCondition

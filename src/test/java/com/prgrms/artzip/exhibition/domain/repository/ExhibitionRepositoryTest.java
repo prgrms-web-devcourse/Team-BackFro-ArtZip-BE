@@ -3,6 +3,10 @@ package com.prgrms.artzip.exhibition.domain.repository;
 import static com.prgrms.artzip.exhibition.domain.enumType.Area.BUSAN;
 import static com.prgrms.artzip.exhibition.domain.enumType.Area.GYEONGGI;
 import static com.prgrms.artzip.exhibition.domain.enumType.Area.SEOUL;
+import static com.prgrms.artzip.exhibition.domain.enumType.Genre.INSATALLATION;
+import static com.prgrms.artzip.exhibition.domain.enumType.Genre.MEDIA;
+import static com.prgrms.artzip.exhibition.domain.enumType.Genre.PHOTO;
+import static com.prgrms.artzip.exhibition.domain.enumType.Genre.SHOW;
 import static com.prgrms.artzip.exhibition.domain.enumType.Month.DEC;
 import static com.prgrms.artzip.exhibition.domain.enumType.Month.JAN;
 import static com.prgrms.artzip.exhibition.domain.enumType.Month.JUN;
@@ -77,7 +81,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 부산")
           .startDate(LocalDate.now().plusDays(10))
           .endDate(LocalDate.now().plusDays(15))
-          .genre(Genre.FINEART)
+          .genre(INSATALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(36.22)
           .longitude(128.02)
@@ -97,7 +101,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 서울")
           .startDate(LocalDate.now().plusDays(3))
           .endDate(LocalDate.now().plusDays(5))
-          .genre(Genre.FINEART)
+          .genre(INSATALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.22)
           .longitude(129.02)
@@ -117,7 +121,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 경기")
           .startDate(LocalDate.now().minusDays(6))
           .endDate(LocalDate.now().minusDays(3))
-          .genre(Genre.FINEART)
+          .genre(INSATALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.22)
           .longitude(129.02)
@@ -204,7 +208,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 부산")
           .startDate(LocalDate.now().plusDays(10))
           .endDate(LocalDate.now().plusDays(15))
-          .genre(Genre.FINEART)
+          .genre(INSATALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(36.22)
           .longitude(128.02)
@@ -224,7 +228,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 경기")
           .startDate(LocalDate.now().minusDays(6))
           .endDate(LocalDate.now().minusDays(3))
-          .genre(Genre.FINEART)
+          .genre(INSATALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.22)
           .longitude(129.02)
@@ -312,7 +316,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 경기")
           .startDate(LocalDate.now().minusDays(6))
           .endDate(LocalDate.now().minusDays(3))
-          .genre(Genre.FINEART)
+          .genre(INSATALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.22)
           .longitude(129.02)
@@ -383,7 +387,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 부산")
           .startDate(LocalDate.now().plusDays(10))
           .endDate(LocalDate.now().plusDays(15))
-          .genre(Genre.FINEART)
+          .genre(INSATALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(36.22)
           .longitude(128.02)
@@ -403,7 +407,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 경기")
           .startDate(LocalDate.now().minusDays(6))
           .endDate(LocalDate.now().minusDays(3))
-          .genre(Genre.FINEART)
+          .genre(INSATALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.22)
           .longitude(129.02)
@@ -459,7 +463,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 부산")
           .startDate(LocalDate.now().minusDays(5))
           .endDate(LocalDate.now().plusDays(15))
-          .genre(Genre.FINEART)
+          .genre(INSATALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(36.22)
           .longitude(128.02)
@@ -479,7 +483,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 경기")
           .startDate(LocalDate.now().plusDays(20))
           .endDate(LocalDate.now().plusDays(30))
-          .genre(Genre.FINEART)
+          .genre(INSATALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.22)
           .longitude(129.02)
@@ -536,7 +540,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 부산")
           .startDate(LocalDate.now().plusDays(10))
           .endDate(LocalDate.now().plusDays(15))
-          .genre(Genre.FINEART)
+          .genre(INSATALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(36.22)
           .longitude(128.02)
@@ -556,7 +560,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 경기")
           .startDate(LocalDate.now().minusDays(6))
           .endDate(LocalDate.now().minusDays(3))
-          .genre(Genre.FINEART)
+          .genre(INSATALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.22)
           .longitude(129.02)
@@ -637,7 +641,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 부산")
           .startDate(LocalDate.of(LocalDate.now().getYear() - 1, 12, 21))
           .endDate(LocalDate.of(LocalDate.now().getYear(), 3, 7))
-          .genre(Genre.FINEART)
+          .genre(INSATALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(36.22)
           .longitude(128.02)
@@ -657,7 +661,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 서울")
           .startDate(LocalDate.of(LocalDate.now().getYear(), 6, 1))
           .endDate(LocalDate.of(LocalDate.now().getYear(), 8, 15))
-          .genre(Genre.FINEART)
+          .genre(MEDIA)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.22)
           .longitude(129.02)
@@ -677,7 +681,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 경기")
           .startDate(LocalDate.of(LocalDate.now().getYear(), 12, 11))
           .endDate(LocalDate.of(LocalDate.now().getYear() + 1, 2, 10))
-          .genre(Genre.FINEART)
+          .genre(PHOTO)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.22)
           .longitude(129.02)
@@ -717,11 +721,13 @@ class ExhibitionRepositoryTest {
       // 부산 경기
       Set<Area> areas = new HashSet<>(Arrays.asList(BUSAN, GYEONGGI));
       Set<Month> months = new HashSet<>();
+      Set<Genre> genres = new HashSet<>();
       boolean includeEnd = true;
 
       ExhibitionCustomCondition exhibitionCustomCondition = ExhibitionCustomCondition.builder()
           .areas(areas)
           .months(months)
+          .genres(genres)
           .includeEnd(includeEnd)
           .build();
 
@@ -744,11 +750,13 @@ class ExhibitionRepositoryTest {
       // 1, 12 -> 부산 경기
       Set<Area> areas = new HashSet<>();
       Set<Month> months = new HashSet<>(Arrays.asList(JAN, DEC));
+      Set<Genre> genres = new HashSet<>();
       boolean includeEnd = true;
 
       ExhibitionCustomCondition exhibitionCustomCondition = ExhibitionCustomCondition.builder()
           .areas(areas)
           .months(months)
+          .genres(genres)
           .includeEnd(includeEnd)
           .build();
 
@@ -766,6 +774,31 @@ class ExhibitionRepositoryTest {
     }
 
     @Test
+    @DisplayName("장르 조건 테스트")
+    void testGenreCondition() {
+      Set<Area> areas = new HashSet<>();
+      Set<Month> months = new HashSet<>();
+      Set<Genre> genres = new HashSet<>(Arrays.asList(MEDIA, SHOW));
+      boolean includeEnd = true;
+
+      ExhibitionCustomCondition exhibitionCustomCondition = ExhibitionCustomCondition.builder()
+          .areas(areas)
+          .months(months)
+          .genres(genres)
+          .includeEnd(includeEnd)
+          .build();
+
+      Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findExhibitionsByCustomCondition(
+          null, exhibitionCustomCondition, PageRequest.of(0, 8));
+
+      List<ExhibitionForSimpleQuery> contents = exhibitionsPagingResult.getContent();
+      assertThat(contents).hasSize(1);
+
+      assertThat(contents.get(0))
+          .hasFieldOrPropertyWithValue("name", "전시회 at 서울");
+    }
+
+    @Test
     @DisplayName("로그인한 상태에서 복합 조건 테스트")
     void testComplexCondition() {
       // 로그인(user1)
@@ -776,11 +809,13 @@ class ExhibitionRepositoryTest {
 
       Set<Area> areas = new HashSet<>(Arrays.asList(BUSAN, GYEONGGI));
       Set<Month> months = new HashSet<>(Arrays.asList(MAR, MAY, JUN));
+      Set<Genre> genres = new HashSet<>(Arrays.asList(PHOTO, MEDIA, INSATALLATION));
       boolean includeEnd = true;
 
       ExhibitionCustomCondition exhibitionCustomCondition = ExhibitionCustomCondition.builder()
           .areas(areas)
           .months(months)
+          .genres(genres)
           .includeEnd(includeEnd)
           .build();
 
@@ -808,7 +843,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 부산")
           .startDate(LocalDate.now().plusDays(10))
           .endDate(LocalDate.now().plusDays(15))
-          .genre(Genre.FINEART)
+          .genre(INSATALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.501086)
           .longitude(127.053447)
@@ -828,7 +863,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 서울")
           .startDate(LocalDate.now().plusDays(20))
           .endDate(LocalDate.now().plusDays(25))
-          .genre(Genre.FINEART)
+          .genre(INSATALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.564138)
           .longitude(126.973763)
@@ -848,7 +883,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 경기")
           .startDate(LocalDate.now().minusDays(10))
           .endDate(LocalDate.now().minusDays(5))
-          .genre(Genre.FINEART)
+          .genre(INSATALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.496193)
           .longitude(127.030906)
@@ -907,7 +942,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 부산")
           .startDate(LocalDate.of(LocalDate.now().getYear() - 1, 12, 21))
           .endDate(LocalDate.of(LocalDate.now().getYear(), 3, 7))
-          .genre(Genre.FINEART)
+          .genre(INSATALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(36.22)
           .longitude(128.02)
@@ -927,7 +962,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 서울")
           .startDate(LocalDate.of(LocalDate.now().getYear(), 6, 1))
           .endDate(LocalDate.of(LocalDate.now().getYear(), 8, 15))
-          .genre(Genre.FINEART)
+          .genre(INSATALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.22)
           .longitude(129.02)

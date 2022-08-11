@@ -8,6 +8,7 @@ import static java.util.Objects.isNull;
 
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.exhibition.domain.enumType.Area;
+import com.prgrms.artzip.exhibition.domain.enumType.Genre;
 import com.prgrms.artzip.exhibition.domain.enumType.Month;
 import com.prgrms.artzip.exhibition.domain.repository.ExhibitionRepository;
 import com.prgrms.artzip.exhibition.dto.ExhibitionCustomCondition;
@@ -72,12 +73,14 @@ public class ExhibitionSearchService {
       ExhibitionCustomConditionRequest exhibitionCustomConditionRequest, boolean includeEnd) {
     List<Area> requestedAreas = exhibitionCustomConditionRequest.getAreas();
     List<Month> requestedMonths = exhibitionCustomConditionRequest.getMonths();
+    List<Genre> requestedGenres = exhibitionCustomConditionRequest.getGenres();
 
-    if (requestedAreas.isEmpty() || requestedMonths.isEmpty()) {
+    if (requestedAreas.isEmpty() || requestedMonths.isEmpty() || requestedGenres.isEmpty()) {
       throw new InvalidRequestException(INVALID_INPUT_VALUE);
     }
-    
-    if (requestedAreas.contains(null) || requestedMonths.contains(null)) {
+
+    if (requestedAreas.contains(null) || requestedMonths.contains(null) || requestedGenres.contains(
+        null)) {
       throw new InvalidRequestException(INVALID_CUSTOM_EXHB_CONDITION);
     }
 
@@ -95,9 +98,17 @@ public class ExhibitionSearchService {
       requestedMonths.forEach(month -> months.add(month));
     }
 
+    Set<Genre> genres = new HashSet<>();
+    if (requestedGenres.contains(Genre.ALL)) {
+      genres.add(Genre.ALL);
+    } else {
+      requestedGenres.forEach(genre -> genres.add(genre));
+    }
+
     return ExhibitionCustomCondition.builder()
         .areas(areas)
         .months(months)
+        .genres(genres)
         .includeEnd(includeEnd)
         .build();
   }
