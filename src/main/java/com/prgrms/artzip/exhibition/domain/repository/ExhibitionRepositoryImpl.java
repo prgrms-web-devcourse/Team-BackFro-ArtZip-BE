@@ -36,10 +36,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
+@Slf4j
 @RequiredArgsConstructor
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
@@ -58,7 +60,9 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
     List<ExhibitionForSimpleQuery> exhibitions = findExhibitions(userId, upcomingCondition,
         Arrays.asList(
             new OrderSpecifier(Order.ASC, exhibition.period.startDate),
-            new OrderSpecifier(Order.ASC, exhibition.period.endDate)),
+            new OrderSpecifier(Order.ASC, exhibition.period.endDate),
+            new OrderSpecifier(Order.ASC, exhibition.id)
+        ),
         pageable);
 
     JPAQuery<Long> countQuery = getExhibitionCountQuery(upcomingCondition);
@@ -73,7 +77,10 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
 
     List<ExhibitionForSimpleQuery> exhibitions = findExhibitions(userId,
         mostLikeCondition,
-        List.of(new OrderSpecifier(Order.DESC, Expressions.numberPath(Long.class, "likeCount"))),
+        List.of(
+            new OrderSpecifier(Order.DESC, Expressions.numberPath(Long.class, "likeCount")),
+            new OrderSpecifier(Order.ASC, exhibition.id)
+        ),
         pageable);
 
     JPAQuery<Long> countQuery = getExhibitionCountQuery(mostLikeCondition);
@@ -188,7 +195,10 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize())
         .groupBy(exhibition.id, exhibitionLikeForExhibitionLikeUser.createdAt)
-        .orderBy(exhibitionLikeForExhibitionLikeUser.createdAt.desc())
+        .orderBy(
+            exhibitionLikeForExhibitionLikeUser.createdAt.desc(),
+            exhibition.id.asc()
+        )
         .fetch();
 
     JPAQuery<Long> countQuery = queryFactory
@@ -209,7 +219,10 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
     BooleanBuilder customCondition = getCustomCondition(exhibitionCustomCondition);
 
     List<ExhibitionForSimpleQuery> exhibitions = findExhibitions(userId, customCondition,
-        List.of(new OrderSpecifier(Order.ASC, exhibition.period.startDate)),
+        List.of(
+            new OrderSpecifier(Order.ASC, exhibition.period.startDate),
+            new OrderSpecifier(Order.ASC, exhibition.id)
+        ),
         pageable);
 
     JPAQuery<Long> countQuery = getExhibitionCountQuery(customCondition);
@@ -249,7 +262,6 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
         .groupBy(exhibition.id)
         .fetch();
   }
-
 
   @Override
   public Optional<ReviewExhibitionInfo> findExhibitionForReview(
@@ -292,6 +304,7 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
 
   private List<ExhibitionForSimpleQuery> findExhibitions(Long userId, BooleanBuilder condition,
       List<OrderSpecifier> orders, Pageable pageable) {
+
     return queryFactory
         .select(Projections.fields(ExhibitionForSimpleQuery.class,
                 exhibition.id,
@@ -366,6 +379,7 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
 
     exhibitionsForReviewCondition
         .and(exhibitionNameContains(query))
+        .and(exhibitionStartDateGt())
         .and(exhibitionIsDeletedIsFalse());
 
     return exhibitionsForReviewCondition;
@@ -445,6 +459,10 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
     } else {
       return exhibitionLikeForIsLiked.user.id.eq(userId);
     }
+  }
+
+  private BooleanExpression exhibitionStartDateGt() {
+    return exhibition.period.startDate.loe(LocalDate.now());
   }
 
   private BooleanExpression exhibitionEndDateGoe() {

@@ -26,15 +26,18 @@ import com.prgrms.artzip.review.dto.response.ReviewExhibitionInfoResponse;
 import com.prgrms.artzip.review.dto.response.ReviewIdResponse;
 import com.prgrms.artzip.review.dto.response.ReviewResponse;
 import com.prgrms.artzip.review.dto.response.ReviewsResponse;
+import com.prgrms.artzip.review.dto.response.ReviewsResponseForExhibitionDetail;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -160,16 +163,42 @@ public class ReviewService {
     Page<ReviewWithLikeAndCommentCount> reviews = reviewRepository.findReviewsByExhibitionIdAndUserId(
         exhibitionId, Objects.isNull(user) ? null : user.getId(), pageable);
 
-    return new PageResponse<>(reviews.map(r -> {
+    return new PageResponse<>(reviews.map(this::getReviewsResponse));
+  }
+
+  @Transactional(readOnly = true)
+  public List<ReviewsResponseForExhibitionDetail> getReviewsForExhibition(Long userId, Long exhibitionId) {
+    List<ReviewWithLikeAndCommentCount> reviews = reviewRepository.findReviewsByExhibitionIdAndUserId(
+        exhibitionId, Objects.isNull(userId) ? null : userId,
+        PageRequest.of(0, 4, Sort.by("reviewLikeCount").descending())).getContent();
+
+    return reviews.stream().map(r -> {
       Review review = reviewRepository.findById(r.getReviewId())
           .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_NOT_FOUND));
       List<ReviewPhoto> reviewPhotos = review.getReviewPhotos();
       User reviewUser = review.getUser();
-      Exhibition exhibition = exhibitionRepository.findById(review.getExhibition().getId())
-          .orElseThrow(() -> new NotFoundException(ErrorCode.EXHB_NOT_FOUND));
+      return new ReviewsResponseForExhibitionDetail(r, reviewPhotos, reviewUser);
+    }).collect(Collectors.toList());
+  }
 
-      return new ReviewsResponse(r, reviewPhotos, reviewUser, exhibition);
-    }));
+  @Transactional(readOnly = true)
+  public PageResponse<ReviewsResponse> getReviewsForMyLikes(User currentUser, Long targetUserId, Pageable pageable) {
+
+    Page<ReviewWithLikeAndCommentCount> reviews = reviewRepository.findReviewsByCurrentUserIdAndTargetUserId(
+        Objects.isNull(currentUser) ? null : currentUser.getId(), targetUserId, pageable);
+
+    return new PageResponse<>(reviews.map(this::getReviewsResponse));
+  }
+
+  private ReviewsResponse getReviewsResponse(ReviewWithLikeAndCommentCount reviewData) {
+    Review review = reviewRepository.findById(reviewData.getReviewId())
+        .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_NOT_FOUND));
+    List<ReviewPhoto> reviewPhotos = review.getReviewPhotos();
+    User reviewUser = review.getUser();
+    Exhibition exhibition = exhibitionRepository.findById(review.getExhibition().getId())
+        .orElseThrow(() -> new NotFoundException(ErrorCode.EXHB_NOT_FOUND));
+
+    return new ReviewsResponse(reviewData, reviewPhotos, reviewUser, exhibition);
   }
 
   private void removeReviewPhotosById(List<Long> reviewPhotoIds) {

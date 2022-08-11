@@ -461,7 +461,7 @@ class ExhibitionRepositoryTest {
       Exhibition exhibitionAtBusan = Exhibition.builder()
           .seq(32)
           .name("전시회 at 부산")
-          .startDate(LocalDate.now().plusDays(10))
+          .startDate(LocalDate.now().minusDays(5))
           .endDate(LocalDate.now().plusDays(15))
           .genre(INSATALLATION)
           .description("이것은 전시회 설명입니다.")
@@ -478,6 +478,26 @@ class ExhibitionRepositoryTest {
           .build();
       em.persist(exhibitionAtBusan);
 
+      Exhibition exhibitionGyeonggi = Exhibition.builder()
+          .seq(34)
+          .name("전시회 at 경기")
+          .startDate(LocalDate.now().plusDays(20))
+          .endDate(LocalDate.now().plusDays(30))
+          .genre(Genre.FINEART)
+          .description("이것은 전시회 설명입니다.")
+          .latitude(37.22)
+          .longitude(129.02)
+          .area(GYEONGGI)
+          .place("미술관")
+          .address("경기도 성남시")
+          .inquiry("문의처 정보")
+          .fee("성인 20,000원")
+          .thumbnail("http://www.culture.go.kr/upload/rdf/22/07/show_2022072010193392447.jpg")
+          .url("https://www.example.com")
+          .placeUrl("https://www.place-example.com")
+          .build();
+      em.persist(exhibitionGyeonggi);
+
       em.flush();
       em.clear();
     }
@@ -487,7 +507,7 @@ class ExhibitionRepositoryTest {
     @DisplayName("검색어에 맞는 결과가 반환되는지 테스트")
     void testFindExhibitionsForReview() {
       List<ExhibitionBasicForSimpleQuery> exhibitions = exhibitionRepository.findExhibitionsForReview(
-          "부산");
+          "전시");
 
       assertThat(exhibitions).hasSize(1);
       assertThat(exhibitions.get(0))
