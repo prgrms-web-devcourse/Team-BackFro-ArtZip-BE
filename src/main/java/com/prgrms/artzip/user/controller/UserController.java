@@ -226,8 +226,8 @@ public class UserController {
         .body(apiResponse);
   }
 
-  @ApiOperation(value = "유저가 좋아요 누른 후기 기회", notes = "유저가 좋아요 누른 후기를 조회합니다.")
-  @GetMapping("{userId}/info/review/like")
+  @ApiOperation(value = "유저가 좋아요 누른 후기 조회", notes = "유저가 좋아요 누른 후기를 조회합니다.")
+  @GetMapping("/{userId}/info/reviews/like")
   public ResponseEntity<ApiResponse<PageResponse<ReviewsResponse>>> getUserLikeReviews(
       @CurrentUser User user,
       @ApiParam(value = "조회할 유저 ID")
@@ -245,7 +245,7 @@ public class UserController {
   }
 
   @ApiOperation(value = "유저가 작성한 후기 조회", notes = "유저가 작성한 후기를 조회합니다.")
-  @GetMapping("{userId}/info/my/reviews")
+  @GetMapping("/{userId}/info/my/reviews")
   public ResponseEntity<ApiResponse<PageResponse<ReviewsResponse>>> getUserMyReviews(
       @CurrentUser User user,
       @ApiParam(value = "조회할 유저 ID")
