@@ -15,6 +15,7 @@ import com.prgrms.artzip.exhibition.domain.repository.ExhibitionRepositoryImpl;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.request.ExhibitionCreateOrUpdateRequest;
+import com.prgrms.artzip.exhibition.dto.request.ExhibitionSemiUpdateRequest;
 import com.prgrms.artzip.exhibition.dto.response.ExhibitionDetailInfoResponse;
 import com.prgrms.artzip.exhibition.dto.response.ExhibitionInfoResponse;
 import com.prgrms.artzip.review.service.ReviewService;
@@ -73,7 +74,7 @@ public class ExhibitionAdminService {
     return exhibitions.map(ExhibitionInfoResponse::new);
   }
 
-  public ExhibitionDetailInfoResponse getExhibition(Long exhibitionId) {
+  public ExhibitionDetailInfoResponse getExhibitionDetail(Long exhibitionId) {
     ExhibitionDetailForSimpleQuery exhibition = exhibitionRepositoryImpl
         .findExhibition(null, exhibitionId)
         .orElseThrow(() -> {
@@ -102,9 +103,7 @@ public class ExhibitionAdminService {
   }
 
   public void updateExhibition(Long exhibitionId, ExhibitionCreateOrUpdateRequest request, MultipartFile thumbnail) {
-    Exhibition exhibition = exhibitionRepository
-        .findById(exhibitionId)
-        .orElseThrow(() -> new NotFoundException(ErrorCode.EXHB_NOT_FOUND));
+    Exhibition exhibition = getExhibition(exhibitionId);
     exhibition.update(request);
     if (Objects.nonNull(thumbnail)) {
       try {
@@ -116,5 +115,16 @@ public class ExhibitionAdminService {
         throw new AWSException(AMAZON_S3_ERROR);
       }
     }
+  }
+
+  public void semiUpdateExhibition(Long exhibitionId, ExhibitionSemiUpdateRequest request) {
+    Exhibition exhibition = getExhibition(exhibitionId);
+    exhibition.updateGenreAndDescription(request);
+  }
+
+  private Exhibition getExhibition(Long exhibitionId) {
+    return exhibitionRepository
+        .findById(exhibitionId)
+        .orElseThrow(() -> new NotFoundException(ErrorCode.EXHB_NOT_FOUND));
   }
 }

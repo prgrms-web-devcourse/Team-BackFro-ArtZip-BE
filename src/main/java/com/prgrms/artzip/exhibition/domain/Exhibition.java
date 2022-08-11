@@ -25,10 +25,12 @@ import com.prgrms.artzip.exhibition.domain.enumType.Genre;
 import com.prgrms.artzip.exhibition.domain.vo.Location;
 import com.prgrms.artzip.exhibition.domain.vo.Period;
 import com.prgrms.artzip.exhibition.dto.request.ExhibitionCreateOrUpdateRequest;
+import com.prgrms.artzip.exhibition.dto.request.ExhibitionSemiUpdateRequest;
 import com.prgrms.artzip.review.domain.Review;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.persistence.Column;
@@ -136,6 +138,15 @@ public class Exhibition extends BaseEntity {
 
   public void changeThumbnail(String thumbnailPath) {
     setThumbnail(thumbnailPath);
+  }
+
+  public void updateGenreAndDescription(ExhibitionSemiUpdateRequest updateRequest) {
+    if (Objects.nonNull(updateRequest.getDescription())) {
+      this.description = updateRequest.getDescription();
+    }
+    if (Objects.nonNull(updateRequest.getGenre())) {
+      this.genre = updateRequest.getGenre();
+    }
   }
 
   public void deleteExhibition() {

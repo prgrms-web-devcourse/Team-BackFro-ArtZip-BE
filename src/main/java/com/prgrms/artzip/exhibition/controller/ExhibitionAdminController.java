@@ -3,6 +3,7 @@ package com.prgrms.artzip.exhibition.controller;
 import com.prgrms.artzip.common.ApiResponse;
 import com.prgrms.artzip.common.PageResponse;
 import com.prgrms.artzip.exhibition.dto.request.ExhibitionCreateOrUpdateRequest;
+import com.prgrms.artzip.exhibition.dto.request.ExhibitionSemiUpdateRequest;
 import com.prgrms.artzip.exhibition.dto.response.ExhibitionDetailInfoResponse;
 import com.prgrms.artzip.exhibition.dto.response.ExhibitionInfoResponse;
 import com.prgrms.artzip.exhibition.service.ExhibitionAdminService;
@@ -17,9 +18,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -56,7 +59,8 @@ public class ExhibitionAdminController {
   public ResponseEntity<ApiResponse<ExhibitionDetailInfoResponse>> getExhibition(
       @PathVariable Long exhibitionId
   ) {
-    ExhibitionDetailInfoResponse exhibition = exhibitionAdminService.getExhibition(exhibitionId);
+    ExhibitionDetailInfoResponse exhibition = exhibitionAdminService
+        .getExhibitionDetail(exhibitionId);
     return ResponseEntity.ok(ApiResponse
         .<ExhibitionDetailInfoResponse>builder()
         .message("전시회 상세 조회 완료")
@@ -81,6 +85,15 @@ public class ExhibitionAdminController {
       @RequestPart MultipartFile thumbnail
   ) {
     exhibitionAdminService.updateExhibition(exhibitionId, request, thumbnail);
+    return ResponseEntity.ok().build();
+  }
+
+  @PatchMapping("/{exhibitionId}/semi")
+  public ResponseEntity<Void> updateSemiExhibition(
+      @PathVariable Long exhibitionId,
+      @RequestBody ExhibitionSemiUpdateRequest request
+  ) {
+    exhibitionAdminService.semiUpdateExhibition(exhibitionId, request);
     return ResponseEntity.ok().build();
   }
 }
