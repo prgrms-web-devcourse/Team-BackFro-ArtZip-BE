@@ -21,7 +21,7 @@ public class ExhibitionAdminService {
 
   public Long createExhibition(ExhibitionCreateRequest request, MultipartFile thumbnail) {
     try {
-      String thumbnailAddress = amazonS3Uploader.upload(thumbnail, "/exhibition");
+      String thumbnailAddress = amazonS3Uploader.upload(thumbnail, "exhibition");
       Exhibition exhibition = exhibitionRepository.save(Exhibition.builder()
           .area(request.getArea())
           .description(request.getDescription())
