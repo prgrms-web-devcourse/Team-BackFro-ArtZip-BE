@@ -25,6 +25,7 @@ public class ReviewsResponse {
   private Boolean isLiked;
   private Boolean isPublic;
   private Long likeCount;
+  private Long commentCount;
   private List<ReviewPhotoInfo> photos;
 
   public ReviewsResponse(ReviewWithLikeAndCommentCount review, List<ReviewPhoto> photos,
@@ -44,6 +45,7 @@ public class ReviewsResponse {
     this.isLiked = review.getIsLiked();
     this.isPublic = review.getIsPublic();
     this.likeCount = review.getLikeCount();
+    this.commentCount = review.getCommentCount();
     this.photos = photos.stream().map(ReviewPhotoInfo::new).collect(Collectors.toList());
   }
 
