@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -76,33 +77,41 @@ public class ExhibitionAdminController {
       @RequestPart MultipartFile thumbnail
   ) {
     Long exhibitionId = exhibitionAdminService.createExhibition(request, thumbnail);
-    return ResponseEntity.created(URI.create("/api/v1/admin/exhibitions/" + exhibitionId)).build();
+    HttpHeaders headers = new HttpHeaders();
+    headers.setLocation(URI.create("/api/v1/admin/exhibitions/" + exhibitionId));
+    return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
   }
 
   @PutMapping("/{exhibitionId}")
-  public ResponseEntity<Void> updateExhibition(
+  public ResponseEntity<?> updateExhibition(
       @PathVariable Long exhibitionId,
       @Valid @ModelAttribute ExhibitionCreateOrUpdateRequest request,
       @RequestPart MultipartFile thumbnail
   ) {
     exhibitionAdminService.updateExhibition(exhibitionId, request, thumbnail);
-    return ResponseEntity.created(URI.create("/api/v1/admin/exhibitions/" + exhibitionId)).build();
+    HttpHeaders headers = new HttpHeaders();
+    headers.setLocation(URI.create("/api/v1/admin/exhibitions/" + exhibitionId));
+    return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
   }
 
   @PatchMapping("/{exhibitionId}/semi")
-  public ResponseEntity<Void> updateSemiExhibition(
+  public ResponseEntity<?> updateSemiExhibition(
       @PathVariable Long exhibitionId,
       @RequestBody ExhibitionSemiUpdateRequest request
   ) {
     exhibitionAdminService.semiUpdateExhibition(exhibitionId, request);
-    return ResponseEntity.created(URI.create("/api/v1/admin/exhibitions/" + exhibitionId)).build();
+    HttpHeaders headers = new HttpHeaders();
+    headers.setLocation(URI.create("/api/v1/admin/exhibitions/" + exhibitionId));
+    return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
   }
 
   @DeleteMapping("/{exhibitionId}")
-  public ResponseEntity<Void> deleteExhibition(
+  public ResponseEntity<?> deleteExhibition(
       @PathVariable Long exhibitionId
   ) {
     exhibitionAdminService.deleteExhibition(exhibitionId);
-    return ResponseEntity.created(URI.create("/api/v1/admin/exhibitions")).build();
+    HttpHeaders headers = new HttpHeaders();
+    headers.setLocation(URI.create("/api/v1/admin/exhibitions"));
+    return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
   }
 }

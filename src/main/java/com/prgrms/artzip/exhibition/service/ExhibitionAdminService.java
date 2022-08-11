@@ -110,7 +110,7 @@ public class ExhibitionAdminService {
         String prevThumbnailPath = exhibition.getThumbnail();
         String newThumbnailPath = amazonS3Uploader.upload(thumbnail, s3DirName);
         exhibition.changeThumbnail(newThumbnailPath);
-        amazonS3Remover.removeFile(exhibition.getThumbnail(), s3DirName);
+        amazonS3Remover.removeFile(prevThumbnailPath, s3DirName);
       } catch (IOException e) {
         throw new AWSException(AMAZON_S3_ERROR);
       }
