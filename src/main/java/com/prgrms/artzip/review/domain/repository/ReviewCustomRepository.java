@@ -15,4 +15,7 @@ public interface ReviewCustomRepository {
 
   Page<ReviewWithLikeAndCommentCount> findMyLikesReviews(
       Long currentUserId, Long targetUserId, Pageable pageable);
+
+  Page<ReviewWithLikeAndCommentCount> findMyReviews(
+      Long currentUserId, Long targetUserId, Pageable pageable);
 }

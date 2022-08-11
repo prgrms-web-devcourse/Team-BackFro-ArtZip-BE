@@ -157,6 +157,56 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
     return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
   }
 
+  @Override
+  public Page<ReviewWithLikeAndCommentCount> findMyReviews(Long currentUserId, Long targetUserId,
+      Pageable pageable) {
+
+    List<ReviewWithLikeAndCommentCount> content = queryFactory.select(
+            Projections.fields(ReviewWithLikeAndCommentCount.class,
+                review.id.as("reviewId"),
+                review.date,
+                review.title,
+                review.content,
+                review.createdAt,
+                review.updatedAt,
+                new CaseBuilder()
+                    .when(alwaysFalse().or(reviewLikeUserIdEq(currentUserId)))
+                    .then(true)
+                    .otherwise(false).as("isLiked"),
+                review.isPublic,
+                reviewLike.id.countDistinct().as("likeCount"),
+                comment.id.countDistinct().as("commentCount")
+            ))
+        .from(review)
+        .leftJoin(reviewLikeToGetIsLiked).on(reviewLikeToGetIsLiked.review.eq(review),
+            alwaysFalse().or(reviewLikeUserIdEq(currentUserId)))
+        .leftJoin(reviewLike).on(review.id.eq(reviewLike.review.id))
+        .leftJoin(comment).on(review.id.eq(comment.review.id), comment.isDeleted.isFalse())
+        .where(review.isDeleted.isFalse(),
+            review.isPublic.isTrue(),
+            reviewTargetUserIdEq(targetUserId),
+            filterIsNotPublic(currentUserId))
+        .offset(pageable.getOffset())
+        .limit(pageable.getPageSize())
+        .groupBy(review.id, review.createdAt)
+        .orderBy(getAllOrderSpecifiers(pageable).toArray(OrderSpecifier[]::new))
+        .fetch();
+
+    JPAQuery<Long> countQuery = queryFactory
+        .select(review.count())
+        .from(review)
+        .where(review.isDeleted.isFalse(),
+            review.isPublic.isTrue(),
+            reviewTargetUserIdEq(targetUserId),
+            filterIsNotPublic(currentUserId));
+
+    return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+  }
+
+  private BooleanBuilder reviewTargetUserIdEq(Long targetUserId) {
+    return nullSafeBooleanBuilder(() -> review.user.id.eq(targetUserId));
+  }
+
   private BooleanBuilder reviewLikeTargetUserIdEq(Long targetUserId) {
     return nullSafeBooleanBuilder(() -> reviewLike.user.id.eq(targetUserId));
   }
