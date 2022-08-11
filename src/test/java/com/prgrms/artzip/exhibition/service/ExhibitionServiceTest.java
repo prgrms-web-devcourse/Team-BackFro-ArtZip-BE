@@ -6,6 +6,7 @@ import static com.prgrms.artzip.common.ErrorCode.INVALID_DISTANCE;
 import static com.prgrms.artzip.exhibition.domain.enumType.Area.GYEONGGI;
 import static com.prgrms.artzip.exhibition.domain.enumType.Area.SEOUL;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -217,6 +218,8 @@ class ExhibitionServiceTest {
       assertThatThrownBy(() -> exhibitionService.getExhibition(null, exhibitionId))
           .isInstanceOf(InvalidRequestException.class)
           .hasMessage(EXHB_NOT_FOUND.getMessage());
+
+      verify(reviewService, never()).getReviewsForExhibition(null, exhibitionId);
     }
 
     @Test
