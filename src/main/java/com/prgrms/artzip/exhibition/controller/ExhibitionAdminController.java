@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -71,5 +72,15 @@ public class ExhibitionAdminController {
   ) {
     Long exhibitionId = exhibitionAdminService.createExhibition(request, thumbnail);
     return ResponseEntity.created(URI.create("/api/v1/admin/exhibitions/" + exhibitionId)).build();
+  }
+
+  @PutMapping("/{exhibitionId}")
+  public ResponseEntity<Void> updateExhibition(
+      @PathVariable Long exhibitionId,
+      @Valid @ModelAttribute ExhibitionCreateOrUpdateRequest request,
+      @RequestPart MultipartFile thumbnail
+  ) {
+    exhibitionAdminService.updateExhibition(exhibitionId, request, thumbnail);
+    return ResponseEntity.ok().build();
   }
 }
