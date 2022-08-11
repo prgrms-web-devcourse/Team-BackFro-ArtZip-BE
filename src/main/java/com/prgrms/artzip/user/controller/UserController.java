@@ -239,4 +239,20 @@ public class UserController {
             .data(response)
             .build());
   }
+
+  @GetMapping("{userId}/info/my/reviews")
+  public ResponseEntity<ApiResponse<PageResponse<ReviewsResponse>>> getUserMyReviews(
+      @CurrentUser User user,
+      @PathVariable("userId") Long userId,
+      @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+    PageResponse<ReviewsResponse> response = reviewService.getMyReviews(user, userId, pageable);
+
+    return ResponseEntity.ok()
+        .body(ApiResponse.<PageResponse<ReviewsResponse>>builder()
+            .message("유저가 작성한 후기 리스트 조회 성공")
+            .status(HttpStatus.OK.value())
+            .data(response)
+            .build());
+  }
 }
