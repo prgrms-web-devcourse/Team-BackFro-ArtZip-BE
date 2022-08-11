@@ -190,6 +190,15 @@ public class ReviewService {
     return new PageResponse<>(reviews.map(this::getReviewsResponse));
   }
 
+  @Transactional(readOnly = true)
+  public PageResponse<ReviewsResponse> getMyReviews(User currentUser, Long targetUserId, Pageable pageable) {
+
+    Page<ReviewWithLikeAndCommentCount> reviews = reviewRepository.findMyReviews(
+        Objects.isNull(currentUser) ? null : currentUser.getId(), targetUserId, pageable);
+
+    return new PageResponse<>(reviews.map(this::getReviewsResponse));
+  }
+
   private ReviewsResponse getReviewsResponse(ReviewWithLikeAndCommentCount reviewData) {
     Review review = reviewRepository.findById(reviewData.getReviewId())
         .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_NOT_FOUND));
