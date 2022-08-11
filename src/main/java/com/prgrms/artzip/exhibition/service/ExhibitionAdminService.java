@@ -36,7 +36,6 @@ public class ExhibitionAdminService {
 
   private final ExhibitionRepository exhibitionRepository;
   private final ExhibitionRepositoryImpl exhibitionRepositoryImpl;
-  private final ReviewService reviewService;
   private final AmazonS3Uploader amazonS3Uploader;
   private final AmazonS3Remover amazonS3Remover;
 
