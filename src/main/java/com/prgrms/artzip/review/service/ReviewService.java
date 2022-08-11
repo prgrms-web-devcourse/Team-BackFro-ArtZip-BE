@@ -163,16 +163,7 @@ public class ReviewService {
     Page<ReviewWithLikeAndCommentCount> reviews = reviewRepository.findReviewsByExhibitionIdAndUserId(
         exhibitionId, Objects.isNull(user) ? null : user.getId(), pageable);
 
-    return new PageResponse<>(reviews.map(r -> {
-      Review review = reviewRepository.findById(r.getReviewId())
-          .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_NOT_FOUND));
-      List<ReviewPhoto> reviewPhotos = review.getReviewPhotos();
-      User reviewUser = review.getUser();
-      Exhibition exhibition = exhibitionRepository.findById(review.getExhibition().getId())
-          .orElseThrow(() -> new NotFoundException(ErrorCode.EXHB_NOT_FOUND));
-
-      return new ReviewsResponse(r, reviewPhotos, reviewUser, exhibition);
-    }));
+    return new PageResponse<>(reviews.map(this::getReviewsResponse));
   }
 
   @Transactional(readOnly = true)
@@ -188,6 +179,26 @@ public class ReviewService {
       User reviewUser = review.getUser();
       return new ReviewsResponseForExhibitionDetail(r, reviewPhotos, reviewUser);
     }).collect(Collectors.toList());
+  }
+
+  @Transactional(readOnly = true)
+  public PageResponse<ReviewsResponse> getReviewsForMyLikes(User currentUser, Long targetUserId, Pageable pageable) {
+
+    Page<ReviewWithLikeAndCommentCount> reviews = reviewRepository.findReviewsByCurrentUserIdAndTargetUserId(
+        Objects.isNull(currentUser) ? null : currentUser.getId(), targetUserId, pageable);
+
+    return new PageResponse<>(reviews.map(this::getReviewsResponse));
+  }
+
+  private ReviewsResponse getReviewsResponse(ReviewWithLikeAndCommentCount reviewData) {
+    Review review = reviewRepository.findById(reviewData.getReviewId())
+        .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_NOT_FOUND));
+    List<ReviewPhoto> reviewPhotos = review.getReviewPhotos();
+    User reviewUser = review.getUser();
+    Exhibition exhibition = exhibitionRepository.findById(review.getExhibition().getId())
+        .orElseThrow(() -> new NotFoundException(ErrorCode.EXHB_NOT_FOUND));
+
+    return new ReviewsResponse(reviewData, reviewPhotos, reviewUser, exhibition);
   }
 
   private void removeReviewPhotosById(List<Long> reviewPhotoIds) {
