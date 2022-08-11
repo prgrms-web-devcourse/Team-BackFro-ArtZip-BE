@@ -6,18 +6,26 @@ import com.prgrms.artzip.common.error.exception.AWSException;
 import com.prgrms.artzip.common.util.AmazonS3Uploader;
 import com.prgrms.artzip.exhibition.domain.Exhibition;
 import com.prgrms.artzip.exhibition.domain.repository.ExhibitionRepository;
+import com.prgrms.artzip.exhibition.domain.repository.ExhibitionRepositoryImpl;
+import com.prgrms.artzip.exhibition.dto.projection.ExhibitionForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.request.ExhibitionCreateRequest;
+import com.prgrms.artzip.exhibition.dto.response.ExhibitionInfoResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+@Transactional
 @RequiredArgsConstructor
 @Service
 public class ExhibitionAdminService {
 
   private final ExhibitionRepository exhibitionRepository;
   private final AmazonS3Uploader amazonS3Uploader;
+  private final ExhibitionRepositoryImpl exhibitionRepositoryImpl;
 
   public Long createExhibition(ExhibitionCreateRequest request, MultipartFile thumbnail) {
     try {
@@ -43,5 +51,10 @@ public class ExhibitionAdminService {
     } catch (IOException ex) {
       throw new AWSException(AMAZON_S3_ERROR);
     }
+  }
+
+  public Page<ExhibitionInfoResponse> getExhibitions(Pageable pageable) {
+    Page<ExhibitionForSimpleQuery> exhibitions = exhibitionRepositoryImpl.findExhibitionsByAdmin(pageable);
+    return exhibitions.map(ExhibitionInfoResponse::new);
   }
 }
