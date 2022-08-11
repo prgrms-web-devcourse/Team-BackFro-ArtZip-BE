@@ -122,6 +122,11 @@ public class ExhibitionAdminService {
     exhibition.updateGenreAndDescription(request);
   }
 
+  public void deleteExhibition(Long exhibitionId) {
+    Exhibition exhibition = getExhibition(exhibitionId);
+    exhibition.deleteExhibition();
+  }
+
   private Exhibition getExhibition(Long exhibitionId) {
     return exhibitionRepository
         .findById(exhibitionId)

@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -85,7 +86,7 @@ public class ExhibitionAdminController {
       @RequestPart MultipartFile thumbnail
   ) {
     exhibitionAdminService.updateExhibition(exhibitionId, request, thumbnail);
-    return ResponseEntity.ok().build();
+    return ResponseEntity.created(URI.create("/api/v1/admin/exhibitions/" + exhibitionId)).build();
   }
 
   @PatchMapping("/{exhibitionId}/semi")
@@ -94,6 +95,14 @@ public class ExhibitionAdminController {
       @RequestBody ExhibitionSemiUpdateRequest request
   ) {
     exhibitionAdminService.semiUpdateExhibition(exhibitionId, request);
-    return ResponseEntity.ok().build();
+    return ResponseEntity.created(URI.create("/api/v1/admin/exhibitions/" + exhibitionId)).build();
+  }
+
+  @DeleteMapping("/{exhibitionId}")
+  public ResponseEntity<Void> deleteExhibition(
+      @PathVariable Long exhibitionId
+  ) {
+    exhibitionAdminService.deleteExhibition(exhibitionId);
+    return ResponseEntity.created(URI.create("/api/v1/admin/exhibitions")).build();
   }
 }
