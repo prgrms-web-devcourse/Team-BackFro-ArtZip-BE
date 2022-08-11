@@ -13,6 +13,6 @@ public interface ReviewCustomRepository {
   Page<ReviewWithLikeAndCommentCount> findReviewsByExhibitionIdAndUserId(
       Long exhibitionId, Long userId, Pageable pageable);
 
-  Page<ReviewWithLikeAndCommentCount> findReviewsByCurrentUserIdAndTargetUserId(
+  Page<ReviewWithLikeAndCommentCount> findMyLikesReviews(
       Long currentUserId, Long targetUserId, Pageable pageable);
 }

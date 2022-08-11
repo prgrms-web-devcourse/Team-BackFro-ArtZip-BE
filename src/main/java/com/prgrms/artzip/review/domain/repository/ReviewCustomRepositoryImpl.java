@@ -114,7 +114,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
   }
 
   @Override
-  public Page<ReviewWithLikeAndCommentCount> findReviewsByCurrentUserIdAndTargetUserId(
+  public Page<ReviewWithLikeAndCommentCount> findMyLikesReviews(
       Long currentUserId, Long targetUserId, Pageable pageable) {
 
     List<ReviewWithLikeAndCommentCount> content = queryFactory.select(

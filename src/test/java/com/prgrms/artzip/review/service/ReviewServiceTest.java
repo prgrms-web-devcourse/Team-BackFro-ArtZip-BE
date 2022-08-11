@@ -14,7 +14,6 @@ import com.prgrms.artzip.comment.domain.Comment;
 import com.prgrms.artzip.comment.repository.CommentRepository;
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.ErrorCode;
-import com.prgrms.artzip.common.PageResponse;
 import com.prgrms.artzip.common.entity.BaseEntity;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
@@ -37,7 +36,6 @@ import com.prgrms.artzip.review.dto.projection.ReviewWithLikeData;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
 import com.prgrms.artzip.review.dto.request.ReviewUpdateRequest;
 import com.prgrms.artzip.review.dto.response.ReviewIdResponse;
-import com.prgrms.artzip.review.dto.response.ReviewsResponse;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
@@ -1495,7 +1493,7 @@ class ReviewServiceTest {
         );
 
         // given
-        given(reviewRepository.findReviewsByCurrentUserIdAndTargetUserId(
+        given(reviewRepository.findMyLikesReviews(
             null, reflectionTargetUser.getId(), pageable))
             .willReturn(reflectionReviews);
         given(reviewRepository.findById(reflectionReviews.getContent().get(0).getReviewId()))
@@ -1507,7 +1505,7 @@ class ReviewServiceTest {
         reviewService.getReviewsForMyLikes(null, reflectionTargetUser.getId(), pageable);
 
         // when
-        verify(reviewRepository).findReviewsByCurrentUserIdAndTargetUserId(
+        verify(reviewRepository).findMyLikesReviews(
             null, reflectionTargetUser.getId(), pageable);
         verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(reflectionReview.getId());
         verify(exhibitionRepository, times(reflectionReviews.getContent().size())).findById(reflectionExhibition.getId());
@@ -1639,7 +1637,7 @@ class ReviewServiceTest {
         );
 
         // given
-        given(reviewRepository.findReviewsByCurrentUserIdAndTargetUserId(
+        given(reviewRepository.findMyLikesReviews(
             reflectionCurrentUser.getId(), null, pageable))
             .willReturn(reflectionReviews);
         given(reviewRepository.findById(reflectionReviews.getContent().get(0).getReviewId()))
@@ -1651,7 +1649,7 @@ class ReviewServiceTest {
         reviewService.getReviewsForMyLikes(reflectionCurrentUser, null, pageable);
 
         // when
-        verify(reviewRepository).findReviewsByCurrentUserIdAndTargetUserId(
+        verify(reviewRepository).findMyLikesReviews(
             reflectionCurrentUser.getId(), null, pageable);
         verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(reflectionReview.getId());
         verify(exhibitionRepository, times(reflectionReviews.getContent().size())).findById(reflectionExhibition.getId());
@@ -1683,7 +1681,7 @@ class ReviewServiceTest {
       void testReviewNotFoundException() {
         // given
         doReturn(reviews)
-            .when(reviewRepository).findReviewsByCurrentUserIdAndTargetUserId(
+            .when(reviewRepository).findMyLikesReviews(
                 null, user.getId(), pageable);
         doThrow(new NotFoundException(ErrorCode.REVIEW_NOT_FOUND))
             .when(reviewRepository).findById(any());
