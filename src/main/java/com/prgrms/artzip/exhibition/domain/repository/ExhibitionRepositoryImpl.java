@@ -383,11 +383,11 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
       Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
       switch (order.getProperty()) {
         case "created_at":
-          OrderSpecifier<?> orderCreatedAt = QueryDslUtil.getSortedColumn(direction, exhibition.createdAt, "created_at");
+          OrderSpecifier<?> orderCreatedAt = QueryDslUtil.getSortedColumn(direction, exhibition.createdAt, "createdAt");
           orders.add(orderCreatedAt);
           break;
         case "exhibition_id":
-          OrderSpecifier<?> orderId = QueryDslUtil.getSortedColumn(direction, exhibition.id, "exhibition_id");
+          OrderSpecifier<?> orderId = QueryDslUtil.getSortedColumn(direction, exhibition.id, "id");
           orders.add(orderId);
         default:
           break;

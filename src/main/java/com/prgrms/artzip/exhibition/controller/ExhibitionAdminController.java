@@ -3,6 +3,7 @@ package com.prgrms.artzip.exhibition.controller;
 import com.prgrms.artzip.common.ApiResponse;
 import com.prgrms.artzip.common.PageResponse;
 import com.prgrms.artzip.exhibition.dto.request.ExhibitionCreateRequest;
+import com.prgrms.artzip.exhibition.dto.response.ExhibitionDetailInfoResponse;
 import com.prgrms.artzip.exhibition.dto.response.ExhibitionInfoResponse;
 import com.prgrms.artzip.exhibition.service.ExhibitionAdminService;
 import io.swagger.annotations.Api;
@@ -17,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -56,6 +58,19 @@ public class ExhibitionAdminController {
         .message("전시회 리스트 조회 완료")
         .status(HttpStatus.OK.value())
         .data(exhibitions)
+        .build());
+  }
+
+  @GetMapping("/{exhibitionId}")
+  public ResponseEntity<ApiResponse<ExhibitionDetailInfoResponse>> getExhibition(
+      @PathVariable Long exhibitionId
+  ) {
+    ExhibitionDetailInfoResponse exhibition = exhibitionAdminService.getExhibition(exhibitionId);
+    return ResponseEntity.ok(ApiResponse
+        .<ExhibitionDetailInfoResponse>builder()
+        .message("전시회 상세 조회 완료")
+        .status(HttpStatus.OK.value())
+        .data(exhibition)
         .build());
   }
 }
