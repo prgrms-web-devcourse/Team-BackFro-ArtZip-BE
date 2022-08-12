@@ -111,7 +111,7 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
                     .when(exhibitionLikeForIsLikedUserIdEq(userId))
                     .then(true)
                     .otherwise(false).as("isLiked"),
-                exhibitionLikeForLikeCount.id.count().as("likeCount"),
+                exhibitionLikeForLikeCount.id.countDistinct().as("likeCount"),
                 review.id.countDistinct().as("reviewCount")
             )
         )
