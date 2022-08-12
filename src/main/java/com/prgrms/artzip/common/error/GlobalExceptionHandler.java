@@ -4,7 +4,6 @@ import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.ErrorResponse;
 import com.prgrms.artzip.common.error.exception.AlreadyExistsException;
 import com.prgrms.artzip.common.error.exception.AuthErrorException;
-import com.prgrms.artzip.common.error.exception.CannotSendMessageException;
 import com.prgrms.artzip.common.error.exception.DuplicateRequestException;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
@@ -128,11 +127,6 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(PermissionDeniedException.class)
   public ResponseEntity<ErrorResponse> handlePermissionDeniedException(
       PermissionDeniedException e) {
-    return handleException(e, e.getErrorCode());
-  }
-
-  @ExceptionHandler(CannotSendMessageException.class)
-  public ResponseEntity<ErrorResponse> handleCannotSendMessageException(CannotSendMessageException e) {
     return handleException(e, e.getErrorCode());
   }
 
