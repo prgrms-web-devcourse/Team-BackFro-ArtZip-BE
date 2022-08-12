@@ -12,6 +12,7 @@ import com.prgrms.artzip.common.error.exception.NotFoundException;
 import com.prgrms.artzip.common.util.AmazonS3Remover;
 import com.prgrms.artzip.common.util.AmazonS3Uploader;
 import com.prgrms.artzip.user.domain.LocalUser;
+import com.prgrms.artzip.user.domain.OAuthUser;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.RoleRepository;
@@ -21,10 +22,12 @@ import com.prgrms.artzip.user.dto.request.UserSignUpRequest;
 import com.prgrms.artzip.user.dto.request.UserUpdateRequest;
 import com.prgrms.artzip.user.dto.response.UserUpdateResponse;
 import java.io.IOException;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,6 +82,40 @@ public class UserService {
         .build();
     return userRepository.save(newUser);
   }
+
+  @Transactional
+  public User oauthSignUp(OAuth2User oauth2User, String provider) {
+    if (oauth2User == null) throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
+    if (!hasText(provider)) throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
+
+    String providerId = oauth2User.getName();
+    return userRepository.findByProviderAndProviderId(provider, providerId)
+        .orElseGet(() -> {
+          Map<String, Object> attributes = oauth2User.getAttributes();
+          Map<String, Object> properties = (Map<String, Object>) attributes.get("properties");
+          Map<String, Object> accountInfo = (Map<String, Object>) attributes.get("kakao_account");
+
+          if (properties == null) throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
+          if (accountInfo == null) throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
+
+          String email = (String) accountInfo.get("email");
+          String nickname = (String) properties.get("nickname");
+          String profileImage = (String) properties.get("profile_image");
+          Role userRole = roleRepository.findByAuthority(Authority.USER)
+              .orElseThrow(() -> new NotFoundException(ROLE_NOT_FOUND));
+
+          OAuthUser user = OAuthUser.builder()
+              .email(email)
+              .nickname(nickname)
+              .provider(provider)
+              .providerId(providerId)
+              .roles(List.of(userRole))
+              .build();
+          if (hasText(profileImage)) user.setProfileImage(profileImage);
+          return userRepository.save(user);
+        });
+  }
+
   @Transactional
   public UserUpdateResponse updateUserInfo(User user, UserUpdateRequest request, MultipartFile file) {
     // 닉네임 업데이트
