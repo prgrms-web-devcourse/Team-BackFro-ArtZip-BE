@@ -210,6 +210,9 @@ public class ReviewRepositoryTest {
           .user(user1)
           .parent(parentComment)
           .build();
+      if (i % 2 == 0) {
+        childrenComment1.softDelete();
+      }
       em.persist(childrenComment1);
       Comment childrenComment2 = Comment.builder()
           .content(String.valueOf(i) + "의 자식2")
@@ -371,7 +374,7 @@ public class ReviewRepositoryTest {
             .hasFieldOrPropertyWithValue("content", publicReview2.getContent())
             .hasFieldOrPropertyWithValue("isPublic", true);
         assertThat(content.get(2))
-            .hasFieldOrPropertyWithValue("commentCount", 90L)
+            .hasFieldOrPropertyWithValue("commentCount", 75L)
             .hasFieldOrPropertyWithValue("isLiked", false)
             .hasFieldOrPropertyWithValue("likeCount", 2L)
             .hasFieldOrPropertyWithValue("reviewId", publicReview1.getId())
@@ -409,7 +412,7 @@ public class ReviewRepositoryTest {
             .hasFieldOrPropertyWithValue("content", publicReview2.getContent())
             .hasFieldOrPropertyWithValue("isPublic", true);
         assertThat(content.get(2))
-            .hasFieldOrPropertyWithValue("commentCount", 90L)
+            .hasFieldOrPropertyWithValue("commentCount", 75L)
             .hasFieldOrPropertyWithValue("isLiked", true)
             .hasFieldOrPropertyWithValue("likeCount", 2L)
             .hasFieldOrPropertyWithValue("reviewId", publicReview1.getId())
@@ -445,7 +448,7 @@ public class ReviewRepositoryTest {
             .hasFieldOrPropertyWithValue("content", publicReview2.getContent())
             .hasFieldOrPropertyWithValue("isPublic", true);
         assertThat(content.get(1))
-            .hasFieldOrPropertyWithValue("commentCount", 90L)
+            .hasFieldOrPropertyWithValue("commentCount", 75L)
             .hasFieldOrPropertyWithValue("isLiked", false)
             .hasFieldOrPropertyWithValue("likeCount", 2L)
             .hasFieldOrPropertyWithValue("reviewId", publicReview1.getId())
@@ -474,7 +477,7 @@ public class ReviewRepositoryTest {
             .hasFieldOrPropertyWithValue("content", publicReview2.getContent())
             .hasFieldOrPropertyWithValue("isPublic", true);
         assertThat(content.get(1))
-            .hasFieldOrPropertyWithValue("commentCount", 90L)
+            .hasFieldOrPropertyWithValue("commentCount", 75L)
             .hasFieldOrPropertyWithValue("isLiked", true)
             .hasFieldOrPropertyWithValue("likeCount", 2L)
             .hasFieldOrPropertyWithValue("reviewId", publicReview1.getId())
