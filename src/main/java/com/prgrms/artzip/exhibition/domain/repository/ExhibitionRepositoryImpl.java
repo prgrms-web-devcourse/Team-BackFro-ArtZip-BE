@@ -122,7 +122,9 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
         .leftJoin(exhibitionLikeForLikeCount)
         .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
         .leftJoin(review)
-        .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse(), review.isPublic.isTrue())
+        .on(review.exhibition.eq(exhibition),
+            review.isDeleted.isFalse(),
+            review.isPublic.isTrue())
         .where(
             exhibition.id.eq(exhibitionId),
             exhibitionIsDeletedIsFalse()
@@ -193,7 +195,10 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
         .leftJoin(exhibitionLikeForLikeCount)
         .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
         .leftJoin(review)
-        .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse(), review.isPublic.isTrue())
+        .on(
+            review.exhibition.eq(exhibition),
+            review.isDeleted.isFalse(),
+            review.isPublic.isTrue())
         .where(
             exhibitionLikeForExhibitionLikeUser.user.id.eq(exhibitionLikeUserId),
             exhibitionIsDeletedIsFalse()
@@ -264,7 +269,9 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
         .leftJoin(exhibitionLikeForLikeCount)
         .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
         .leftJoin(review)
-        .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse(), review.isPublic.isTrue())
+        .on(review.exhibition.eq(exhibition),
+            review.isDeleted.isFalse(),
+            review.isPublic.isTrue())
         .groupBy(exhibition.id)
         .fetch();
   }
@@ -331,7 +338,10 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
         .leftJoin(exhibitionLikeForLikeCount)
         .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
         .leftJoin(review)
-        .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse())
+        .on(
+            review.exhibition.eq(exhibition),
+            review.isDeleted.isFalse(),
+            review.isPublic.isTrue())
         .where(exhibitionIsDeletedIsFalse())
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize())
@@ -370,7 +380,9 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
         .leftJoin(exhibitionLikeForLikeCount)
         .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
         .leftJoin(review)
-        .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse(), review.isPublic.isTrue())
+        .on(review.exhibition.eq(exhibition),
+            review.isDeleted.isFalse(),
+            review.isPublic.isTrue())
         .where(condition)
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize())
