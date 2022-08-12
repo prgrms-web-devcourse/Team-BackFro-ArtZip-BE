@@ -148,7 +148,7 @@ public class WebSecurityConfig {
         .and()
         .oauth2Login()
         .authorizationEndpoint()
-        .baseUri("/oauth/login")
+        .baseUri("/api/v1/users/oauth/login")
         .and()
         .successHandler(oAuth2AuthenticationSuccessHandler)
         .and()
