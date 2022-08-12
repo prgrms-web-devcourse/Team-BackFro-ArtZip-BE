@@ -21,6 +21,7 @@ public class ExhibitionDetailInfoResponse extends ExhibitionBasicInfoResponse {
   private Genre genre;
   private String description;
   private long likeCount;
+  private long reviewCount;
   private String placeAddress;
   private double lat;
   private double lng;
@@ -29,7 +30,8 @@ public class ExhibitionDetailInfoResponse extends ExhibitionBasicInfoResponse {
 
   public ExhibitionDetailInfoResponse(Long exhibitionId, String name, String thumbnail,
       LocalDate startDate, LocalDate endDate, Area area, String url, String placeUrl,
-      String inquiry, Genre genre, String description, long likeCount, String placeAddress,
+      String inquiry, Genre genre, String description, long likeCount, long reviewCount,
+      String placeAddress,
       double lat, double lng, boolean isLiked, List<ReviewsResponseForExhibitionDetail> reviews) {
     super(exhibitionId, name, thumbnail);
     this.startDate = startDate;
@@ -41,6 +43,7 @@ public class ExhibitionDetailInfoResponse extends ExhibitionBasicInfoResponse {
     this.genre = genre;
     this.description = description;
     this.likeCount = likeCount;
+    this.reviewCount = reviewCount;
     this.placeAddress = placeAddress;
     this.lat = lat;
     this.lng = lng;

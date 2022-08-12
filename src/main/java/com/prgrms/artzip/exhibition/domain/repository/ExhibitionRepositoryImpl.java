@@ -11,7 +11,6 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 import com.prgrms.artzip.common.util.QueryDslUtil;
-import com.prgrms.artzip.exhibition.domain.QExhibition;
 import com.prgrms.artzip.exhibition.domain.QExhibitionLike;
 import com.prgrms.artzip.exhibition.domain.enumType.Area;
 import com.prgrms.artzip.exhibition.domain.enumType.Genre;
@@ -112,7 +111,8 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
                     .when(exhibitionLikeForIsLikedUserIdEq(userId))
                     .then(true)
                     .otherwise(false).as("isLiked"),
-                exhibitionLikeForLikeCount.id.count().as("likeCount")
+                exhibitionLikeForLikeCount.id.count().as("likeCount"),
+                review.id.countDistinct().as("reviewCount")
             )
         )
         .from(exhibition)
@@ -121,6 +121,8 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
             exhibitionLikeForIsLikedUserIdEq(userId))
         .leftJoin(exhibitionLikeForLikeCount)
         .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
+        .leftJoin(review)
+        .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse(), review.isPublic.isTrue())
         .where(
             exhibition.id.eq(exhibitionId),
             exhibitionIsDeletedIsFalse()
@@ -191,7 +193,7 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
         .leftJoin(exhibitionLikeForLikeCount)
         .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
         .leftJoin(review)
-        .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse())
+        .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse(), review.isPublic.isTrue())
         .where(
             exhibitionLikeForExhibitionLikeUser.user.id.eq(exhibitionLikeUserId),
             exhibitionIsDeletedIsFalse()
@@ -262,7 +264,7 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
         .leftJoin(exhibitionLikeForLikeCount)
         .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
         .leftJoin(review)
-        .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse())
+        .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse(), review.isPublic.isTrue())
         .groupBy(exhibition.id)
         .fetch();
   }
@@ -337,7 +339,8 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
         .orderBy(getAllOrderSpecifiers(pageable).toArray(OrderSpecifier[]::new))
         .fetch();
 
-    JPAQuery<Long> countQuery = getExhibitionCountQuery(new BooleanBuilder().and(exhibitionIsDeletedIsFalse()));
+    JPAQuery<Long> countQuery = getExhibitionCountQuery(
+        new BooleanBuilder().and(exhibitionIsDeletedIsFalse()));
 
     return PageableExecutionUtils.getPage(exhibitions, pageable, countQuery::fetchOne);
   }
@@ -367,7 +370,7 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
         .leftJoin(exhibitionLikeForLikeCount)
         .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
         .leftJoin(review)
-        .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse())
+        .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse(), review.isPublic.isTrue())
         .where(condition)
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize())
@@ -383,7 +386,8 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
       Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
       switch (order.getProperty()) {
         case "created_at":
-          OrderSpecifier<?> orderCreatedAt = QueryDslUtil.getSortedColumn(direction, exhibition.createdAt, "createdAt");
+          OrderSpecifier<?> orderCreatedAt = QueryDslUtil.getSortedColumn(direction,
+              exhibition.createdAt, "createdAt");
           orders.add(orderCreatedAt);
           break;
         case "exhibition_id":
