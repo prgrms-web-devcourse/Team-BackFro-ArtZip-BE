@@ -35,4 +35,6 @@ public interface ExhibitionCustomRepository {
       double longitude, double distance);
 
   Optional<ReviewExhibitionInfo> findExhibitionForReview(Long userId, Long exhibitionId);
+
+  Page<ExhibitionForSimpleQuery> findExhibitionsByAdmin(Pageable pageable);
 }
