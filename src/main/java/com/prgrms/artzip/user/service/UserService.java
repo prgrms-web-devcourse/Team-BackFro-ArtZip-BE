@@ -85,7 +85,7 @@ public class UserService {
 
   @Transactional
   public User oauthSignUp(OAuth2User oauth2User, String provider) {
-    if (oauth2User == null) throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
+    if (isNull(oauth2User)) throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
     if (!hasText(provider)) throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
 
     String providerId = oauth2User.getName();
@@ -95,9 +95,10 @@ public class UserService {
           Map<String, Object> properties = (Map<String, Object>) attributes.get("properties");
           Map<String, Object> accountInfo = (Map<String, Object>) attributes.get("kakao_account");
 
-          if (properties == null) throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
-          if (accountInfo == null) throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
+          if (isNull(properties)) throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
+          if (isNull(accountInfo)) throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
 
+          // TODO: attributes에서 user에 필요한 정보 뽑아내는 부분 vendor에 따른 추상화 리팩토링 필요
           String email = (String) accountInfo.get("email");
           String nickname = (String) properties.get("nickname");
           String profileImage = (String) properties.get("profile_image");

@@ -10,7 +10,7 @@ import com.prgrms.artzip.common.jwt.Jwt;
 import com.prgrms.artzip.common.jwt.JwtAuthenticationFilter;
 import com.prgrms.artzip.common.jwt.JwtAuthenticationProvider;
 import com.prgrms.artzip.common.util.JwtService;
-import com.prgrms.artzip.user.OAuth2AuthenticationSuccessHandler;
+import com.prgrms.artzip.common.oauth.OAuth2AuthenticationSuccessHandler;
 import com.prgrms.artzip.user.service.UserService;
 import com.prgrms.artzip.user.service.UserUtilService;
 import org.slf4j.Logger;
@@ -34,7 +34,6 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.PrintWriter;
-import springfox.documentation.service.OAuth;
 
 @EnableWebSecurity
 @Configuration

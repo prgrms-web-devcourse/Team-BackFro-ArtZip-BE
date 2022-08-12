@@ -1,8 +1,6 @@
-package com.prgrms.artzip.user;
+package com.prgrms.artzip.common.oauth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.prgrms.artzip.common.ErrorResponse;
-import com.prgrms.artzip.common.jwt.Jwt;
 import com.prgrms.artzip.common.util.JwtService;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
