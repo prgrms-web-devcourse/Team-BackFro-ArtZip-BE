@@ -184,7 +184,16 @@ public class ReviewService {
   @Transactional(readOnly = true)
   public PageResponse<ReviewsResponse> getReviewsForMyLikes(User currentUser, Long targetUserId, Pageable pageable) {
 
-    Page<ReviewWithLikeAndCommentCount> reviews = reviewRepository.findReviewsByCurrentUserIdAndTargetUserId(
+    Page<ReviewWithLikeAndCommentCount> reviews = reviewRepository.findMyLikesReviews(
+        Objects.isNull(currentUser) ? null : currentUser.getId(), targetUserId, pageable);
+
+    return new PageResponse<>(reviews.map(this::getReviewsResponse));
+  }
+
+  @Transactional(readOnly = true)
+  public PageResponse<ReviewsResponse> getMyReviews(User currentUser, Long targetUserId, Pageable pageable) {
+
+    Page<ReviewWithLikeAndCommentCount> reviews = reviewRepository.findMyReviews(
         Objects.isNull(currentUser) ? null : currentUser.getId(), targetUserId, pageable);
 
     return new PageResponse<>(reviews.map(this::getReviewsResponse));

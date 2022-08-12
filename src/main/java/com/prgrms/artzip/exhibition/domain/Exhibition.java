@@ -24,10 +24,13 @@ import com.prgrms.artzip.exhibition.domain.enumType.Area;
 import com.prgrms.artzip.exhibition.domain.enumType.Genre;
 import com.prgrms.artzip.exhibition.domain.vo.Location;
 import com.prgrms.artzip.exhibition.domain.vo.Period;
+import com.prgrms.artzip.exhibition.dto.request.ExhibitionCreateOrUpdateRequest;
+import com.prgrms.artzip.exhibition.dto.request.ExhibitionSemiUpdateRequest;
 import com.prgrms.artzip.review.domain.Review;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.persistence.Column;
@@ -98,8 +101,9 @@ public class Exhibition extends BaseEntity {
 
   @Builder
   public Exhibition(Integer seq, String name, LocalDate startDate, LocalDate endDate, Genre genre,
-      String description, Double latitude, Double longitude, Area area, String place,
-      String address, String inquiry, String fee, String thumbnail, String url, String placeUrl) {
+      String description, Double latitude, Double longitude, Area area,
+      String place, String address, String inquiry, String fee, String thumbnail, String url,
+      String placeUrl) {
     this.seq = seq;
     setName(name);
     setPeriod(startDate, endDate);
@@ -112,6 +116,37 @@ public class Exhibition extends BaseEntity {
     setUrl(url);
     setPlaceUrl(placeUrl);
     this.isDeleted = false;
+  }
+
+  public void update(ExhibitionCreateOrUpdateRequest updateRequest) {
+    setName(updateRequest.getName());
+    setPeriod(updateRequest.getStartDate(), updateRequest.getEndDate());
+    this.genre = updateRequest.getGenre();
+    setDescription(updateRequest.getDescription());
+    setLocation(
+        updateRequest.getLatitude(),
+        updateRequest.getLongitude(),
+        updateRequest.getArea(),
+        updateRequest.getPlace(),
+        updateRequest.getAddress()
+    );
+    setInquiry(updateRequest.getInquiry());
+    setFee(updateRequest.getFee());
+    setUrl(updateRequest.getUrl());
+    setPlaceUrl(updateRequest.getPlaceUrl());
+  }
+
+  public void changeThumbnail(String thumbnailPath) {
+    setThumbnail(thumbnailPath);
+  }
+
+  public void updateGenreAndDescription(ExhibitionSemiUpdateRequest updateRequest) {
+    if (Objects.nonNull(updateRequest.getDescription())) {
+      this.description = updateRequest.getDescription();
+    }
+    if (Objects.nonNull(updateRequest.getGenre())) {
+      this.genre = updateRequest.getGenre();
+    }
   }
 
   public void deleteExhibition() {

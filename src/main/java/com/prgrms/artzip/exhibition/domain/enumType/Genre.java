@@ -1,5 +1,5 @@
 package com.prgrms.artzip.exhibition.domain.enumType;
 
 public enum Genre {
-  FINEART, MODERNART
+  ALL, PAINTING, PHOTO, MOLDINGS, INSATALLATION, MEDIA, SHOW, RELICS
 }
