@@ -46,7 +46,7 @@ public class ReviewRepositoryTest {
   private User user1, user2, user3;
   private Exhibition exhibitionAtBusan, exhibitionAtSeoul, exhibitionAlreadyEnd;
   private Review publicReview1, publicReview2, publicReview3, privateReview, deletedReview;
-  private ReviewLike reviewLike1, reviewLike2, reviewLike3;
+  private ReviewLike reviewLike1, reviewLike2, reviewLike3, reviewLike4;
 
   int commentCountOfPublicReview1 = 30;
   int commentCountOfPublicReview2 = 20;
@@ -176,6 +176,8 @@ public class ReviewRepositoryTest {
     em.persist(reviewLike2);
     reviewLike3 = new ReviewLike(privateReview, user3);
     em.persist(reviewLike3);
+    reviewLike4 = new ReviewLike(publicReview2, user1);
+    em.persist(reviewLike4);
 
     for (int i = 0; i < commentCountOfPublicReview1; i++) {
       Comment comment = Comment.builder()
@@ -367,7 +369,7 @@ public class ReviewRepositoryTest {
         assertThat(content.get(1))
             .hasFieldOrPropertyWithValue("commentCount", 60L)
             .hasFieldOrPropertyWithValue("isLiked", false)
-            .hasFieldOrPropertyWithValue("likeCount", 0L)
+            .hasFieldOrPropertyWithValue("likeCount", 1L)
             .hasFieldOrPropertyWithValue("reviewId", publicReview2.getId())
             .hasFieldOrPropertyWithValue("date", publicReview2.getDate())
             .hasFieldOrPropertyWithValue("title", publicReview2.getTitle())
@@ -404,8 +406,8 @@ public class ReviewRepositoryTest {
             .hasFieldOrPropertyWithValue("isPublic", true);
         assertThat(content.get(1))
             .hasFieldOrPropertyWithValue("commentCount", 60L)
-            .hasFieldOrPropertyWithValue("isLiked", false)
-            .hasFieldOrPropertyWithValue("likeCount", 0L)
+            .hasFieldOrPropertyWithValue("isLiked", true)
+            .hasFieldOrPropertyWithValue("likeCount", 1L)
             .hasFieldOrPropertyWithValue("reviewId", publicReview2.getId())
             .hasFieldOrPropertyWithValue("date", publicReview2.getDate())
             .hasFieldOrPropertyWithValue("title", publicReview2.getTitle())
@@ -441,7 +443,7 @@ public class ReviewRepositoryTest {
         assertThat(content.get(0))
             .hasFieldOrPropertyWithValue("commentCount", 60L)
             .hasFieldOrPropertyWithValue("isLiked", false)
-            .hasFieldOrPropertyWithValue("likeCount", 0L)
+            .hasFieldOrPropertyWithValue("likeCount", 1L)
             .hasFieldOrPropertyWithValue("reviewId", publicReview2.getId())
             .hasFieldOrPropertyWithValue("date", publicReview2.getDate())
             .hasFieldOrPropertyWithValue("title", publicReview2.getTitle())
@@ -469,8 +471,8 @@ public class ReviewRepositoryTest {
         List<ReviewWithLikeAndCommentCount> content = result.getContent();
         assertThat(content.get(0))
             .hasFieldOrPropertyWithValue("commentCount", 60L)
-            .hasFieldOrPropertyWithValue("isLiked", false)
-            .hasFieldOrPropertyWithValue("likeCount", 0L)
+            .hasFieldOrPropertyWithValue("isLiked", true)
+            .hasFieldOrPropertyWithValue("likeCount", 1L)
             .hasFieldOrPropertyWithValue("reviewId", publicReview2.getId())
             .hasFieldOrPropertyWithValue("date", publicReview2.getDate())
             .hasFieldOrPropertyWithValue("title", publicReview2.getTitle())
@@ -488,6 +490,82 @@ public class ReviewRepositoryTest {
       }
 
     }
+
+  }
+
+  @Nested
+  @DisplayName("findMyLikesReviews() 테스트: 유저가 좋아요한 후기 다건 조회")
+  class TestFindMyLikesReviews {
+
+    Pageable pageable = PageRequest.of(0, 20, Sort.by("createdAt").descending());
+
+      @Test
+      @DisplayName("currentUserId == null인 경우, isLiked(좋아요 여부)는 조회되지 않는다.")
+      void testCurrentUserIdIsNull() {
+
+        Page<ReviewWithLikeAndCommentCount> result = reviewRepository.findMyLikesReviews(
+            null, user1.getId(), pageable);
+
+        assertThat(result.getTotalPages()).isEqualTo(1);
+        assertThat(result.getTotalElements()).isEqualTo(2);
+        List<ReviewWithLikeAndCommentCount> content = result.getContent();
+        assertThat(content.get(0))
+            .hasFieldOrPropertyWithValue("commentCount", 60L)
+            .hasFieldOrPropertyWithValue("isLiked", false)
+            .hasFieldOrPropertyWithValue("likeCount", 1L)
+            .hasFieldOrPropertyWithValue("reviewId", publicReview2.getId())
+            .hasFieldOrPropertyWithValue("date", publicReview2.getDate())
+            .hasFieldOrPropertyWithValue("title", publicReview2.getTitle())
+            .hasFieldOrPropertyWithValue("content", publicReview2.getContent())
+            .hasFieldOrPropertyWithValue("isPublic", true);
+        assertThat(content.get(1))
+            .hasFieldOrPropertyWithValue("commentCount", 75L)
+            .hasFieldOrPropertyWithValue("isLiked", false)
+            .hasFieldOrPropertyWithValue("likeCount", 2L)
+            .hasFieldOrPropertyWithValue("reviewId", publicReview1.getId())
+            .hasFieldOrPropertyWithValue("date", publicReview1.getDate())
+            .hasFieldOrPropertyWithValue("title", publicReview1.getTitle())
+            .hasFieldOrPropertyWithValue("content", publicReview1.getContent())
+            .hasFieldOrPropertyWithValue("isPublic", true);
+      }
+
+      @Test
+      @DisplayName("currentUserId != null인 경우, isLiked(좋아요 여부)도 함께 조회된다.")
+      void testCurrentUserIdInNotNull() {
+        Page<ReviewWithLikeAndCommentCount> result = reviewRepository.findReviewsByExhibitionIdAndUserId(
+            null, user1.getId(), pageable);
+
+        assertThat(result.getTotalPages()).isEqualTo(1);
+        assertThat(result.getTotalElements()).isEqualTo(3);
+        List<ReviewWithLikeAndCommentCount> content = result.getContent();
+        assertThat(content.get(0))
+            .hasFieldOrPropertyWithValue("commentCount", 0L)
+            .hasFieldOrPropertyWithValue("isLiked", false)
+            .hasFieldOrPropertyWithValue("likeCount", 0L)
+            .hasFieldOrPropertyWithValue("reviewId", publicReview3.getId())
+            .hasFieldOrPropertyWithValue("date", publicReview3.getDate())
+            .hasFieldOrPropertyWithValue("title", publicReview3.getTitle())
+            .hasFieldOrPropertyWithValue("content", publicReview3.getContent())
+            .hasFieldOrPropertyWithValue("isPublic", true);
+        assertThat(content.get(1))
+            .hasFieldOrPropertyWithValue("commentCount", 60L)
+            .hasFieldOrPropertyWithValue("isLiked", true)
+            .hasFieldOrPropertyWithValue("likeCount", 1L)
+            .hasFieldOrPropertyWithValue("reviewId", publicReview2.getId())
+            .hasFieldOrPropertyWithValue("date", publicReview2.getDate())
+            .hasFieldOrPropertyWithValue("title", publicReview2.getTitle())
+            .hasFieldOrPropertyWithValue("content", publicReview2.getContent())
+            .hasFieldOrPropertyWithValue("isPublic", true);
+        assertThat(content.get(2))
+            .hasFieldOrPropertyWithValue("commentCount", 75L)
+            .hasFieldOrPropertyWithValue("isLiked", true)
+            .hasFieldOrPropertyWithValue("likeCount", 2L)
+            .hasFieldOrPropertyWithValue("reviewId", publicReview1.getId())
+            .hasFieldOrPropertyWithValue("date", publicReview1.getDate())
+            .hasFieldOrPropertyWithValue("title", publicReview1.getTitle())
+            .hasFieldOrPropertyWithValue("content", publicReview1.getContent())
+            .hasFieldOrPropertyWithValue("isPublic", true);
+      }
 
   }
 
