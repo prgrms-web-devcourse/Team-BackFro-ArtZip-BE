@@ -162,6 +162,7 @@ class ExhibitionServiceTest {
         .placeUrl("http://galleryraon.com")
         .isLiked(true)
         .likeCount(10)
+        .reviewCount(7)
         .build();
 
     private ExhibitionDetailForSimpleQuery exhibitionDetail2 = ExhibitionDetailForSimpleQuery.builder()
@@ -183,6 +184,7 @@ class ExhibitionServiceTest {
         .thumbnail("http://www.culture.go.kr/upload/rdf/21/11/show_20211181717993881.jpg")
         .isLiked(false)
         .likeCount(5)
+        .reviewCount(5)
         .build();
 
     Review review = new Review(user,
