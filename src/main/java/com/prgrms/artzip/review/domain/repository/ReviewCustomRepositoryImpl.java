@@ -186,7 +186,6 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
         .leftJoin(reviewLike).on(review.id.eq(reviewLike.review.id))
         .leftJoin(comment).on(review.id.eq(comment.review.id), comment.isDeleted.isFalse())
         .where(review.isDeleted.isFalse(),
-            review.isPublic.isTrue(),
             reviewTargetUserIdEq(targetUserId),
             filterIsNotPublic(currentUserId))
         .offset(pageable.getOffset())
@@ -199,7 +198,6 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
         .select(review.count())
         .from(review)
         .where(review.isDeleted.isFalse(),
-            review.isPublic.isTrue(),
             reviewTargetUserIdEq(targetUserId),
             filterIsNotPublic(currentUserId));
 
