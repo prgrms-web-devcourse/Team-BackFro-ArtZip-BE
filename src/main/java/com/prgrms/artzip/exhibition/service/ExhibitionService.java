@@ -65,6 +65,7 @@ public class ExhibitionService {
         .genre(exhibition.getGenre())
         .description(exhibition.getDescription())
         .likeCount(exhibition.getLikeCount())
+        .reviewCount(exhibition.getReviewCount())
         .placeAddress(exhibition.getLocation().getAddress())
         .lat(exhibition.getLocation().getLatitude())
         .lng(exhibition.getLocation().getLongitude())
