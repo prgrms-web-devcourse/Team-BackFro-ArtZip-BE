@@ -1,4 +1,4 @@
-package com.prgrms.artzip.exhibition.domain.enumType;
+package com.prgrms.artzip.exhibition.domain.repository;
 
 import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.error.exception.NotFoundException;

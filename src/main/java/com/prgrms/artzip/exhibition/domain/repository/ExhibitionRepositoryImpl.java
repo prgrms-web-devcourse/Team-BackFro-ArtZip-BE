@@ -2,10 +2,10 @@ package com.prgrms.artzip.exhibition.domain.repository;
 
 import static com.prgrms.artzip.exhibition.domain.QExhibition.exhibition;
 import static com.prgrms.artzip.exhibition.domain.QExhibitionLike.exhibitionLike;
-import static com.prgrms.artzip.exhibition.domain.enumType.ExhibitionSortType.END_DATE;
-import static com.prgrms.artzip.exhibition.domain.enumType.ExhibitionSortType.EXHIBITION_ID;
-import static com.prgrms.artzip.exhibition.domain.enumType.ExhibitionSortType.LIKE_COUNT;
-import static com.prgrms.artzip.exhibition.domain.enumType.ExhibitionSortType.START_DATE;
+import static com.prgrms.artzip.exhibition.domain.repository.ExhibitionSortType.END_DATE;
+import static com.prgrms.artzip.exhibition.domain.repository.ExhibitionSortType.EXHIBITION_ID;
+import static com.prgrms.artzip.exhibition.domain.repository.ExhibitionSortType.LIKE_COUNT;
+import static com.prgrms.artzip.exhibition.domain.repository.ExhibitionSortType.START_DATE;
 import static com.prgrms.artzip.review.domain.QReview.review;
 import static com.querydsl.core.types.dsl.MathExpressions.acos;
 import static com.querydsl.core.types.dsl.MathExpressions.cos;
@@ -16,7 +16,6 @@ import static java.util.Objects.nonNull;
 
 import com.prgrms.artzip.exhibition.domain.QExhibitionLike;
 import com.prgrms.artzip.exhibition.domain.enumType.Area;
-import com.prgrms.artzip.exhibition.domain.enumType.ExhibitionSortType;
 import com.prgrms.artzip.exhibition.domain.enumType.Genre;
 import com.prgrms.artzip.exhibition.domain.enumType.Month;
 import com.prgrms.artzip.exhibition.dto.ExhibitionCustomCondition;
