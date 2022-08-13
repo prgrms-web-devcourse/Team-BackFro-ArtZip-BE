@@ -73,7 +73,7 @@ public class CommentService {
     Comment comment = commentUtilService.getComment(commentId);
     if (comment.getIsDeleted()) throw new DuplicateRequestException(ErrorCode.COMMENT_ALREADY_DELETED);
     checkOwner(comment, user);
-    comment.setContent(request.content());
+    comment.update(request.content());
     List<Comment> children = commentRepository.getCommentsOfParents(List.of(commentId));
     return new CommentResponse(comment, user, children);
   }

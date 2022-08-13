@@ -42,11 +42,12 @@ public class Comment extends BaseEntity {
   @Column(name = "content", nullable = false, length = 500)
   private String content;
 
-  //TODO migration 으로 해당 column db에 alter 시키기
   @Column(name = "is_deleted", nullable = false)
   private Boolean isDeleted = false;
 
-  //TODO migration 으로 해당 column db에 alter 시키기
+  @Column(name = "is_edited", nullable = false)
+  private Boolean isEdited = false;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   private User user;
@@ -73,7 +74,7 @@ public class Comment extends BaseEntity {
     this.review = review;
   }
 
-  public void setContent(String content) {
+  private void setContent(String content) {
     if (Objects.isNull(content) || content.isBlank()) {
       throw new InvalidRequestException(ErrorCode.CONTENT_IS_REQUIRED);
     }
@@ -81,6 +82,11 @@ public class Comment extends BaseEntity {
       throw new InvalidRequestException(ErrorCode.CONTENT_IS_TOO_LONG);
     }
     this.content = content;
+  }
+
+  public void update(String content) {
+    setContent(content);
+    this.isEdited = true;
   }
 
   public void softDelete() {
