@@ -26,6 +26,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Formula;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -44,9 +45,6 @@ public class Comment extends BaseEntity {
 
   @Column(name = "is_deleted", nullable = false)
   private Boolean isDeleted = false;
-
-  @Column(name = "is_edited", nullable = false)
-  private Boolean isEdited = false;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
@@ -74,7 +72,7 @@ public class Comment extends BaseEntity {
     this.review = review;
   }
 
-  private void setContent(String content) {
+  public void setContent(String content) {
     if (Objects.isNull(content) || content.isBlank()) {
       throw new InvalidRequestException(ErrorCode.CONTENT_IS_REQUIRED);
     }
@@ -82,11 +80,6 @@ public class Comment extends BaseEntity {
       throw new InvalidRequestException(ErrorCode.CONTENT_IS_TOO_LONG);
     }
     this.content = content;
-  }
-
-  public void update(String content) {
-    setContent(content);
-    this.isEdited = true;
   }
 
   public void softDelete() {
