@@ -28,6 +28,7 @@ import com.prgrms.artzip.exhibition.domain.repository.ExhibitionRepository;
 import com.prgrms.artzip.review.domain.Review;
 import com.prgrms.artzip.review.domain.ReviewLike;
 import com.prgrms.artzip.review.domain.ReviewPhoto;
+import com.prgrms.artzip.review.domain.repository.ReviewLikeRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewPhotoRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewRepository;
 import com.prgrms.artzip.review.dto.projection.ReviewExhibitionInfo;
@@ -74,6 +75,9 @@ class ReviewServiceTest {
 
   @Mock
   private ReviewRepository reviewRepository;
+
+  @Mock
+  private ReviewLikeRepository reviewLikeRepository;
 
   @Mock
   private ReviewPhotoRepository reviewPhotoRepository;
