@@ -25,14 +25,16 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 
 public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
 
   private final JPAQueryFactory queryFactory;
 
+  // like count 계산할 때 사용
   private final QReviewLike reviewLikeToGetIsLiked = new QReviewLike("reviewLikeToGetIsLiked");
+  // target user의 like를 필터링할 때 사용
+  private final QReviewLike reviewLikeToFilterTargetUser = new QReviewLike("reviewLikeToFilterTargetUser");
 
   public ReviewCustomRepositoryImpl(EntityManager entityManager) {
     this.queryFactory = new JPAQueryFactory(entityManager);
@@ -93,7 +95,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
         .leftJoin(reviewLikeToGetIsLiked).on(reviewLikeToGetIsLiked.review.eq(review),
             alwaysFalse().or(reviewLikeUserIdEq(userId)))
         .leftJoin(reviewLike).on(review.id.eq(reviewLike.review.id))
-        .leftJoin(comment).on(review.id.eq(comment.review.id))
+        .leftJoin(comment).on(review.id.eq(comment.review.id), comment.isDeleted.isFalse())
         .where(review.isDeleted.eq(false),
             review.isPublic.eq(true),
             reviewExhibitionIdEq(exhibitionId))
@@ -137,7 +139,8 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
         .leftJoin(reviewLikeToGetIsLiked).on(reviewLikeToGetIsLiked.review.eq(review),
             alwaysFalse().or(reviewLikeUserIdEq(currentUserId)))
         .leftJoin(reviewLike).on(review.id.eq(reviewLike.review.id))
-        .leftJoin(comment).on(review.id.eq(comment.review.id))
+        .leftJoin(reviewLikeToFilterTargetUser).on(review.id.eq(reviewLikeToFilterTargetUser.review.id))
+        .leftJoin(comment).on(review.id.eq(comment.review.id), comment.isDeleted.isFalse())
         .where(review.isDeleted.eq(false),
             review.isPublic.eq(true),
             reviewLikeTargetUserIdEq(targetUserId))
@@ -183,7 +186,6 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
         .leftJoin(reviewLike).on(review.id.eq(reviewLike.review.id))
         .leftJoin(comment).on(review.id.eq(comment.review.id), comment.isDeleted.isFalse())
         .where(review.isDeleted.isFalse(),
-            review.isPublic.isTrue(),
             reviewTargetUserIdEq(targetUserId),
             filterIsNotPublic(currentUserId))
         .offset(pageable.getOffset())
@@ -196,7 +198,6 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
         .select(review.count())
         .from(review)
         .where(review.isDeleted.isFalse(),
-            review.isPublic.isTrue(),
             reviewTargetUserIdEq(targetUserId),
             filterIsNotPublic(currentUserId));
 
@@ -208,7 +209,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
   }
 
   private BooleanBuilder reviewLikeTargetUserIdEq(Long targetUserId) {
-    return nullSafeBooleanBuilder(() -> reviewLike.user.id.eq(targetUserId));
+    return nullSafeBooleanBuilder(() -> reviewLikeToFilterTargetUser.user.id.eq(targetUserId));
   }
 
   private BooleanBuilder reviewExhibitionIdEq(Long exhibitionId) {
