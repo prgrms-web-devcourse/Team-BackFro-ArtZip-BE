@@ -56,7 +56,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
                 .then(true)
                 .otherwise(false).as("isLiked"),
             review.isPublic,
-            reviewLike.id.count().as("likeCount"),
+            reviewLike.id.countDistinct().as("likeCount"),
             comment.id.countDistinct().as("commentCount")
         ))
         .from(review)
