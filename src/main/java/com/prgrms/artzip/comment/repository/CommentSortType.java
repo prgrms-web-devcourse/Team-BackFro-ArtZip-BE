@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 public enum CommentSortType {
   CREATED_AT("createdAt", comment.createdAt),
   COMMENT_ID("id", comment.id),
-  LIKE_COUNT("likeCount", commentLike.commentLikeId.countDistinct());
+  LIKE_COUNT("likeCount", commentLike.id.countDistinct());
 
   private final String property;
   private final Expression target;

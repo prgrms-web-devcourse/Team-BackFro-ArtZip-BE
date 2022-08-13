@@ -43,7 +43,7 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
                 comment.updatedAt,
                 comment.isDeleted,
                 user,
-                commentLike.commentLikeId.countDistinct().as("likeCount"),
+                commentLike.id.countDistinct().as("likeCount"),
                 commentToGetChildren.id.countDistinct().as("childCount"),
                 new CaseBuilder()
                     .when(commentLikeEqToUserId(userId))
@@ -57,7 +57,7 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
         .leftJoin(commentToGetChildren).on(commentToGetChildren.parent.id.eq(comment.id)
             .and(commentToGetChildren.isDeleted.isFalse()))
         .leftJoin(commentLikeToGetIsLiked)
-        .on(commentLikeToGetIsLiked.commentLikeId.commentId.eq(comment.id),
+        .on(commentLikeToGetIsLiked.comment.id.eq(comment.id),
             commentLikeEqToUserId(userId))
         .where(comment.review.id.eq(reviewId).and(comment.parent.isNull()))
         .offset(pageable.getOffset())
@@ -76,7 +76,7 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
 
 
   private BooleanBuilder commentLikeEqToUserId(Long userId) {
-    return nullSafeBooleanBuilder(() -> commentLikeToGetIsLiked.commentLikeId.userId.eq(userId));
+    return nullSafeBooleanBuilder(() -> commentLikeToGetIsLiked.user.id.eq(userId));
   }
 
   private List<OrderSpecifier> getAllOrderSpecifiers(Pageable pageable) {
