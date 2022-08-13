@@ -13,7 +13,6 @@ import com.prgrms.artzip.exhibition.domain.enumType.Genre;
 import com.prgrms.artzip.review.domain.Review;
 import com.prgrms.artzip.review.domain.ReviewLike;
 import com.prgrms.artzip.review.dto.projection.ReviewWithLikeAndCommentCount;
-import com.prgrms.artzip.review.dto.projection.ReviewWithLikeData;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import java.time.LocalDate;

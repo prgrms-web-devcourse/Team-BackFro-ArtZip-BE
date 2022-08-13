@@ -12,7 +12,6 @@ import static org.mockito.Mockito.verify;
 
 import com.prgrms.artzip.comment.domain.Comment;
 import com.prgrms.artzip.comment.dto.response.CommentResponse;
-import com.prgrms.artzip.comment.repository.CommentRepository;
 import com.prgrms.artzip.comment.service.CommentService;
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.ErrorCode;
@@ -29,12 +28,10 @@ import com.prgrms.artzip.exhibition.domain.repository.ExhibitionRepository;
 import com.prgrms.artzip.review.domain.Review;
 import com.prgrms.artzip.review.domain.ReviewLike;
 import com.prgrms.artzip.review.domain.ReviewPhoto;
-import com.prgrms.artzip.review.domain.repository.ReviewLikeRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewPhotoRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewRepository;
 import com.prgrms.artzip.review.dto.projection.ReviewExhibitionInfo;
 import com.prgrms.artzip.review.dto.projection.ReviewWithLikeAndCommentCount;
-import com.prgrms.artzip.review.dto.projection.ReviewWithLikeData;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
 import com.prgrms.artzip.review.dto.request.ReviewUpdateRequest;
 import com.prgrms.artzip.review.dto.response.ReviewIdResponse;
@@ -82,16 +79,10 @@ class ReviewServiceTest {
   private ReviewPhotoRepository reviewPhotoRepository;
 
   @Mock
-  private ReviewLikeRepository reviewLikeRepository;
-
-  @Mock
   private UserRepository userRepository;
 
   @Mock
   private ExhibitionRepository exhibitionRepository;
-
-  @Mock
-  private CommentRepository commentRepository;
 
   @Mock
   AmazonS3Uploader amazonS3Uploader;
@@ -1051,19 +1042,20 @@ class ReviewServiceTest {
             .willReturn(Optional.of(reviewExhibitionInfo));
         given(commentService.getCommentsByReviewId(
             reflectionReview.getId(),
-            reflectionUser,PageRequest.of(0, 20)))
+            reflectionUser, PageRequest.of(0, 20)))
             .willReturn(reflectionComments);
 
         // when
         reviewService.getReview(reflectionUser, reflectionReview.getId());
 
         // then
-        verify(reviewRepository).findByReviewIdAndUserId(reflectionReview.getId(), reflectionUser.getId());
+        verify(reviewRepository).findByReviewIdAndUserId(reflectionReview.getId(),
+            reflectionUser.getId());
         verify(exhibitionRepository).findExhibitionForReview(
             reflectionUser.getId(), reflectionReview.getExhibition().getId());
         verify(commentService).getCommentsByReviewId(
             reflectionReview.getId(),
-            reflectionUser,PageRequest.of(0, 20));
+            reflectionUser, PageRequest.of(0, 20));
       }
 
     }
@@ -2151,7 +2143,7 @@ class ReviewServiceTest {
             LocalDateTime.class
         );
 
-        Review reflectionReview =  Review.builder()
+        Review reflectionReview = Review.builder()
             .user(reflectionCurrentUser)
             .exhibition(reflectionExhibition)
             .content("이것은 리뷰 본문입니다.")
@@ -2224,8 +2216,10 @@ class ReviewServiceTest {
         // when
         verify(reviewRepository).findMyReviews(
             null, reflectionTargetUser.getId(), pageable);
-        verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(reflectionReview.getId());
-        verify(exhibitionRepository, times(reflectionReviews.getContent().size())).findById(reflectionExhibition.getId());
+        verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(
+            reflectionReview.getId());
+        verify(exhibitionRepository, times(reflectionReviews.getContent().size())).findById(
+            reflectionExhibition.getId());
       }
 
       @Test
@@ -2295,7 +2289,7 @@ class ReviewServiceTest {
             LocalDateTime.class
         );
 
-        Review reflectionReview =  Review.builder()
+        Review reflectionReview = Review.builder()
             .user(reflectionCurrentUser)
             .exhibition(reflectionExhibition)
             .content("이것은 리뷰 본문입니다.")
@@ -2368,8 +2362,10 @@ class ReviewServiceTest {
         // when
         verify(reviewRepository).findMyReviews(
             reflectionCurrentUser.getId(), null, pageable);
-        verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(reflectionReview.getId());
-        verify(exhibitionRepository, times(reflectionReviews.getContent().size())).findById(reflectionExhibition.getId());
+        verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(
+            reflectionReview.getId());
+        verify(exhibitionRepository, times(reflectionReviews.getContent().size())).findById(
+            reflectionExhibition.getId());
       }
 
     }
