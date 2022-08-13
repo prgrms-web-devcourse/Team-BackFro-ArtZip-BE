@@ -171,7 +171,7 @@ class ExhibitionSearchServiceTest {
       ExhibitionCustomConditionRequest exhibitionCustomConditionRequest = ExhibitionCustomConditionRequest.builder()
           .areas(new ArrayList<>())
           .months(List.of(Month.JUN))
-          .genres(List.of(Genre.INSATALLATION))
+          .genres(List.of(Genre.INSTALLATION))
           .build();
 
       assertThatThrownBy(() -> exhibitionSearchService.getExhibitionsByCustomCondition(userId,
@@ -189,7 +189,7 @@ class ExhibitionSearchServiceTest {
       ExhibitionCustomConditionRequest exhibitionCustomConditionRequest = ExhibitionCustomConditionRequest.builder()
           .areas(List.of(Area.SEOUL))
           .months(new ArrayList<>())
-          .genres(List.of(Genre.INSATALLATION))
+          .genres(List.of(Genre.INSTALLATION))
           .build();
 
       assertThatThrownBy(() -> exhibitionSearchService.getExhibitionsByCustomCondition(userId,
@@ -225,7 +225,7 @@ class ExhibitionSearchServiceTest {
       ExhibitionCustomConditionRequest exhibitionCustomConditionRequest = ExhibitionCustomConditionRequest.builder()
           .areas(Arrays.asList(Area.SEOUL, null))
           .months(Arrays.asList(Month.JUN))
-          .genres(Arrays.asList(Genre.INSATALLATION))
+          .genres(Arrays.asList(Genre.INSTALLATION))
           .build();
 
       assertThatThrownBy(() -> exhibitionSearchService.getExhibitionsByCustomCondition(userId,
@@ -243,7 +243,7 @@ class ExhibitionSearchServiceTest {
       ExhibitionCustomConditionRequest exhibitionCustomConditionRequest = ExhibitionCustomConditionRequest.builder()
           .areas(Arrays.asList(Area.SEOUL))
           .months(Arrays.asList(Month.DEC, null))
-          .genres(Arrays.asList(Genre.INSATALLATION))
+          .genres(Arrays.asList(Genre.INSTALLATION))
           .build();
 
       assertThatThrownBy(() -> exhibitionSearchService.getExhibitionsByCustomCondition(userId,
@@ -261,7 +261,7 @@ class ExhibitionSearchServiceTest {
       ExhibitionCustomConditionRequest exhibitionCustomConditionRequest = ExhibitionCustomConditionRequest.builder()
           .areas(Arrays.asList(Area.SEOUL))
           .months(Arrays.asList(Month.DEC))
-          .genres(Arrays.asList(Genre.INSATALLATION, null))
+          .genres(Arrays.asList(Genre.INSTALLATION, null))
           .build();
 
       assertThatThrownBy(() -> exhibitionSearchService.getExhibitionsByCustomCondition(userId,
@@ -279,7 +279,7 @@ class ExhibitionSearchServiceTest {
       ExhibitionCustomConditionRequest exhibitionCustomConditionRequest = ExhibitionCustomConditionRequest.builder()
           .areas(Arrays.asList(Area.SEOUL, Area.ALL))
           .months(Arrays.asList(Month.JUN))
-          .genres(Arrays.asList(Genre.INSATALLATION))
+          .genres(Arrays.asList(Genre.INSTALLATION))
           .build();
 
       when(exhibitionRepository.findExhibitionsByCustomCondition(eq(userId),
@@ -298,7 +298,7 @@ class ExhibitionSearchServiceTest {
       ExhibitionCustomConditionRequest exhibitionCustomConditionRequest = ExhibitionCustomConditionRequest.builder()
           .areas(Arrays.asList(Area.SEOUL))
           .months(Arrays.asList(Month.JUN, Month.ALL))
-          .genres(Arrays.asList(Genre.INSATALLATION))
+          .genres(Arrays.asList(Genre.INSTALLATION))
           .build();
 
       when(exhibitionRepository.findExhibitionsByCustomCondition(eq(userId),
