@@ -19,7 +19,6 @@ import com.prgrms.artzip.review.domain.repository.ReviewPhotoRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewRepository;
 import com.prgrms.artzip.review.dto.projection.ReviewExhibitionInfo;
 import com.prgrms.artzip.review.dto.projection.ReviewWithLikeAndCommentCount;
-import com.prgrms.artzip.review.dto.projection.ReviewWithLikeData;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
 import com.prgrms.artzip.review.dto.request.ReviewUpdateRequest;
 import com.prgrms.artzip.review.dto.response.ReviewExhibitionInfoResponse;
@@ -135,7 +134,7 @@ public class ReviewService {
     Review review = reviewRepository.findById(reviewId)
         .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_NOT_FOUND));
 
-    ReviewWithLikeData reviewData = reviewRepository.findByReviewIdAndUserId(reviewId,
+    ReviewWithLikeAndCommentCount reviewData = reviewRepository.findByReviewIdAndUserId(reviewId,
             Objects.isNull(user) ? null : user.getId())
         .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_NOT_FOUND));
 
@@ -146,9 +145,8 @@ public class ReviewService {
         .orElseThrow(() -> new NotFoundException(ErrorCode.EXHB_NOT_FOUND));
     Page<CommentResponse> comments = commentService.getCommentsByReviewId(
         reviewId, user, PageRequest.of(0, 20));
-    Long reviewCommentCount = commentService.getCommentCountByReviewId(reviewId);
 
-    return new ReviewResponse(reviewCommentCount,
+    return new ReviewResponse(
         comments,
         reviewData,
         reviewPhotos,
