@@ -1,4 +1,4 @@
-package com.prgrms.artzip.exhibition.domain.enumType;
+package com.prgrms.artzip.exhibition.domain.repository;
 
 import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
@@ -15,7 +15,9 @@ public enum ExhibitionSortType {
   CREATED_AT("createdAt", QExhibition.exhibition.createdAt),
   EXHIBITION_ID("id", QExhibition.exhibition.id),
   LIKE_COUNT("likeCount", new QExhibitionLike(
-      "exhibitionLikeForLikeCount").id.countDistinct());
+      "exhibitionLikeForLikeCount").id.countDistinct()),
+  START_DATE("startDate", QExhibition.exhibition.period.startDate),
+  END_DATE("endDate", QExhibition.exhibition.period.endDate);
 
   private final String property;
   private final Expression target;
@@ -27,6 +29,8 @@ public enum ExhibitionSortType {
   public static ExhibitionSortType getExhibitionSortType(String property) {
     return Arrays.stream(ExhibitionSortType.values())
         .filter(exhibitionSortType -> exhibitionSortType.property.equals(property))
-        .findAny().orElseThrow(() -> {throw new NotFoundException(ErrorCode.INVALID_EXHB_SORT_TYPE);});
+        .findAny().orElseThrow(() -> {
+          throw new NotFoundException(ErrorCode.INVALID_EXHB_SORT_TYPE);
+        });
   }
 }

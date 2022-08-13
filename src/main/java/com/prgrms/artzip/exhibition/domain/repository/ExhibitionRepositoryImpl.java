@@ -2,6 +2,10 @@ package com.prgrms.artzip.exhibition.domain.repository;
 
 import static com.prgrms.artzip.exhibition.domain.QExhibition.exhibition;
 import static com.prgrms.artzip.exhibition.domain.QExhibitionLike.exhibitionLike;
+import static com.prgrms.artzip.exhibition.domain.repository.ExhibitionSortType.END_DATE;
+import static com.prgrms.artzip.exhibition.domain.repository.ExhibitionSortType.EXHIBITION_ID;
+import static com.prgrms.artzip.exhibition.domain.repository.ExhibitionSortType.LIKE_COUNT;
+import static com.prgrms.artzip.exhibition.domain.repository.ExhibitionSortType.START_DATE;
 import static com.prgrms.artzip.review.domain.QReview.review;
 import static com.querydsl.core.types.dsl.MathExpressions.acos;
 import static com.querydsl.core.types.dsl.MathExpressions.cos;
@@ -12,7 +16,6 @@ import static java.util.Objects.nonNull;
 
 import com.prgrms.artzip.exhibition.domain.QExhibitionLike;
 import com.prgrms.artzip.exhibition.domain.enumType.Area;
-import com.prgrms.artzip.exhibition.domain.enumType.ExhibitionSortType;
 import com.prgrms.artzip.exhibition.domain.enumType.Genre;
 import com.prgrms.artzip.exhibition.domain.enumType.Month;
 import com.prgrms.artzip.exhibition.dto.ExhibitionCustomCondition;
@@ -32,7 +35,6 @@ import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -60,12 +62,12 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
   public Page<ExhibitionForSimpleQuery> findUpcomingExhibitions(Long userId, Pageable pageable) {
     BooleanBuilder upcomingCondition = getUpcomingCondition();
 
-    List<ExhibitionForSimpleQuery> exhibitions = findExhibitions(userId, upcomingCondition,
-        Arrays.asList(
-            new OrderSpecifier(Order.ASC, exhibition.period.startDate),
-            new OrderSpecifier(Order.ASC, exhibition.period.endDate),
-            new OrderSpecifier(Order.ASC, exhibition.id)
-        ),
+    List<OrderSpecifier> orders = List.of(
+        START_DATE.getOrderSpecifier(Order.ASC),
+        END_DATE.getOrderSpecifier(Order.ASC),
+        EXHIBITION_ID.getOrderSpecifier(Order.ASC));
+
+    List<ExhibitionForSimpleQuery> exhibitions = findExhibitions(userId, upcomingCondition, orders,
         pageable);
 
     JPAQuery<Long> countQuery = getExhibitionCountQuery(upcomingCondition);
@@ -78,12 +80,11 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
       Pageable pageable) {
     BooleanBuilder mostLikeCondition = getMostLikeCondition(includeEnd);
 
-    List<ExhibitionForSimpleQuery> exhibitions = findExhibitions(userId,
-        mostLikeCondition,
-        List.of(
-            new OrderSpecifier(Order.DESC, Expressions.numberPath(Long.class, "likeCount")),
-            new OrderSpecifier(Order.ASC, exhibition.id)
-        ),
+    List<OrderSpecifier> orders = List.of(
+        LIKE_COUNT.getOrderSpecifier(Order.DESC),
+        EXHIBITION_ID.getOrderSpecifier(Order.ASC));
+
+    List<ExhibitionForSimpleQuery> exhibitions = findExhibitions(userId, mostLikeCondition, orders,
         pageable);
 
     JPAQuery<Long> countQuery = getExhibitionCountQuery(mostLikeCondition);
@@ -138,10 +139,10 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
       boolean includeEnd, Pageable pageable) {
     BooleanBuilder exhibitionsByQueryCondition = getExhibitionsByQueryCondition(query, includeEnd);
 
+    List<OrderSpecifier> orders = List.of(EXHIBITION_ID.getOrderSpecifier(Order.ASC));
+
     List<ExhibitionForSimpleQuery> exhibitions = findExhibitions(userId,
-        exhibitionsByQueryCondition,
-        List.of(new OrderSpecifier(Order.ASC, exhibition.id)),
-        pageable);
+        exhibitionsByQueryCondition, orders, pageable);
 
     JPAQuery<Long> countQuery = getExhibitionCountQuery(exhibitionsByQueryCondition);
 
@@ -229,11 +230,11 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
       ExhibitionCustomCondition exhibitionCustomCondition, Pageable pageable) {
     BooleanBuilder customCondition = getCustomCondition(exhibitionCustomCondition);
 
-    List<ExhibitionForSimpleQuery> exhibitions = findExhibitions(userId, customCondition,
-        List.of(
-            new OrderSpecifier(Order.ASC, exhibition.period.startDate),
-            new OrderSpecifier(Order.ASC, exhibition.id)
-        ),
+    List<OrderSpecifier> orders = List.of(
+        START_DATE.getOrderSpecifier(Order.ASC),
+        EXHIBITION_ID.getOrderSpecifier(Order.ASC));
+
+    List<ExhibitionForSimpleQuery> exhibitions = findExhibitions(userId, customCondition, orders,
         pageable);
 
     JPAQuery<Long> countQuery = getExhibitionCountQuery(customCondition);
