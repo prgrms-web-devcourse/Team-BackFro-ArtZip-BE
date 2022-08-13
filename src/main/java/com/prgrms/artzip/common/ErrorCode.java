@@ -52,7 +52,7 @@ public enum ErrorCode {
    */
   INVALID_EXHBN_NAME(400, "EX002", "전시회 이름은 필수입니다.(1 <= 전시회 이름 <= 70)"),
   INVALID_EXHBN_PERIOD(400, "EX003", "전시회 기간 정보는 필수입니다.(startDate <= endDate)"),
-  INVALID_EXHBN_DESCRIPTION(400, "EX004", "전시회 설명은 최대 1000자 입니다."),
+  INVALID_EXHBN_DESCRIPTION(400, "EX004", "전시회 설명은 최대 5000자 입니다."),
   INVALID_EXHBN_COORDINATE(400, "EX005", "전시회 좌표는 필수입니다.(-90 <= 위도 <= 90, -180 <= 경도 <= 180)"),
   INVALID_EXHB_AREA(400, "EX006", "전시회 지역은 필수입니다."),
   INVALID_EXHB_PLACE(400, "EX007", "전시회 장소는 필수입니다.(1 <= 전시회 장소 <= 20)"),
@@ -64,12 +64,13 @@ public enum ErrorCode {
   INVALID_EXHB_URL(400, "EX012", "전시회 URL은 필수입니다.(1 <= 전시회 URL <= 2083)"),
   INVALID_EXHB_PLACEURL(400, "EX013", "전시회 장소 URL은 필수입니다.(1 <= 전시회 장소 URL <= 2083)"),
   INVALID_EXHB_LIKE(400, "EX014", "전시회 좋아요에는 전시회 정보와 사용자 정보가 필수입니다."),
-  EXHB_NOT_FOUND(404, "EX015", "존재하지 않는 전시회 입니다."),
+  EXHB_NOT_FOUND(400, "EX015", "존재하지 않는 전시회 입니다."),
   INVALID_EXHB_QUERY(400, "EX016", "검색어는 필수입니다.(2 <= 검색어)"),
   INVALID_EXHB_QUERY_FOR_REVIEW(400, "EX017", "검색어는 필수입니다."),
   INVALID_CUSTOM_EXHB_CONDITION(400, "EX018", "areas, months, genres 에는 null이 포함될 수 없습니다"),
   INVALID_COORDINATE(400, "EX019", "옳지 않은 위도 경도 정보입니다.(-90 <= 위도 <= 90, -180 <= 경도 <= 180)"),
   INVALID_DISTANCE(400, "EX020", "거리는 0 이상이어야 합니다."),
+  INVALID_EXHB_SORT_TYPE(400, "EX021", "유효하지 않은 전시회 정렬 조건입니다."),
 
   /**
    * Comment Domain

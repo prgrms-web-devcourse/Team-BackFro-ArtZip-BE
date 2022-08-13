@@ -8,6 +8,7 @@ import com.prgrms.artzip.exhibition.dto.response.ExhibitionDetailInfoResponse;
 import com.prgrms.artzip.exhibition.dto.response.ExhibitionInfoResponse;
 import com.prgrms.artzip.exhibition.service.ExhibitionAdminService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import java.net.URI;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,10 +39,11 @@ public class ExhibitionAdminController {
 
   private final ExhibitionAdminService exhibitionAdminService;
 
-  @GetMapping()
+  @ApiOperation(value = "관리자 전시회 다건 조회", notes = "삭제가 안된 모든 전시회를 조회합니다.")
+  @GetMapping
   public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfoResponse>>> getExhibitions(
       @PageableDefault(
-          sort = {"created_at"},
+          sort = {"createdAt"},
           direction = Direction.DESC
       ) Pageable pageable
   ) {
@@ -57,6 +59,7 @@ public class ExhibitionAdminController {
         .build());
   }
 
+  @ApiOperation(value = "관리자 전시회 단건 조회", notes = "전시회의 상세 정보를 조회합니다.")
   @GetMapping("/{exhibitionId}")
   public ResponseEntity<ApiResponse<ExhibitionDetailInfoResponse>> getExhibition(
       @PathVariable Long exhibitionId
@@ -71,7 +74,8 @@ public class ExhibitionAdminController {
         .build());
   }
 
-  @PostMapping()
+  @ApiOperation(value = "관리자 전시회 생성", notes = "전시회를 생성합니다.")
+  @PostMapping
   public ResponseEntity<Void> createExhibition(
       @Valid @ModelAttribute ExhibitionCreateOrUpdateRequest request,
       @RequestPart MultipartFile thumbnail
@@ -82,11 +86,12 @@ public class ExhibitionAdminController {
     return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
   }
 
+  @ApiOperation(value = "관리자 전시회 수정", notes = "전시회를 수정합니다.")
   @PutMapping("/{exhibitionId}")
   public ResponseEntity<?> updateExhibition(
       @PathVariable Long exhibitionId,
       @Valid @ModelAttribute ExhibitionCreateOrUpdateRequest request,
-      @RequestPart MultipartFile thumbnail
+      @RequestPart(required = false) MultipartFile thumbnail
   ) {
     exhibitionAdminService.updateExhibition(exhibitionId, request, thumbnail);
     HttpHeaders headers = new HttpHeaders();
@@ -94,6 +99,7 @@ public class ExhibitionAdminController {
     return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
   }
 
+  @ApiOperation(value = "관리자 전시회 간이 수정", notes = "장르 및 설명을 넣기 위한 간이 API입니다.")
   @PatchMapping("/{exhibitionId}/semi")
   public ResponseEntity<?> updateSemiExhibition(
       @PathVariable Long exhibitionId,
@@ -105,6 +111,7 @@ public class ExhibitionAdminController {
     return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
   }
 
+  @ApiOperation(value = "관리자 전시회 삭제", notes = "전시회를 삭제합니다. (soft delete)")
   @DeleteMapping("/{exhibitionId}")
   public ResponseEntity<?> deleteExhibition(
       @PathVariable Long exhibitionId
