@@ -2,11 +2,13 @@ package com.prgrms.artzip.comment.service;
 
 import com.prgrms.artzip.comment.domain.Comment;
 import com.prgrms.artzip.comment.domain.CommentLike;
+import com.prgrms.artzip.comment.dto.projection.CommentSimpleProjection;
 import com.prgrms.artzip.comment.dto.request.CommentCreateRequest;
 import com.prgrms.artzip.comment.dto.request.CommentUpdateRequest;
 import com.prgrms.artzip.comment.dto.response.CommentInfo;
 import com.prgrms.artzip.comment.dto.response.CommentLikeResponse;
 import com.prgrms.artzip.comment.dto.response.CommentResponse;
+import com.prgrms.artzip.comment.dto.response.CommentResponseQ;
 import com.prgrms.artzip.comment.repository.CommentLikeRepository;
 import com.prgrms.artzip.comment.repository.CommentRepository;
 import com.prgrms.artzip.common.ErrorCode;
@@ -48,6 +50,12 @@ public class CommentService {
                 .toList()
         )
     );
+  }
+
+  @Transactional(readOnly = true)
+  public Page<CommentResponseQ> getCommentsByReviewIdQ(Long reviewId, User user, Pageable pageable) {
+    Page<CommentSimpleProjection> comments = commentRepository.getCommentsByReviewIdQ(reviewId, Objects.nonNull(user) ? user.getId() : null, pageable);
+    return comments.map(CommentResponseQ::new);
   }
 
   public CommentResponse createComment(CommentCreateRequest request, Long reviewId, User user) {
@@ -105,7 +113,7 @@ public class CommentService {
     Comment comment = commentUtilService.getComment(commentId);
     Optional<CommentLike> commentLike = commentLikeRepository
         .getCommentLikeByCommentIdAndUserId(commentId, user.getId());
-    Boolean isLiked;
+    boolean isLiked;
     if (commentLike.isPresent()) {
       commentLikeRepository.deleteCommentLikeByCommentIdAndUserId(commentId, user.getId());
       isLiked = false;

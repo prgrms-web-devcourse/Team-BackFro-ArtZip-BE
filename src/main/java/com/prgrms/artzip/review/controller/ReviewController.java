@@ -2,6 +2,7 @@ package com.prgrms.artzip.review.controller;
 
 import com.prgrms.artzip.comment.dto.request.CommentCreateRequest;
 import com.prgrms.artzip.comment.dto.response.CommentResponse;
+import com.prgrms.artzip.comment.dto.response.CommentResponseQ;
 import com.prgrms.artzip.comment.service.CommentService;
 import com.prgrms.artzip.common.ApiResponse;
 import com.prgrms.artzip.common.PageResponse;
@@ -113,8 +114,6 @@ public class ReviewController {
         .body(apiResponse);
   }
 
-  //TODO 아래 두 API 테스트 작성
-
   @ApiOperation(value = "후기 댓글 다건 조회", notes = "후기의 댓글들을 조회합니다.")
   @GetMapping("/{reviewId}/comments")
   public ResponseEntity<ApiResponse<PageResponse<CommentResponse>>> getComments(
@@ -133,6 +132,24 @@ public class ReviewController {
     return ResponseEntity.ok(response);
   }
 
+  @ApiOperation(value = "후기 댓글 다건 조회Q", notes = "후기의 댓글들을 조회합니다.")
+  @GetMapping("/{reviewId}/comments/Q")
+  public ResponseEntity<ApiResponse<PageResponse<CommentResponseQ>>> getCommentsQ(
+      @ApiParam(value = "조회할 후기의 ID")
+      @PathVariable Long reviewId,
+      @CurrentUser User user,
+      @PageableDefault(
+          sort = {"createdAt"},
+          direction = Sort.Direction.DESC
+      ) Pageable pageable
+  ) {
+    PageResponse<CommentResponseQ> comments =
+        new PageResponse<>(commentService.getCommentsByReviewIdQ(reviewId, user, pageable));
+    ApiResponse<PageResponse<CommentResponseQ>> response
+        = new ApiResponse<>("댓글 다건 조회 성공", HttpStatus.OK.value(), comments);
+    return ResponseEntity.ok(response);
+  }
+
   @ApiOperation(value = "리뷰 댓글 생성", notes = "리뷰에 댓글을 생성합니다.")
   @PostMapping("/{reviewId}/comments")
   public ResponseEntity<ApiResponse<CommentResponse>> createComment(
@@ -141,7 +158,6 @@ public class ReviewController {
       @RequestBody @Valid CommentCreateRequest request,
       @CurrentUser User user
   ) {
-    //TODO 유저 아이디 수정 -> 추후 아마 유저 객체가 들어올듯
     CommentResponse comment = commentService.createComment(request, reviewId, user);
     ApiResponse<CommentResponse> response
         = new ApiResponse<>("댓글 생성 성공", HttpStatus.OK.value(), comment);
