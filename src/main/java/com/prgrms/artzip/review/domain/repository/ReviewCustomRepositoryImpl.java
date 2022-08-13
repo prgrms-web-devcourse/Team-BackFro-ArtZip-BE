@@ -1,10 +1,10 @@
 package com.prgrms.artzip.review.domain.repository;
 
 import static com.prgrms.artzip.comment.domain.QComment.comment;
+import static com.prgrms.artzip.common.util.QueryDslCustomUtils.alwaysFalse;
+import static com.prgrms.artzip.common.util.QueryDslCustomUtils.nullSafeBooleanBuilder;
 import static com.prgrms.artzip.review.domain.QReview.review;
 import static com.prgrms.artzip.review.domain.QReviewLike.reviewLike;
-import static com.prgrms.artzip.review.domain.repository.QuerydslUtils.alwaysFalse;
-import static com.prgrms.artzip.review.domain.repository.QuerydslUtils.nullSafeBooleanBuilder;
 
 import com.prgrms.artzip.review.domain.QReviewLike;
 import com.prgrms.artzip.review.dto.projection.ReviewWithLikeAndCommentCount;
@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 
 public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {

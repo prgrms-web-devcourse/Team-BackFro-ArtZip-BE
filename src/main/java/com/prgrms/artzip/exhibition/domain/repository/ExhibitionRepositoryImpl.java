@@ -10,7 +10,6 @@ import static com.querydsl.core.types.dsl.MathExpressions.sin;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
-import com.prgrms.artzip.common.util.QueryDslUtil;
 import com.prgrms.artzip.exhibition.domain.QExhibitionLike;
 import com.prgrms.artzip.exhibition.domain.enumType.Area;
 import com.prgrms.artzip.exhibition.domain.enumType.ExhibitionSortType;
@@ -21,7 +20,6 @@ import com.prgrms.artzip.exhibition.dto.projection.ExhibitionBasicForSimpleQuery
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionWithLocationForSimpleQuery;
-import com.prgrms.artzip.review.domain.repository.ReviewSortType;
 import com.prgrms.artzip.review.dto.projection.ReviewExhibitionInfo;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
@@ -34,7 +32,6 @@ import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -45,7 +42,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 
 @Slf4j
