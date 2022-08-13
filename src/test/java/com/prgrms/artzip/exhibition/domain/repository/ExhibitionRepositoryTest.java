@@ -53,7 +53,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.domain.Sort.Order;
 
 @DataJpaTest
 @Import({QueryDslTestConfig.class})
@@ -71,6 +70,7 @@ class ExhibitionRepositoryTest {
   class FindUpcomingExhibitionsTest {
 
     private User user1;
+    private Pageable pageable = PageRequest.of(0, 8);
 
     @BeforeEach
     void setUp() {
@@ -153,6 +153,16 @@ class ExhibitionRepositoryTest {
           .build();
       em.persist(review);
 
+      Review privateReview = Review.builder()
+          .user(user2)
+          .exhibition(exhibitionAtBusan)
+          .content("이것은 비공개 리뷰 본문입니다.")
+          .title("이것은 비공개 리뷰 제목입니다.")
+          .date(LocalDate.now())
+          .isPublic(false)
+          .build();
+      em.persist(privateReview);
+
       em.persist(new ExhibitionLike(user1, exhibitionAtSeoul));
       em.persist(new ExhibitionLike(user1, exhibitionAtBusan));
       em.persist(new ExhibitionLike(user1, exhibitionAlreadyEnd));
@@ -166,7 +176,7 @@ class ExhibitionRepositoryTest {
     @DisplayName("로그인하지 않은 상태에서 실제로 시작일이 빠른 전시회가 먼저 오는지 확인하는 테스트")
     void testFindUpcomingExhibitionWithoutAuthorization() {
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-          .findUpcomingExhibitions(null, PageRequest.of(0, 10));
+          .findUpcomingExhibitions(null, pageable);
       ExhibitionForSimpleQuery exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);
 
       assertThat(exhibitionsPagingResult.getContent()).hasSize(2);
@@ -181,7 +191,7 @@ class ExhibitionRepositoryTest {
     @DisplayName("로그인한 상태에서 실제로 시작일이 빠른 전시회가 먼저 오는지 확인하는 테스트")
     void testFindUpcomingExhibitionWithAuthorization() {
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-          .findUpcomingExhibitions(user1.getId(), PageRequest.of(0, 10));
+          .findUpcomingExhibitions(user1.getId(), pageable);
       ExhibitionForSimpleQuery exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);
 
       assertThat(exhibitionsPagingResult.getContent()).hasSize(2);
@@ -1254,7 +1264,8 @@ class ExhibitionRepositoryTest {
       );
 
       //when
-      Page<ExhibitionForSimpleQuery> response = exhibitionRepository.findExhibitionsByAdmin(pageable);
+      Page<ExhibitionForSimpleQuery> response = exhibitionRepository.findExhibitionsByAdmin(
+          pageable);
 
       //then
       assertThat(response.getContent()).hasSize(3);
@@ -1276,7 +1287,8 @@ class ExhibitionRepositoryTest {
       );
 
       //when
-      Page<ExhibitionForSimpleQuery> response = exhibitionRepository.findExhibitionsByAdmin(pageable);
+      Page<ExhibitionForSimpleQuery> response = exhibitionRepository.findExhibitionsByAdmin(
+          pageable);
 
       //then
       assertThat(response.getContent()).hasSize(3);

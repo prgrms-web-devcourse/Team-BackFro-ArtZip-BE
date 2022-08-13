@@ -2,6 +2,9 @@ package com.prgrms.artzip.exhibition.domain.repository;
 
 import static com.prgrms.artzip.exhibition.domain.QExhibition.exhibition;
 import static com.prgrms.artzip.exhibition.domain.QExhibitionLike.exhibitionLike;
+import static com.prgrms.artzip.exhibition.domain.enumType.ExhibitionSortType.END_DATE;
+import static com.prgrms.artzip.exhibition.domain.enumType.ExhibitionSortType.EXHIBITION_ID;
+import static com.prgrms.artzip.exhibition.domain.enumType.ExhibitionSortType.START_DATE;
 import static com.prgrms.artzip.review.domain.QReview.review;
 import static com.querydsl.core.types.dsl.MathExpressions.acos;
 import static com.querydsl.core.types.dsl.MathExpressions.cos;
@@ -32,7 +35,6 @@ import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -60,14 +62,15 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
   public Page<ExhibitionForSimpleQuery> findUpcomingExhibitions(Long userId, Pageable pageable) {
     BooleanBuilder upcomingCondition = getUpcomingCondition();
 
-    List<ExhibitionForSimpleQuery> exhibitions = findExhibitions(userId, upcomingCondition,
-        Arrays.asList(
-            new OrderSpecifier(Order.ASC, exhibition.period.startDate),
-            new OrderSpecifier(Order.ASC, exhibition.period.endDate),
-            new OrderSpecifier(Order.ASC, exhibition.id)
-        ),
-        pageable);
+    List<OrderSpecifier> orders = List.of(
+        START_DATE.getOrderSpecifier(Order.ASC),
+        END_DATE.getOrderSpecifier(Order.ASC),
+        EXHIBITION_ID.getOrderSpecifier(Order.ASC)
+    );
 
+    List<ExhibitionForSimpleQuery> exhibitions = findExhibitions(userId, upcomingCondition, orders,
+        pageable);
+    
     JPAQuery<Long> countQuery = getExhibitionCountQuery(upcomingCondition);
 
     return PageableExecutionUtils.getPage(exhibitions, pageable, countQuery::fetchOne);
