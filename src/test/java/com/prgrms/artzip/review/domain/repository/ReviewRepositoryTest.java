@@ -276,6 +276,7 @@ public class ReviewRepositoryTest {
       assertThat(result.get().getIsLiked()).isEqualTo(true);
       assertThat(result.get().getIsPublic()).isEqualTo(publicReview1.getIsPublic());
       assertThat(result.get().getLikeCount()).isEqualTo(2);
+      assertThat(result.get().getCommentCount()).isEqualTo(75L);
     }
 
     @Test
@@ -292,6 +293,7 @@ public class ReviewRepositoryTest {
       assertThat(result.get().getIsLiked()).isEqualTo(true);
       assertThat(result.get().getIsPublic()).isEqualTo(publicReview1.getIsPublic());
       assertThat(result.get().getLikeCount()).isEqualTo(2);
+      assertThat(result.get().getCommentCount()).isEqualTo(75L);
     }
 
     @Test
@@ -308,6 +310,7 @@ public class ReviewRepositoryTest {
       assertThat(result.get().getIsLiked()).isEqualTo(false);
       assertThat(result.get().getIsPublic()).isEqualTo(privateReview.getIsPublic());
       assertThat(result.get().getLikeCount()).isEqualTo(1);
+      assertThat(result.get().getCommentCount()).isEqualTo(0L);
     }
 
     @Test
@@ -324,6 +327,7 @@ public class ReviewRepositoryTest {
       assertThat(result.get().getIsLiked()).isEqualTo(true);
       assertThat(result.get().getIsPublic()).isEqualTo(publicReview1.getIsPublic());
       assertThat(result.get().getLikeCount()).isEqualTo(2);
+      assertThat(result.get().getCommentCount()).isEqualTo(75L);
     }
 
     @Test
