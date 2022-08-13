@@ -4,6 +4,7 @@ import static com.prgrms.artzip.exhibition.domain.QExhibition.exhibition;
 import static com.prgrms.artzip.exhibition.domain.QExhibitionLike.exhibitionLike;
 import static com.prgrms.artzip.exhibition.domain.enumType.ExhibitionSortType.END_DATE;
 import static com.prgrms.artzip.exhibition.domain.enumType.ExhibitionSortType.EXHIBITION_ID;
+import static com.prgrms.artzip.exhibition.domain.enumType.ExhibitionSortType.LIKE_COUNT;
 import static com.prgrms.artzip.exhibition.domain.enumType.ExhibitionSortType.START_DATE;
 import static com.prgrms.artzip.review.domain.QReview.review;
 import static com.querydsl.core.types.dsl.MathExpressions.acos;
@@ -65,12 +66,11 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
     List<OrderSpecifier> orders = List.of(
         START_DATE.getOrderSpecifier(Order.ASC),
         END_DATE.getOrderSpecifier(Order.ASC),
-        EXHIBITION_ID.getOrderSpecifier(Order.ASC)
-    );
+        EXHIBITION_ID.getOrderSpecifier(Order.ASC));
 
     List<ExhibitionForSimpleQuery> exhibitions = findExhibitions(userId, upcomingCondition, orders,
         pageable);
-    
+
     JPAQuery<Long> countQuery = getExhibitionCountQuery(upcomingCondition);
 
     return PageableExecutionUtils.getPage(exhibitions, pageable, countQuery::fetchOne);
@@ -81,12 +81,11 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
       Pageable pageable) {
     BooleanBuilder mostLikeCondition = getMostLikeCondition(includeEnd);
 
-    List<ExhibitionForSimpleQuery> exhibitions = findExhibitions(userId,
-        mostLikeCondition,
-        List.of(
-            new OrderSpecifier(Order.DESC, Expressions.numberPath(Long.class, "likeCount")),
-            new OrderSpecifier(Order.ASC, exhibition.id)
-        ),
+    List<OrderSpecifier> orders = List.of(
+        LIKE_COUNT.getOrderSpecifier(Order.DESC),
+        EXHIBITION_ID.getOrderSpecifier(Order.ASC));
+
+    List<ExhibitionForSimpleQuery> exhibitions = findExhibitions(userId, mostLikeCondition, orders,
         pageable);
 
     JPAQuery<Long> countQuery = getExhibitionCountQuery(mostLikeCondition);

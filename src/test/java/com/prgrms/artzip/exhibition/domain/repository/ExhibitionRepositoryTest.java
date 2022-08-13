@@ -65,12 +65,13 @@ class ExhibitionRepositoryTest {
   @Autowired
   private ExhibitionRepository exhibitionRepository;
 
+  private Pageable pageable = PageRequest.of(0, 8);
+
   @Nested
   @DisplayName("findUpcomingExhibitions() 테스트")
   class FindUpcomingExhibitionsTest {
 
     private User user1;
-    private Pageable pageable = PageRequest.of(0, 8);
 
     @BeforeEach
     void setUp() {
@@ -270,6 +271,16 @@ class ExhibitionRepositoryTest {
           .build();
       em.persist(review);
 
+      Review privateReview = Review.builder()
+          .user(user2)
+          .exhibition(exhibitionAtBusan)
+          .content("이것은 비공개 리뷰 본문입니다.")
+          .title("이것은 비공개 리뷰 제목입니다.")
+          .date(LocalDate.now())
+          .isPublic(false)
+          .build();
+      em.persist(privateReview);
+
       em.persist(new ExhibitionLike(user1, exhibitionAtBusan));
       em.persist(new ExhibitionLike(user1, exhibitionAlreadyEnd));
       em.persist(new ExhibitionLike(user2, exhibitionAlreadyEnd));
@@ -282,7 +293,7 @@ class ExhibitionRepositoryTest {
     @DisplayName("로그인하지 않고 종료된 전시회 포함하여 인기 많은 전시회 조회 테스트")
     void testFindMostLikeExhibitionIncludeEndWithoutAuthorization() {
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-          .findMostLikeExhibitions(null, true, PageRequest.of(0, 10));
+          .findMostLikeExhibitions(null, true, pageable);
 
       assertThat(exhibitionsPagingResult.getContent()).hasSize(2);
 
@@ -298,7 +309,7 @@ class ExhibitionRepositoryTest {
     @DisplayName("로그인 하고 종료된 전시회 제외하고 인기 많은 전시회 조회 테스트")
     void testFindMostLikeExhibitionExcludeEndWithAuthorization() {
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-          .findMostLikeExhibitions(user1.getId(), false, PageRequest.of(0, 10));
+          .findMostLikeExhibitions(user1.getId(), false, pageable);
 
       ExhibitionForSimpleQuery exhibitionAtBusan = exhibitionsPagingResult.getContent().get(0);
 
