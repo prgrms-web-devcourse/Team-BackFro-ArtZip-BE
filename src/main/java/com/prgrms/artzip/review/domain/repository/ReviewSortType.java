@@ -29,11 +29,9 @@ public enum ReviewSortType {
   }
 
   public static Optional<ReviewSortType> getReviewSortType(String property) {
-    return Optional.ofNullable(
-        Arrays.stream(ReviewSortType.values())
-            .filter(reviewSortType -> reviewSortType.property.equals(property))
-            .findAny()
-            .orElse(null));
+    return Arrays.stream(ReviewSortType.values())
+        .filter(reviewSortType -> reviewSortType.property.equals(property))
+        .findAny();
   }
 
 }

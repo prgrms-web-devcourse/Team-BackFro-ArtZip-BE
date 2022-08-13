@@ -69,7 +69,7 @@ public class Exhibition extends BaseEntity {
   @Column(name = "genre", length = 20)
   private Genre genre;
 
-  @Column(name = "description", length = 1000)
+  @Column(name = "description", length = 5000)
   private String description;
 
   @Embedded
@@ -170,7 +170,7 @@ public class Exhibition extends BaseEntity {
 
   private void setDescription(String description) {
     if (hasText(description)) {
-      if (description.length() > 1000) {
+      if (description.length() > 5000) {
         throw new InvalidRequestException(INVALID_EXHBN_DESCRIPTION);
       }
       this.description = description;

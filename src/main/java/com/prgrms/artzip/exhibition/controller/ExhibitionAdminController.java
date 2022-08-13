@@ -41,7 +41,7 @@ public class ExhibitionAdminController {
   @GetMapping()
   public ResponseEntity<ApiResponse<PageResponse<ExhibitionInfoResponse>>> getExhibitions(
       @PageableDefault(
-          sort = {"created_at"},
+          sort = {"createdAt"},
           direction = Direction.DESC
       ) Pageable pageable
   ) {
@@ -86,7 +86,7 @@ public class ExhibitionAdminController {
   public ResponseEntity<?> updateExhibition(
       @PathVariable Long exhibitionId,
       @Valid @ModelAttribute ExhibitionCreateOrUpdateRequest request,
-      @RequestPart MultipartFile thumbnail
+      @RequestPart(required = false) MultipartFile thumbnail
   ) {
     exhibitionAdminService.updateExhibition(exhibitionId, request, thumbnail);
     HttpHeaders headers = new HttpHeaders();
