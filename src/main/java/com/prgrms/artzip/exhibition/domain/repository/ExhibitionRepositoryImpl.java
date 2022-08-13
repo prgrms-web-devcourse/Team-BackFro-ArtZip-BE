@@ -231,11 +231,11 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
       ExhibitionCustomCondition exhibitionCustomCondition, Pageable pageable) {
     BooleanBuilder customCondition = getCustomCondition(exhibitionCustomCondition);
 
-    List<ExhibitionForSimpleQuery> exhibitions = findExhibitions(userId, customCondition,
-        List.of(
-            new OrderSpecifier(Order.ASC, exhibition.period.startDate),
-            new OrderSpecifier(Order.ASC, exhibition.id)
-        ),
+    List<OrderSpecifier> orders = List.of(
+        START_DATE.getOrderSpecifier(Order.ASC),
+        EXHIBITION_ID.getOrderSpecifier(Order.ASC));
+
+    List<ExhibitionForSimpleQuery> exhibitions = findExhibitions(userId, customCondition, orders,
         pageable);
 
     JPAQuery<Long> countQuery = getExhibitionCountQuery(customCondition);

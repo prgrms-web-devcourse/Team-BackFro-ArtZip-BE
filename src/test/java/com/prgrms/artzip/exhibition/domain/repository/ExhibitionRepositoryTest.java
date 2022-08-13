@@ -457,7 +457,7 @@ class ExhibitionRepositoryTest {
       em.flush();
       em.clear();
     }
-    
+
     @Test
     @DisplayName("로그인 하지 않고 끝난 전시회 제외 하지 않고 검색 경우 태스트")
     void testWithEndExhibition() {
@@ -616,7 +616,7 @@ class ExhibitionRepositoryTest {
       // user2 : 로그인 유저
       // user1 : 조회 대상
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-          .findUserLikeExhibitions(user2.getId(), user1.getId(), PageRequest.of(0, 8));
+          .findUserLikeExhibitions(user2.getId(), user1.getId(), pageable);
 
       List<ExhibitionForSimpleQuery> contents = exhibitionsPagingResult.getContent();
       assertThat(contents).hasSize(2);
@@ -635,7 +635,7 @@ class ExhibitionRepositoryTest {
     void testSameUser() {
       // user1 : 로그인 유저, 조회 대상
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-          .findUserLikeExhibitions(user1.getId(), user1.getId(), PageRequest.of(0, 8));
+          .findUserLikeExhibitions(user1.getId(), user1.getId(), pageable);
 
       List<ExhibitionForSimpleQuery> contents = exhibitionsPagingResult.getContent();
       assertThat(contents).hasSize(2);
@@ -759,7 +759,7 @@ class ExhibitionRepositoryTest {
           .build();
 
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-          .findExhibitionsByCustomCondition(null, exhibitionCustomCondition, PageRequest.of(0, 8));
+          .findExhibitionsByCustomCondition(null, exhibitionCustomCondition, pageable);
 
       List<ExhibitionForSimpleQuery> contents = exhibitionsPagingResult.getContent();
       assertThat(contents).hasSize(2);
@@ -788,7 +788,7 @@ class ExhibitionRepositoryTest {
           .build();
 
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-          .findExhibitionsByCustomCondition(null, exhibitionCustomCondition, PageRequest.of(0, 8));
+          .findExhibitionsByCustomCondition(null, exhibitionCustomCondition, pageable);
 
       List<ExhibitionForSimpleQuery> contents = exhibitionsPagingResult.getContent();
       assertThat(contents).hasSize(2);
@@ -816,7 +816,7 @@ class ExhibitionRepositoryTest {
           .build();
 
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findExhibitionsByCustomCondition(
-          null, exhibitionCustomCondition, PageRequest.of(0, 8));
+          null, exhibitionCustomCondition, pageable);
 
       List<ExhibitionForSimpleQuery> contents = exhibitionsPagingResult.getContent();
       assertThat(contents).hasSize(1);
@@ -848,7 +848,7 @@ class ExhibitionRepositoryTest {
 
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
           .findExhibitionsByCustomCondition(user1.getId(), exhibitionCustomCondition,
-              PageRequest.of(0, 8));
+              pageable);
 
       List<ExhibitionForSimpleQuery> contents = exhibitionsPagingResult.getContent();
       assertThat(contents).hasSize(1);
