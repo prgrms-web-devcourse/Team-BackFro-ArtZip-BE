@@ -457,13 +457,12 @@ class ExhibitionRepositoryTest {
       em.flush();
       em.clear();
     }
-
-
+    
     @Test
     @DisplayName("로그인 하지 않고 끝난 전시회 제외 하지 않고 검색 경우 태스트")
     void testWithEndExhibition() {
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-          .findExhibitionsByQuery(null, "부산", true, PageRequest.of(0, 10));
+          .findExhibitionsByQuery(null, "부산", true, pageable);
 
       assertThat(exhibitionsPagingResult.getContent()).hasSize(1);
     }
@@ -472,7 +471,7 @@ class ExhibitionRepositoryTest {
     @DisplayName("로그인 하고 끝난 전시회 제외하고 검색 경우 태스트")
     void testWithOutEndExhibition() {
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-          .findExhibitionsByQuery(user2.getId(), "전시회", false, PageRequest.of(0, 10));
+          .findExhibitionsByQuery(user2.getId(), "전시회", false, pageable);
 
       assertThat(exhibitionsPagingResult.getContent()).hasSize(1);
       assertThat(exhibitionsPagingResult.getContent().get(0))

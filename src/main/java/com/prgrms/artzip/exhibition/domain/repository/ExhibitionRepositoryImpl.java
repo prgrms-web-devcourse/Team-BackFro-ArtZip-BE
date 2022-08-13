@@ -140,10 +140,10 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
       boolean includeEnd, Pageable pageable) {
     BooleanBuilder exhibitionsByQueryCondition = getExhibitionsByQueryCondition(query, includeEnd);
 
+    List<OrderSpecifier> orders = List.of(EXHIBITION_ID.getOrderSpecifier(Order.ASC));
+
     List<ExhibitionForSimpleQuery> exhibitions = findExhibitions(userId,
-        exhibitionsByQueryCondition,
-        List.of(new OrderSpecifier(Order.ASC, exhibition.id)),
-        pageable);
+        exhibitionsByQueryCondition, orders, pageable);
 
     JPAQuery<Long> countQuery = getExhibitionCountQuery(exhibitionsByQueryCondition);
 
