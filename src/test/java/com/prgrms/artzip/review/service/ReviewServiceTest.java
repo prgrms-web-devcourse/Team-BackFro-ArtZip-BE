@@ -697,8 +697,7 @@ class ReviewServiceTest {
   @DisplayName("후기 단건 조회")
   class TestGetReview {
 
-    private ReviewWithLikeData reviewWithLikeData = mock(ReviewWithLikeData.class);
-    private ReviewExhibitionInfo reviewExhibitionInfo = mock(ReviewExhibitionInfo.class);
+    private ReviewWithLikeAndCommentCount reviewData = mock(ReviewWithLikeAndCommentCount.class);
 
     private List<Comment> parents = List.of(
         Comment.builder()
@@ -757,7 +756,7 @@ class ReviewServiceTest {
       void testExhibitionNotFoundException() {
         // given
         doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
-        doReturn(Optional.of(reviewWithLikeData))
+        doReturn(Optional.of(reviewData))
             .when(reviewRepository).findByReviewIdAndUserId(review.getId(), null);
         doThrow(new NotFoundException(ErrorCode.EXHB_NOT_FOUND))
             .when(exhibitionRepository).findExhibitionForReview(any(), any());
