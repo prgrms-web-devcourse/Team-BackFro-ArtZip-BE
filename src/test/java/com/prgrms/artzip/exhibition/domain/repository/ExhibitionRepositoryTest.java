@@ -13,9 +13,12 @@ import static com.prgrms.artzip.exhibition.domain.enumType.Month.JUN;
 import static com.prgrms.artzip.exhibition.domain.enumType.Month.MAR;
 import static com.prgrms.artzip.exhibition.domain.enumType.Month.MAY;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.prgrms.artzip.QueryDslTestConfig;
 import com.prgrms.artzip.common.Authority;
+import com.prgrms.artzip.common.ErrorCode;
+import com.prgrms.artzip.common.error.exception.NotFoundException;
 import com.prgrms.artzip.exhibition.domain.Exhibition;
 import com.prgrms.artzip.exhibition.domain.ExhibitionLike;
 import com.prgrms.artzip.exhibition.domain.enumType.Area;
@@ -1284,6 +1287,21 @@ class ExhibitionRepositoryTest {
       assertThat(response.getContent().get(0).getPeriod())
           .hasFieldOrPropertyWithValue("startDate", exhibitionAtBusan.getPeriod().getStartDate())
           .hasFieldOrPropertyWithValue("endDate", exhibitionAtBusan.getPeriod().getEndDate());
+    }
+
+    @Test
+    @DisplayName("[관리자] - 전시회 다건 조회 테스트 (잘못된 정렬 기준)")
+    void testFindExhibitionsByAdminOrderByInvalidSort() {
+      // given
+      Pageable pageable = PageRequest.of(
+          0, 10, Sort.by(Direction.DESC, "something wrong")
+      );
+
+      //when //then
+      assertThatThrownBy(() -> {
+        exhibitionRepository.findExhibitionsByAdmin(pageable);
+      }).isInstanceOf(NotFoundException.class)
+          .hasMessage(ErrorCode.INVALID_EXHB_SORT_TYPE.getMessage());
     }
   }
 }

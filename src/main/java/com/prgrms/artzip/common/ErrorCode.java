@@ -64,7 +64,7 @@ public enum ErrorCode {
   INVALID_EXHB_URL(400, "EX012", "전시회 URL은 필수입니다.(1 <= 전시회 URL <= 2083)"),
   INVALID_EXHB_PLACEURL(400, "EX013", "전시회 장소 URL은 필수입니다.(1 <= 전시회 장소 URL <= 2083)"),
   INVALID_EXHB_LIKE(400, "EX014", "전시회 좋아요에는 전시회 정보와 사용자 정보가 필수입니다."),
-  EXHB_NOT_FOUND(404, "EX015", "존재하지 않는 전시회 입니다."),
+  EXHB_NOT_FOUND(400, "EX015", "존재하지 않는 전시회 입니다."),
   INVALID_EXHB_QUERY(400, "EX016", "검색어는 필수입니다.(2 <= 검색어)"),
   INVALID_EXHB_QUERY_FOR_REVIEW(400, "EX017", "검색어는 필수입니다."),
   INVALID_CUSTOM_EXHB_CONDITION(400, "EX018", "areas, months, genres 에는 null이 포함될 수 없습니다"),

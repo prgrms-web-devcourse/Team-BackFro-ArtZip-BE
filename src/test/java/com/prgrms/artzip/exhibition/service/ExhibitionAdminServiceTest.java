@@ -43,6 +43,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 
@@ -61,9 +63,6 @@ class ExhibitionAdminServiceTest {
 
   @Mock
   private ExhibitionRepository exhibitionRepository;
-
-  @Mock
-  private ExhibitionRepositoryImpl exhibitionRepositoryImpl;
 
   private final String s3DirName = "exhibition";
 
@@ -165,7 +164,7 @@ class ExhibitionAdminServiceTest {
   @DisplayName("전시회 다건 조회 테스트")
   void testGetExhibitions() {
     //given
-    Pageable pageable = PageRequest.of(0, 10);
+    Pageable pageable = PageRequest.of(0, 10, Sort.by(Direction.DESC, "createdAt"));
     ExhibitionForSimpleQuery sample = ExhibitionForSimpleQuery.builder()
         .id(0L)
         .name("전시회 제목")
@@ -175,14 +174,14 @@ class ExhibitionAdminServiceTest {
         .likeCount(0L)
         .reviewCount(0L)
         .build();
-    doReturn(new PageImpl(List.of(sample))).when(exhibitionRepositoryImpl)
+    doReturn(new PageImpl(List.of(sample))).when(exhibitionRepository)
         .findExhibitionsByAdmin(pageable);
 
     //when
     exhibitionAdminService.getExhibitions(pageable);
 
     //then
-    verify(exhibitionRepositoryImpl).findExhibitionsByAdmin(pageable);
+    verify(exhibitionRepository).findExhibitionsByAdmin(pageable);
   }
 
   @Test
@@ -204,17 +203,17 @@ class ExhibitionAdminServiceTest {
         .url("https://www.example.com")
         .placeUrl("https://www.place-example.com")
         .build();
-    doReturn(Optional.of(sample)).when(exhibitionRepositoryImpl).findExhibition(null, 0L);
+    doReturn(Optional.of(sample)).when(exhibitionRepository).findExhibition(null, 0L);
 
     //when
     exhibitionAdminService.getExhibitionDetail(0L);
 
     //then
-    verify(exhibitionRepositoryImpl).findExhibition(null, 0L);
+    verify(exhibitionRepository).findExhibition(null, 0L);
   }
 
   @Test
-  @DisplayName("전시회 상세 조회 테스트 (without url")
+  @DisplayName("전시회 상세 조회 테스트 (without url)")
   void testGetExhibitionWithoutUrl() {
     //given
     ExhibitionDetailForSimpleQuery sample = ExhibitionDetailForSimpleQuery.builder()
@@ -230,20 +229,20 @@ class ExhibitionAdminServiceTest {
         .inquiry("문의처 정보")
         .fee("성인 20,000원")
         .build();
-    doReturn(Optional.of(sample)).when(exhibitionRepositoryImpl).findExhibition(null, 0L);
+    doReturn(Optional.of(sample)).when(exhibitionRepository).findExhibition(null, 0L);
 
     //when
     exhibitionAdminService.getExhibitionDetail(0L);
 
     //then
-    verify(exhibitionRepositoryImpl).findExhibition(null, 0L);
+    verify(exhibitionRepository).findExhibition(null, 0L);
   }
 
   @Test
   @DisplayName("유효하지 않은 전시회 상세 조회 테스트")
   void testGetInvalidExhibition() {
     //given
-    doReturn(Optional.empty()).when(exhibitionRepositoryImpl).findExhibition(null, 0L);
+    doReturn(Optional.empty()).when(exhibitionRepository).findExhibition(null, 0L);
 
     //when
     assertThatThrownBy(() -> {
@@ -252,7 +251,7 @@ class ExhibitionAdminServiceTest {
         .hasMessage(ErrorCode.EXHB_NOT_FOUND.getMessage());
 
     //then
-    verify(exhibitionRepositoryImpl).findExhibition(null, 0L);
+    verify(exhibitionRepository).findExhibition(null, 0L);
   }
 
   @Test

@@ -18,8 +18,10 @@ import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 import static org.springframework.util.StringUtils.hasText;
 
+import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.entity.BaseEntity;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
+import com.prgrms.artzip.common.error.exception.NotFoundException;
 import com.prgrms.artzip.exhibition.domain.enumType.Area;
 import com.prgrms.artzip.exhibition.domain.enumType.Genre;
 import com.prgrms.artzip.exhibition.domain.vo.Location;
@@ -150,6 +152,9 @@ public class Exhibition extends BaseEntity {
   }
 
   public void deleteExhibition() {
+    if (this.isDeleted) {
+      throw new NotFoundException(ErrorCode.EXHB_NOT_FOUND);
+    }
     this.isDeleted = true;
   }
 
