@@ -14,7 +14,8 @@ import lombok.RequiredArgsConstructor;
 public enum ExhibitionSortType {
   CREATED_AT("createdAt", QExhibition.exhibition.createdAt),
   EXHIBITION_ID("id", QExhibition.exhibition.id),
-  LIKE_COUNT("likeCount", QExhibitionLike.exhibitionLike.countDistinct());
+  LIKE_COUNT("likeCount", new QExhibitionLike(
+      "exhibitionLikeForLikeCount").id.countDistinct());
 
   private final String property;
   private final Expression target;

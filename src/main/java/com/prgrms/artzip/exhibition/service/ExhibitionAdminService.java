@@ -3,7 +3,6 @@ package com.prgrms.artzip.exhibition.service;
 import static com.prgrms.artzip.common.ErrorCode.AMAZON_S3_ERROR;
 import static org.springframework.util.StringUtils.hasText;
 
-import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.error.exception.AWSException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
@@ -11,14 +10,12 @@ import com.prgrms.artzip.common.util.AmazonS3Remover;
 import com.prgrms.artzip.common.util.AmazonS3Uploader;
 import com.prgrms.artzip.exhibition.domain.Exhibition;
 import com.prgrms.artzip.exhibition.domain.repository.ExhibitionRepository;
-import com.prgrms.artzip.exhibition.domain.repository.ExhibitionRepositoryImpl;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.request.ExhibitionCreateOrUpdateRequest;
 import com.prgrms.artzip.exhibition.dto.request.ExhibitionSemiUpdateRequest;
 import com.prgrms.artzip.exhibition.dto.response.ExhibitionDetailInfoResponse;
 import com.prgrms.artzip.exhibition.dto.response.ExhibitionInfoResponse;
-import com.prgrms.artzip.review.service.ReviewService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -35,7 +32,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class ExhibitionAdminService {
 
   private final ExhibitionRepository exhibitionRepository;
-  private final ExhibitionRepositoryImpl exhibitionRepositoryImpl;
   private final AmazonS3Uploader amazonS3Uploader;
   private final AmazonS3Remover amazonS3Remover;
 
@@ -68,13 +64,13 @@ public class ExhibitionAdminService {
   }
 
   public Page<ExhibitionInfoResponse> getExhibitions(Pageable pageable) {
-    Page<ExhibitionForSimpleQuery> exhibitions = exhibitionRepositoryImpl.findExhibitionsByAdmin(
+    Page<ExhibitionForSimpleQuery> exhibitions = exhibitionRepository.findExhibitionsByAdmin(
         pageable);
     return exhibitions.map(ExhibitionInfoResponse::new);
   }
 
   public ExhibitionDetailInfoResponse getExhibitionDetail(Long exhibitionId) {
-    ExhibitionDetailForSimpleQuery exhibition = exhibitionRepositoryImpl
+    ExhibitionDetailForSimpleQuery exhibition = exhibitionRepository
         .findExhibition(null, exhibitionId)
         .orElseThrow(() -> {
           throw new NotFoundException(ErrorCode.EXHB_NOT_FOUND);

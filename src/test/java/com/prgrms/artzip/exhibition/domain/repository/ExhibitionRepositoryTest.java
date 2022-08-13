@@ -47,6 +47,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 
 @DataJpaTest
 @Import({QueryDslTestConfig.class})
@@ -1094,6 +1098,192 @@ class ExhibitionRepositoryTest {
       assertThat(maybeSeoulExhibition.get().getIsLiked()).isFalse();
       assertThat(maybeSeoulExhibition.get().getLikeCount()).isEqualTo(1);
       assertThat(maybeSeoulExhibition.get().getReviewCount()).isEqualTo(0);
+    }
+  }
+
+  @Nested
+  @DisplayName("관리자 전시회 조회 테스트들")
+  class FindExhibitionsByAdmin {
+
+    private User user1;
+    private User user2;
+
+    private Exhibition exhibitionAtBusan;
+    private Exhibition exhibitionAtSeoul;
+    private Exhibition exhibitionAtGyeonggi;
+
+    @BeforeEach
+    void setUp() {
+      Role role = new Role(Authority.USER);
+      em.persist(role);
+
+      user1 = new User("test@example.com", "Emily", List.of(role));
+      em.persist(user1);
+
+      user2 = new User("tes2t@example.com", "Jerry", List.of(role));
+      em.persist(user2);
+
+      exhibitionAtBusan = Exhibition.builder()
+          .seq(32)
+          .name("전시회 at 부산")
+          .startDate(LocalDate.of(LocalDate.now().getYear() - 1, 12, 21))
+          .endDate(LocalDate.of(LocalDate.now().getYear(), 3, 7))
+          .genre(INSATALLATION)
+          .description("이것은 전시회 설명입니다.")
+          .latitude(36.22)
+          .longitude(128.02)
+          .area(BUSAN)
+          .place("미술관")
+          .address("부산 동구 중앙대로 11")
+          .inquiry("문의처 정보")
+          .fee("성인 20,000원")
+          .thumbnail("http://www.culture.go.kr/upload/rdf/22/07/show_2022072010193392447.jpg")
+          .url("https://www.example.com")
+          .placeUrl("https://www.place-example.com")
+          .build();
+      em.persist(exhibitionAtBusan);
+
+      exhibitionAtSeoul = Exhibition.builder()
+          .seq(33)
+          .name("전시회 at 서울")
+          .startDate(LocalDate.of(LocalDate.now().getYear(), 6, 1))
+          .endDate(LocalDate.of(LocalDate.now().getYear(), 8, 15))
+          .genre(INSATALLATION)
+          .description("이것은 전시회 설명입니다.")
+          .latitude(37.22)
+          .longitude(129.02)
+          .area(SEOUL)
+          .place("미술관")
+          .address("서울 어딘가")
+          .inquiry("문의처 정보")
+          .fee("성인 20,000원")
+          .thumbnail("http://www.culture.go.kr/upload/rdf/22/07/show_2022072010193392447.jpg")
+          .url("https://www.example.com")
+          .placeUrl("https://www.place-example.com")
+          .build();
+      em.persist(exhibitionAtSeoul);
+
+      exhibitionAtGyeonggi = Exhibition.builder()
+          .seq(34)
+          .name("전시회 at 경기")
+          .startDate(LocalDate.now().minusDays(10))
+          .endDate(LocalDate.now().minusDays(5))
+          .genre(INSATALLATION)
+          .description("이것은 전시회 설명입니다.")
+          .latitude(37.496193)
+          .longitude(127.030906)
+          .area(GYEONGGI)
+          .place("미술관")
+          .address("경기도 성남시")
+          .inquiry("문의처 정보")
+          .fee("성인 20,000원")
+          .thumbnail("http://www.culture.go.kr/upload/rdf/22/07/show_2022072010193392447.jpg")
+          .url("https://www.example.com")
+          .placeUrl("https://www.place-example.com")
+          .build();
+      em.persist(exhibitionAtGyeonggi);
+
+      Review review1 = Review.builder()
+          .user(user1)
+          .exhibition(exhibitionAtBusan)
+          .content("이것은 리뷰 본문입니다.")
+          .title("이것은 리뷰 제목입니다.")
+          .date(LocalDate.now())
+          .isPublic(true)
+          .build();
+      em.persist(review1);
+
+      Review review2 = Review.builder()
+          .user(user1)
+          .exhibition(exhibitionAtBusan)
+          .content("이것은 리뷰 본문입니다.")
+          .title("이것은 리뷰 제목입니다.")
+          .date(LocalDate.now())
+          .isPublic(true)
+          .build();
+      em.persist(review2);
+
+      Review review3 = Review.builder()
+          .user(user1)
+          .exhibition(exhibitionAtBusan)
+          .content("이것은 리뷰 본문입니다.")
+          .title("이것은 리뷰 제목입니다.")
+          .date(LocalDate.now())
+          .isPublic(false)
+          .build();
+      em.persist(review3);
+
+      Review review4 = Review.builder()
+          .user(user1)
+          .exhibition(exhibitionAtSeoul)
+          .content("이것은 리뷰 본문입니다.")
+          .title("이것은 리뷰 제목입니다.")
+          .date(LocalDate.now())
+          .isPublic(true)
+          .build();
+      review4.updateIdDeleted(true);
+      em.persist(review4);
+
+      Review review5 = Review.builder()
+          .user(user1)
+          .exhibition(exhibitionAtGyeonggi)
+          .content("이것은 리뷰 본문입니다.")
+          .title("이것은 리뷰 제목입니다.")
+          .date(LocalDate.now())
+          .isPublic(true)
+          .build();
+      em.persist(review5);
+
+      em.persist(new ExhibitionLike(user1, exhibitionAtBusan));
+      em.persist(new ExhibitionLike(user2, exhibitionAtBusan));
+      em.persist(new ExhibitionLike(user1, exhibitionAtSeoul));
+
+      em.flush();
+      em.clear();
+    }
+
+    @Test
+    @DisplayName("[관리자] - 전시회 다건 조회 테스트 (생성일자 순 정렬)")
+    void testFindExhibitionsByAdminOrderByCreatedAt() {
+      // given
+      Pageable pageable = PageRequest.of(
+          0, 10, Sort.by(Direction.DESC, "createdAt")
+      );
+
+      //when
+      Page<ExhibitionForSimpleQuery> response = exhibitionRepository.findExhibitionsByAdmin(pageable);
+
+      //then
+      assertThat(response.getContent()).hasSize(3);
+      assertThat(response.getContent().get(0))
+          .hasFieldOrPropertyWithValue("id", exhibitionAtGyeonggi.getId())
+          .hasFieldOrPropertyWithValue("name", exhibitionAtGyeonggi.getName())
+          .hasFieldOrPropertyWithValue("thumbnail", exhibitionAtGyeonggi.getThumbnail());
+      assertThat(response.getContent().get(0).getPeriod())
+          .hasFieldOrPropertyWithValue("startDate", exhibitionAtGyeonggi.getPeriod().getStartDate())
+          .hasFieldOrPropertyWithValue("endDate", exhibitionAtGyeonggi.getPeriod().getEndDate());
+    }
+
+    @Test
+    @DisplayName("[관리자] - 전시회 다건 조회 테스트 (좋아요 수 순 정렬)")
+    void testFindExhibitionsByAdminOrderByLikeCount() {
+      // given
+      Pageable pageable = PageRequest.of(
+          0, 10, Sort.by(Direction.DESC, "likeCount")
+      );
+
+      //when
+      Page<ExhibitionForSimpleQuery> response = exhibitionRepository.findExhibitionsByAdmin(pageable);
+
+      //then
+      assertThat(response.getContent()).hasSize(3);
+      assertThat(response.getContent().get(0))
+          .hasFieldOrPropertyWithValue("id", exhibitionAtBusan.getId())
+          .hasFieldOrPropertyWithValue("name", exhibitionAtBusan.getName())
+          .hasFieldOrPropertyWithValue("thumbnail", exhibitionAtBusan.getThumbnail());
+      assertThat(response.getContent().get(0).getPeriod())
+          .hasFieldOrPropertyWithValue("startDate", exhibitionAtBusan.getPeriod().getStartDate())
+          .hasFieldOrPropertyWithValue("endDate", exhibitionAtBusan.getPeriod().getEndDate());
     }
   }
 }
