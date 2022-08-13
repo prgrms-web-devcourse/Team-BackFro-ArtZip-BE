@@ -269,14 +269,15 @@ public class ReviewRepositoryTest {
           publicReview1.getId(), user1.getId());
 
       assertThat(result.isPresent()).isTrue();
-      assertThat(result.get().getReviewId()).isEqualTo(publicReview1.getId());
-      assertThat(result.get().getDate()).isEqualTo(publicReview1.getDate());
-      assertThat(result.get().getTitle()).isEqualTo(publicReview1.getTitle());
-      assertThat(result.get().getContent()).isEqualTo(publicReview1.getContent());
-      assertThat(result.get().getIsLiked()).isEqualTo(true);
-      assertThat(result.get().getIsPublic()).isEqualTo(publicReview1.getIsPublic());
-      assertThat(result.get().getLikeCount()).isEqualTo(2);
-      assertThat(result.get().getCommentCount()).isEqualTo(75L);
+      assertThat(result.get())
+          .hasFieldOrPropertyWithValue("commentCount", 75L)
+          .hasFieldOrPropertyWithValue("isLiked", true)
+          .hasFieldOrPropertyWithValue("likeCount", 2L)
+          .hasFieldOrPropertyWithValue("reviewId", publicReview1.getId())
+          .hasFieldOrPropertyWithValue("date", publicReview1.getDate())
+          .hasFieldOrPropertyWithValue("title", publicReview1.getTitle())
+          .hasFieldOrPropertyWithValue("content", publicReview1.getContent())
+          .hasFieldOrPropertyWithValue("isPublic", true);
     }
 
     @Test
@@ -286,14 +287,15 @@ public class ReviewRepositoryTest {
           publicReview1.getId(), user1.getId());
 
       assertThat(result.isPresent()).isTrue();
-      assertThat(result.get().getReviewId()).isEqualTo(publicReview1.getId());
-      assertThat(result.get().getDate()).isEqualTo(publicReview1.getDate());
-      assertThat(result.get().getTitle()).isEqualTo(publicReview1.getTitle());
-      assertThat(result.get().getContent()).isEqualTo(publicReview1.getContent());
-      assertThat(result.get().getIsLiked()).isEqualTo(true);
-      assertThat(result.get().getIsPublic()).isEqualTo(publicReview1.getIsPublic());
-      assertThat(result.get().getLikeCount()).isEqualTo(2);
-      assertThat(result.get().getCommentCount()).isEqualTo(75L);
+      assertThat(result.get())
+          .hasFieldOrPropertyWithValue("commentCount", 75L)
+          .hasFieldOrPropertyWithValue("isLiked", true)
+          .hasFieldOrPropertyWithValue("likeCount", 2L)
+          .hasFieldOrPropertyWithValue("reviewId", publicReview1.getId())
+          .hasFieldOrPropertyWithValue("date", publicReview1.getDate())
+          .hasFieldOrPropertyWithValue("title", publicReview1.getTitle())
+          .hasFieldOrPropertyWithValue("content", publicReview1.getContent())
+          .hasFieldOrPropertyWithValue("isPublic", true);
     }
 
     @Test
@@ -303,14 +305,15 @@ public class ReviewRepositoryTest {
           privateReview.getId(), user1.getId());
 
       assertThat(result.isPresent()).isTrue();
-      assertThat(result.get().getReviewId()).isEqualTo(privateReview.getId());
-      assertThat(result.get().getDate()).isEqualTo(privateReview.getDate());
-      assertThat(result.get().getTitle()).isEqualTo(privateReview.getTitle());
-      assertThat(result.get().getContent()).isEqualTo(privateReview.getContent());
-      assertThat(result.get().getIsLiked()).isEqualTo(false);
-      assertThat(result.get().getIsPublic()).isEqualTo(privateReview.getIsPublic());
-      assertThat(result.get().getLikeCount()).isEqualTo(1);
-      assertThat(result.get().getCommentCount()).isEqualTo(0L);
+      assertThat(result.get())
+          .hasFieldOrPropertyWithValue("commentCount", 0L)
+          .hasFieldOrPropertyWithValue("isLiked", false)
+          .hasFieldOrPropertyWithValue("likeCount", 1L)
+          .hasFieldOrPropertyWithValue("reviewId", privateReview.getId())
+          .hasFieldOrPropertyWithValue("date", privateReview.getDate())
+          .hasFieldOrPropertyWithValue("title", privateReview.getTitle())
+          .hasFieldOrPropertyWithValue("content", privateReview.getContent())
+          .hasFieldOrPropertyWithValue("isPublic", false);
     }
 
     @Test
@@ -320,14 +323,15 @@ public class ReviewRepositoryTest {
           publicReview1.getId(), user1.getId());
 
       assertThat(result.isPresent()).isTrue();
-      assertThat(result.get().getReviewId()).isEqualTo(publicReview1.getId());
-      assertThat(result.get().getDate()).isEqualTo(publicReview1.getDate());
-      assertThat(result.get().getTitle()).isEqualTo(publicReview1.getTitle());
-      assertThat(result.get().getContent()).isEqualTo(publicReview1.getContent());
-      assertThat(result.get().getIsLiked()).isEqualTo(true);
-      assertThat(result.get().getIsPublic()).isEqualTo(publicReview1.getIsPublic());
-      assertThat(result.get().getLikeCount()).isEqualTo(2);
-      assertThat(result.get().getCommentCount()).isEqualTo(75L);
+      assertThat(result.get())
+          .hasFieldOrPropertyWithValue("commentCount", 75L)
+          .hasFieldOrPropertyWithValue("isLiked", true)
+          .hasFieldOrPropertyWithValue("likeCount", 2L)
+          .hasFieldOrPropertyWithValue("reviewId", publicReview1.getId())
+          .hasFieldOrPropertyWithValue("date", publicReview1.getDate())
+          .hasFieldOrPropertyWithValue("title", publicReview1.getTitle())
+          .hasFieldOrPropertyWithValue("content", publicReview1.getContent())
+          .hasFieldOrPropertyWithValue("isPublic", true);
     }
 
     @Test
