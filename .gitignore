@@ -6,6 +6,7 @@ build/
 
 **/resources/application-dev.yml
 **/resources/application-aws.yml
+**/resources/application-oauth.yml
 .env
 .DS_Store
 
