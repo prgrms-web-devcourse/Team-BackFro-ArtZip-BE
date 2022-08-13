@@ -69,7 +69,7 @@ class ReviewControllerTest {
         .name("전시회 제목")
         .startDate(LocalDate.of(2022, 4, 11))
         .endDate(LocalDate.of(2022, 6, 2))
-        .genre(Genre.INSATALLATION)
+        .genre(Genre.INSTALLATION)
         .description("이것은 전시회 설명입니다.")
         .latitude(36.22)
         .longitude(128.02)
