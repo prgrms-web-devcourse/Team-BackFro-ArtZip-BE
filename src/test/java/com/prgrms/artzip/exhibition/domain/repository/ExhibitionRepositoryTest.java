@@ -3,7 +3,7 @@ package com.prgrms.artzip.exhibition.domain.repository;
 import static com.prgrms.artzip.exhibition.domain.enumType.Area.BUSAN;
 import static com.prgrms.artzip.exhibition.domain.enumType.Area.GYEONGGI;
 import static com.prgrms.artzip.exhibition.domain.enumType.Area.SEOUL;
-import static com.prgrms.artzip.exhibition.domain.enumType.Genre.INSATALLATION;
+import static com.prgrms.artzip.exhibition.domain.enumType.Genre.INSTALLATION;
 import static com.prgrms.artzip.exhibition.domain.enumType.Genre.MEDIA;
 import static com.prgrms.artzip.exhibition.domain.enumType.Genre.PHOTO;
 import static com.prgrms.artzip.exhibition.domain.enumType.Genre.SHOW;
@@ -53,7 +53,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.domain.Sort.Order;
 
 @DataJpaTest
 @Import({QueryDslTestConfig.class})
@@ -65,6 +64,8 @@ class ExhibitionRepositoryTest {
 
   @Autowired
   private ExhibitionRepository exhibitionRepository;
+
+  private Pageable pageable = PageRequest.of(0, 8);
 
   @Nested
   @DisplayName("findUpcomingExhibitions() 테스트")
@@ -88,7 +89,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 부산")
           .startDate(LocalDate.now().plusDays(10))
           .endDate(LocalDate.now().plusDays(15))
-          .genre(INSATALLATION)
+          .genre(INSTALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(36.22)
           .longitude(128.02)
@@ -108,7 +109,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 서울")
           .startDate(LocalDate.now().plusDays(3))
           .endDate(LocalDate.now().plusDays(5))
-          .genre(INSATALLATION)
+          .genre(INSTALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.22)
           .longitude(129.02)
@@ -128,7 +129,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 경기")
           .startDate(LocalDate.now().minusDays(6))
           .endDate(LocalDate.now().minusDays(3))
-          .genre(INSATALLATION)
+          .genre(INSTALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.22)
           .longitude(129.02)
@@ -153,6 +154,16 @@ class ExhibitionRepositoryTest {
           .build();
       em.persist(review);
 
+      Review privateReview = Review.builder()
+          .user(user2)
+          .exhibition(exhibitionAtBusan)
+          .content("이것은 비공개 리뷰 본문입니다.")
+          .title("이것은 비공개 리뷰 제목입니다.")
+          .date(LocalDate.now())
+          .isPublic(false)
+          .build();
+      em.persist(privateReview);
+
       em.persist(new ExhibitionLike(user1, exhibitionAtSeoul));
       em.persist(new ExhibitionLike(user1, exhibitionAtBusan));
       em.persist(new ExhibitionLike(user1, exhibitionAlreadyEnd));
@@ -166,7 +177,7 @@ class ExhibitionRepositoryTest {
     @DisplayName("로그인하지 않은 상태에서 실제로 시작일이 빠른 전시회가 먼저 오는지 확인하는 테스트")
     void testFindUpcomingExhibitionWithoutAuthorization() {
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-          .findUpcomingExhibitions(null, PageRequest.of(0, 10));
+          .findUpcomingExhibitions(null, pageable);
       ExhibitionForSimpleQuery exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);
 
       assertThat(exhibitionsPagingResult.getContent()).hasSize(2);
@@ -181,7 +192,7 @@ class ExhibitionRepositoryTest {
     @DisplayName("로그인한 상태에서 실제로 시작일이 빠른 전시회가 먼저 오는지 확인하는 테스트")
     void testFindUpcomingExhibitionWithAuthorization() {
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-          .findUpcomingExhibitions(user1.getId(), PageRequest.of(0, 10));
+          .findUpcomingExhibitions(user1.getId(), pageable);
       ExhibitionForSimpleQuery exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);
 
       assertThat(exhibitionsPagingResult.getContent()).hasSize(2);
@@ -215,7 +226,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 부산")
           .startDate(LocalDate.now().plusDays(10))
           .endDate(LocalDate.now().plusDays(15))
-          .genre(INSATALLATION)
+          .genre(INSTALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(36.22)
           .longitude(128.02)
@@ -235,7 +246,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 경기")
           .startDate(LocalDate.now().minusDays(6))
           .endDate(LocalDate.now().minusDays(3))
-          .genre(INSATALLATION)
+          .genre(INSTALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.22)
           .longitude(129.02)
@@ -260,6 +271,16 @@ class ExhibitionRepositoryTest {
           .build();
       em.persist(review);
 
+      Review privateReview = Review.builder()
+          .user(user2)
+          .exhibition(exhibitionAtBusan)
+          .content("이것은 비공개 리뷰 본문입니다.")
+          .title("이것은 비공개 리뷰 제목입니다.")
+          .date(LocalDate.now())
+          .isPublic(false)
+          .build();
+      em.persist(privateReview);
+
       em.persist(new ExhibitionLike(user1, exhibitionAtBusan));
       em.persist(new ExhibitionLike(user1, exhibitionAlreadyEnd));
       em.persist(new ExhibitionLike(user2, exhibitionAlreadyEnd));
@@ -272,7 +293,7 @@ class ExhibitionRepositoryTest {
     @DisplayName("로그인하지 않고 종료된 전시회 포함하여 인기 많은 전시회 조회 테스트")
     void testFindMostLikeExhibitionIncludeEndWithoutAuthorization() {
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-          .findMostLikeExhibitions(null, true, PageRequest.of(0, 10));
+          .findMostLikeExhibitions(null, true, pageable);
 
       assertThat(exhibitionsPagingResult.getContent()).hasSize(2);
 
@@ -288,7 +309,7 @@ class ExhibitionRepositoryTest {
     @DisplayName("로그인 하고 종료된 전시회 제외하고 인기 많은 전시회 조회 테스트")
     void testFindMostLikeExhibitionExcludeEndWithAuthorization() {
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-          .findMostLikeExhibitions(user1.getId(), false, PageRequest.of(0, 10));
+          .findMostLikeExhibitions(user1.getId(), false, pageable);
 
       ExhibitionForSimpleQuery exhibitionAtBusan = exhibitionsPagingResult.getContent().get(0);
 
@@ -323,7 +344,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 경기")
           .startDate(LocalDate.now().minusDays(6))
           .endDate(LocalDate.now().minusDays(3))
-          .genre(INSATALLATION)
+          .genre(INSTALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.22)
           .longitude(129.02)
@@ -394,7 +415,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 부산")
           .startDate(LocalDate.now().plusDays(10))
           .endDate(LocalDate.now().plusDays(15))
-          .genre(INSATALLATION)
+          .genre(INSTALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(36.22)
           .longitude(128.02)
@@ -414,7 +435,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 경기")
           .startDate(LocalDate.now().minusDays(6))
           .endDate(LocalDate.now().minusDays(3))
-          .genre(INSATALLATION)
+          .genre(INSTALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.22)
           .longitude(129.02)
@@ -437,12 +458,11 @@ class ExhibitionRepositoryTest {
       em.clear();
     }
 
-
     @Test
     @DisplayName("로그인 하지 않고 끝난 전시회 제외 하지 않고 검색 경우 태스트")
     void testWithEndExhibition() {
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-          .findExhibitionsByQuery(null, "부산", true, PageRequest.of(0, 10));
+          .findExhibitionsByQuery(null, "부산", true, pageable);
 
       assertThat(exhibitionsPagingResult.getContent()).hasSize(1);
     }
@@ -451,7 +471,7 @@ class ExhibitionRepositoryTest {
     @DisplayName("로그인 하고 끝난 전시회 제외하고 검색 경우 태스트")
     void testWithOutEndExhibition() {
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-          .findExhibitionsByQuery(user2.getId(), "전시회", false, PageRequest.of(0, 10));
+          .findExhibitionsByQuery(user2.getId(), "전시회", false, pageable);
 
       assertThat(exhibitionsPagingResult.getContent()).hasSize(1);
       assertThat(exhibitionsPagingResult.getContent().get(0))
@@ -470,7 +490,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 부산")
           .startDate(LocalDate.now().minusDays(5))
           .endDate(LocalDate.now().plusDays(15))
-          .genre(INSATALLATION)
+          .genre(INSTALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(36.22)
           .longitude(128.02)
@@ -490,7 +510,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 경기")
           .startDate(LocalDate.now().plusDays(20))
           .endDate(LocalDate.now().plusDays(30))
-          .genre(INSATALLATION)
+          .genre(INSTALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.22)
           .longitude(129.02)
@@ -547,7 +567,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 부산")
           .startDate(LocalDate.now().plusDays(10))
           .endDate(LocalDate.now().plusDays(15))
-          .genre(INSATALLATION)
+          .genre(INSTALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(36.22)
           .longitude(128.02)
@@ -567,7 +587,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 경기")
           .startDate(LocalDate.now().minusDays(6))
           .endDate(LocalDate.now().minusDays(3))
-          .genre(INSATALLATION)
+          .genre(INSTALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.22)
           .longitude(129.02)
@@ -596,7 +616,7 @@ class ExhibitionRepositoryTest {
       // user2 : 로그인 유저
       // user1 : 조회 대상
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-          .findUserLikeExhibitions(user2.getId(), user1.getId(), PageRequest.of(0, 8));
+          .findUserLikeExhibitions(user2.getId(), user1.getId(), pageable);
 
       List<ExhibitionForSimpleQuery> contents = exhibitionsPagingResult.getContent();
       assertThat(contents).hasSize(2);
@@ -615,7 +635,7 @@ class ExhibitionRepositoryTest {
     void testSameUser() {
       // user1 : 로그인 유저, 조회 대상
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-          .findUserLikeExhibitions(user1.getId(), user1.getId(), PageRequest.of(0, 8));
+          .findUserLikeExhibitions(user1.getId(), user1.getId(), pageable);
 
       List<ExhibitionForSimpleQuery> contents = exhibitionsPagingResult.getContent();
       assertThat(contents).hasSize(2);
@@ -648,7 +668,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 부산")
           .startDate(LocalDate.of(LocalDate.now().getYear() - 1, 12, 21))
           .endDate(LocalDate.of(LocalDate.now().getYear(), 3, 7))
-          .genre(INSATALLATION)
+          .genre(INSTALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(36.22)
           .longitude(128.02)
@@ -739,7 +759,7 @@ class ExhibitionRepositoryTest {
           .build();
 
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-          .findExhibitionsByCustomCondition(null, exhibitionCustomCondition, PageRequest.of(0, 8));
+          .findExhibitionsByCustomCondition(null, exhibitionCustomCondition, pageable);
 
       List<ExhibitionForSimpleQuery> contents = exhibitionsPagingResult.getContent();
       assertThat(contents).hasSize(2);
@@ -768,7 +788,7 @@ class ExhibitionRepositoryTest {
           .build();
 
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-          .findExhibitionsByCustomCondition(null, exhibitionCustomCondition, PageRequest.of(0, 8));
+          .findExhibitionsByCustomCondition(null, exhibitionCustomCondition, pageable);
 
       List<ExhibitionForSimpleQuery> contents = exhibitionsPagingResult.getContent();
       assertThat(contents).hasSize(2);
@@ -796,7 +816,7 @@ class ExhibitionRepositoryTest {
           .build();
 
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findExhibitionsByCustomCondition(
-          null, exhibitionCustomCondition, PageRequest.of(0, 8));
+          null, exhibitionCustomCondition, pageable);
 
       List<ExhibitionForSimpleQuery> contents = exhibitionsPagingResult.getContent();
       assertThat(contents).hasSize(1);
@@ -816,7 +836,7 @@ class ExhibitionRepositoryTest {
 
       Set<Area> areas = new HashSet<>(Arrays.asList(BUSAN, GYEONGGI));
       Set<Month> months = new HashSet<>(Arrays.asList(MAR, MAY, JUN));
-      Set<Genre> genres = new HashSet<>(Arrays.asList(PHOTO, MEDIA, INSATALLATION));
+      Set<Genre> genres = new HashSet<>(Arrays.asList(PHOTO, MEDIA, INSTALLATION));
       boolean includeEnd = true;
 
       ExhibitionCustomCondition exhibitionCustomCondition = ExhibitionCustomCondition.builder()
@@ -828,7 +848,7 @@ class ExhibitionRepositoryTest {
 
       Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
           .findExhibitionsByCustomCondition(user1.getId(), exhibitionCustomCondition,
-              PageRequest.of(0, 8));
+              pageable);
 
       List<ExhibitionForSimpleQuery> contents = exhibitionsPagingResult.getContent();
       assertThat(contents).hasSize(1);
@@ -850,7 +870,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 부산")
           .startDate(LocalDate.now().plusDays(10))
           .endDate(LocalDate.now().plusDays(15))
-          .genre(INSATALLATION)
+          .genre(INSTALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.501086)
           .longitude(127.053447)
@@ -870,7 +890,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 서울")
           .startDate(LocalDate.now().plusDays(20))
           .endDate(LocalDate.now().plusDays(25))
-          .genre(INSATALLATION)
+          .genre(INSTALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.564138)
           .longitude(126.973763)
@@ -890,7 +910,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 경기")
           .startDate(LocalDate.now().minusDays(10))
           .endDate(LocalDate.now().minusDays(5))
-          .genre(INSATALLATION)
+          .genre(INSTALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.496193)
           .longitude(127.030906)
@@ -949,7 +969,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 부산")
           .startDate(LocalDate.of(LocalDate.now().getYear() - 1, 12, 21))
           .endDate(LocalDate.of(LocalDate.now().getYear(), 3, 7))
-          .genre(INSATALLATION)
+          .genre(INSTALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(36.22)
           .longitude(128.02)
@@ -969,7 +989,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 서울")
           .startDate(LocalDate.of(LocalDate.now().getYear(), 6, 1))
           .endDate(LocalDate.of(LocalDate.now().getYear(), 8, 15))
-          .genre(INSATALLATION)
+          .genre(INSTALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.22)
           .longitude(129.02)
@@ -1131,7 +1151,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 부산")
           .startDate(LocalDate.of(LocalDate.now().getYear() - 1, 12, 21))
           .endDate(LocalDate.of(LocalDate.now().getYear(), 3, 7))
-          .genre(INSATALLATION)
+          .genre(INSTALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(36.22)
           .longitude(128.02)
@@ -1151,7 +1171,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 서울")
           .startDate(LocalDate.of(LocalDate.now().getYear(), 6, 1))
           .endDate(LocalDate.of(LocalDate.now().getYear(), 8, 15))
-          .genre(INSATALLATION)
+          .genre(INSTALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.22)
           .longitude(129.02)
@@ -1171,7 +1191,7 @@ class ExhibitionRepositoryTest {
           .name("전시회 at 경기")
           .startDate(LocalDate.now().minusDays(10))
           .endDate(LocalDate.now().minusDays(5))
-          .genre(INSATALLATION)
+          .genre(INSTALLATION)
           .description("이것은 전시회 설명입니다.")
           .latitude(37.496193)
           .longitude(127.030906)
@@ -1254,7 +1274,8 @@ class ExhibitionRepositoryTest {
       );
 
       //when
-      Page<ExhibitionForSimpleQuery> response = exhibitionRepository.findExhibitionsByAdmin(pageable);
+      Page<ExhibitionForSimpleQuery> response = exhibitionRepository.findExhibitionsByAdmin(
+          pageable);
 
       //then
       assertThat(response.getContent()).hasSize(3);
@@ -1276,7 +1297,8 @@ class ExhibitionRepositoryTest {
       );
 
       //when
-      Page<ExhibitionForSimpleQuery> response = exhibitionRepository.findExhibitionsByAdmin(pageable);
+      Page<ExhibitionForSimpleQuery> response = exhibitionRepository.findExhibitionsByAdmin(
+          pageable);
 
       //then
       assertThat(response.getContent()).hasSize(3);
