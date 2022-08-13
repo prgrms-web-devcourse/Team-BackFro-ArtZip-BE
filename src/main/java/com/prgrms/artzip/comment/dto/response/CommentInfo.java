@@ -22,7 +22,7 @@ public class CommentInfo {
     this.isDeleted = entity.getIsDeleted();
     this.content = isDeleted ? null : entity.getContent();
     this.updatedAt = isDeleted ? null : entity.getUpdatedAt();
-    this.isEdited = isDeleted ? null : updatedAt != null;
+    this.isEdited = isDeleted ? null : !entity.getCreatedAt().isEqual(entity.getUpdatedAt());
     this.user = isDeleted ? null : new CommentUser(entity.getUser());
     this.commentId = entity.getId();
     this.createdAt = entity.getCreatedAt();

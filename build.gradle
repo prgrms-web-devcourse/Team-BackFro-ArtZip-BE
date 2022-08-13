@@ -62,6 +62,9 @@ dependencies {
 
 	//mysql
 	implementation 'mysql:mysql-connector-java'
+
+	//oauth
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 }
 
 tasks.named('test') {
@@ -169,7 +172,19 @@ task copyPrivate(type: Copy) {
 
 	copy {
 		from './BackFro-BE-submodule'
+		include "application-oauth.yml"
+		into 'src/main/resources'
+	}
+
+	copy {
+		from './BackFro-BE-submodule'
 		include "application-aws.yml"
+		into 'src/test/resources'
+	}
+
+	copy {
+		from './BackFro-BE-submodule'
+		include "application-oauth.yml"
 		into 'src/test/resources'
 	}
 }

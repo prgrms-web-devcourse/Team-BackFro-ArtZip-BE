@@ -10,6 +10,7 @@ import com.prgrms.artzip.common.jwt.Jwt;
 import com.prgrms.artzip.common.jwt.JwtAuthenticationFilter;
 import com.prgrms.artzip.common.jwt.JwtAuthenticationProvider;
 import com.prgrms.artzip.common.util.JwtService;
+import com.prgrms.artzip.common.oauth.OAuth2AuthenticationSuccessHandler;
 import com.prgrms.artzip.user.service.UserService;
 import com.prgrms.artzip.user.service.UserUtilService;
 import org.slf4j.Logger;
@@ -106,6 +107,11 @@ public class WebSecurityConfig {
     return new ExceptionHandlerFilter(objectMapper);
   }
 
+  @Bean
+  public OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler(JwtService jwtService, UserService userService, ObjectMapper objectMapper) {
+    return new OAuth2AuthenticationSuccessHandler(jwtService, userService, objectMapper);
+  }
+
   public WebSecurityConfig(JwtConfig jwtConfig) {
     this.jwtConfig = jwtConfig;
   }
@@ -119,7 +125,7 @@ public class WebSecurityConfig {
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http, JwtService jwtService,
       UserUtilService userUtilService, ObjectMapper objectMapper,
-      ExceptionHandlerFilter exceptionHandlerFilter) throws Exception {
+      ExceptionHandlerFilter exceptionHandlerFilter, OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler) throws Exception {
     http
         .cors()
         .and()
@@ -139,6 +145,12 @@ public class WebSecurityConfig {
         .antMatchers(HttpMethod.DELETE,
             "/api/v1/reviews/**", "/api/v1/comments/**").hasAnyAuthority(USER.name(), ADMIN.name())
         .anyRequest().permitAll()
+        .and()
+        .oauth2Login()
+        .authorizationEndpoint()
+        .baseUri("/api/v1/users/oauth/login")
+        .and()
+        .successHandler(oAuth2AuthenticationSuccessHandler)
         .and()
         .exceptionHandling()
         .accessDeniedHandler(accessDeniedHandler(objectMapper))

@@ -2,7 +2,6 @@ package com.prgrms.artzip.comment.domain;
 
 import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.entity.BaseEntity;
-import com.prgrms.artzip.common.error.exception.AlreadyExistsException;
 import com.prgrms.artzip.common.error.exception.DuplicateRequestException;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.review.domain.Review;
@@ -20,8 +19,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import com.prgrms.artzip.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,11 +39,9 @@ public class Comment extends BaseEntity {
   @Column(name = "content", nullable = false, length = 500)
   private String content;
 
-  //TODO migration 으로 해당 column db에 alter 시키기
   @Column(name = "is_deleted", nullable = false)
   private Boolean isDeleted = false;
 
-  //TODO migration 으로 해당 column db에 alter 시키기
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   private User user;

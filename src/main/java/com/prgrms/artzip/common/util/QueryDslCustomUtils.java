@@ -1,12 +1,11 @@
-package com.prgrms.artzip.review.domain.repository;
+package com.prgrms.artzip.common.util;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import java.util.function.Supplier;
 
-public class QuerydslUtils {
-
+public class QueryDslCustomUtils {
   public static BooleanExpression alwaysTrue() {
     return Expressions.asBoolean(true).isTrue();
   }
@@ -22,5 +21,4 @@ public class QuerydslUtils {
       return new BooleanBuilder();
     }
   }
-
 }

@@ -10,10 +10,9 @@ import static com.querydsl.core.types.dsl.MathExpressions.sin;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
-import com.prgrms.artzip.common.util.QueryDslUtil;
-import com.prgrms.artzip.exhibition.domain.QExhibition;
 import com.prgrms.artzip.exhibition.domain.QExhibitionLike;
 import com.prgrms.artzip.exhibition.domain.enumType.Area;
+import com.prgrms.artzip.exhibition.domain.enumType.ExhibitionSortType;
 import com.prgrms.artzip.exhibition.domain.enumType.Genre;
 import com.prgrms.artzip.exhibition.domain.enumType.Month;
 import com.prgrms.artzip.exhibition.dto.ExhibitionCustomCondition;
@@ -33,16 +32,16 @@ import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 
 @Slf4j
@@ -112,7 +111,8 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
                     .when(exhibitionLikeForIsLikedUserIdEq(userId))
                     .then(true)
                     .otherwise(false).as("isLiked"),
-                exhibitionLikeForLikeCount.id.count().as("likeCount")
+                exhibitionLikeForLikeCount.id.countDistinct().as("likeCount"),
+                review.id.countDistinct().as("reviewCount")
             )
         )
         .from(exhibition)
@@ -121,6 +121,10 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
             exhibitionLikeForIsLikedUserIdEq(userId))
         .leftJoin(exhibitionLikeForLikeCount)
         .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
+        .leftJoin(review)
+        .on(review.exhibition.eq(exhibition),
+            review.isDeleted.isFalse(),
+            review.isPublic.isTrue())
         .where(
             exhibition.id.eq(exhibitionId),
             exhibitionIsDeletedIsFalse()
@@ -191,7 +195,10 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
         .leftJoin(exhibitionLikeForLikeCount)
         .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
         .leftJoin(review)
-        .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse())
+        .on(
+            review.exhibition.eq(exhibition),
+            review.isDeleted.isFalse(),
+            review.isPublic.isTrue())
         .where(
             exhibitionLikeForExhibitionLikeUser.user.id.eq(exhibitionLikeUserId),
             exhibitionIsDeletedIsFalse()
@@ -262,7 +269,9 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
         .leftJoin(exhibitionLikeForLikeCount)
         .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
         .leftJoin(review)
-        .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse())
+        .on(review.exhibition.eq(exhibition),
+            review.isDeleted.isFalse(),
+            review.isPublic.isTrue())
         .groupBy(exhibition.id)
         .fetch();
   }
@@ -329,7 +338,10 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
         .leftJoin(exhibitionLikeForLikeCount)
         .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
         .leftJoin(review)
-        .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse())
+        .on(
+            review.exhibition.eq(exhibition),
+            review.isDeleted.isFalse(),
+            review.isPublic.isTrue())
         .where(exhibitionIsDeletedIsFalse())
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize())
@@ -337,7 +349,8 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
         .orderBy(getAllOrderSpecifiers(pageable).toArray(OrderSpecifier[]::new))
         .fetch();
 
-    JPAQuery<Long> countQuery = getExhibitionCountQuery(new BooleanBuilder().and(exhibitionIsDeletedIsFalse()));
+    JPAQuery<Long> countQuery = getExhibitionCountQuery(
+        new BooleanBuilder().and(exhibitionIsDeletedIsFalse()));
 
     return PageableExecutionUtils.getPage(exhibitions, pageable, countQuery::fetchOne);
   }
@@ -367,33 +380,15 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
         .leftJoin(exhibitionLikeForLikeCount)
         .on(exhibitionLikeForLikeCount.exhibition.eq(exhibition))
         .leftJoin(review)
-        .on(review.exhibition.eq(exhibition), review.isDeleted.isFalse())
+        .on(review.exhibition.eq(exhibition),
+            review.isDeleted.isFalse(),
+            review.isPublic.isTrue())
         .where(condition)
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize())
         .groupBy(exhibition.id)
         .orderBy(orders.toArray(OrderSpecifier[]::new))
         .fetch();
-  }
-
-  private List<OrderSpecifier> getAllOrderSpecifiers(Pageable pageable) {
-    List<OrderSpecifier> orders = new ArrayList<>();
-
-    for (Sort.Order order : pageable.getSort()) {
-      Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
-      switch (order.getProperty()) {
-        case "created_at":
-          OrderSpecifier<?> orderCreatedAt = QueryDslUtil.getSortedColumn(direction, exhibition.createdAt, "createdAt");
-          orders.add(orderCreatedAt);
-          break;
-        case "exhibition_id":
-          OrderSpecifier<?> orderId = QueryDslUtil.getSortedColumn(direction, exhibition.id, "id");
-          orders.add(orderId);
-        default:
-          break;
-      }
-    }
-    return orders;
   }
 
   private JPAQuery<Long> getExhibitionCountQuery(BooleanBuilder condition) {
@@ -532,5 +527,16 @@ public class ExhibitionRepositoryImpl implements ExhibitionCustomRepository {
 
   private BooleanExpression exhibitionNameContains(String name) {
     return name == null ? null : exhibition.name.contains(name);
+  }
+
+  private List<OrderSpecifier> getAllOrderSpecifiers(Pageable pageable) {
+    if (pageable.getSort().isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    return pageable.getSort().stream()
+        .map(order -> ExhibitionSortType.getExhibitionSortType(order.getProperty())
+            .getOrderSpecifier(order.getDirection().isAscending() ? Order.ASC : Order.DESC))
+        .collect(Collectors.toList());
   }
 }

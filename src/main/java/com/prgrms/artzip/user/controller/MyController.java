@@ -74,7 +74,12 @@ public class MyController {
     ApiResponse apiResponse = ApiResponse.builder()
         .message("내 정보를 조회하였습니다.")
         .status(OK.value())
-        .data(new SimpleUserResponse(user.getId()))
+        .data(SimpleUserResponse.builder()
+            .userId(user.getId())
+            .email(user.getEmail())
+            .nickname(user.getNickname())
+            .profileImage(user.getProfileImage())
+            .build())
         .build();
     return ResponseEntity.ok(apiResponse);
   }

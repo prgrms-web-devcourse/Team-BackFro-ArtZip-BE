@@ -10,14 +10,14 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    @Query("SELECT COUNT(c) from Comment c WHERE c.user.id = :userId")
+    @Query("SELECT COUNT(c) from Comment c WHERE c.user.id = :userId and c.isDeleted = false")
     Long countByUserId(@Param("userId") Long userId);
 
     @Query(value = "select c from Comment c left join fetch c.user where c.review.id = :reviewId and c.parent is null",
             countQuery = "select count(c) from Comment c where c.review.id = :reviewId and c.parent is null")
     Page<Comment> getCommentsByReviewId(Long reviewId, Pageable pageable);
 
-    @Query("select c from Comment c join fetch c.user where c.parent.id in :parentIds")
+    @Query("select c from Comment c where c.parent.id in :parentIds and c.isDeleted = false")
     List<Comment> getCommentsOfParents(List<Long> parentIds);
 
     @Query(value = "select c from Comment c join fetch c.user where c.parent.id = :parentId",

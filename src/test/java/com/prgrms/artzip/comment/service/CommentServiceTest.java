@@ -18,6 +18,7 @@ import com.prgrms.artzip.comment.repository.CommentLikeRepository;
 import com.prgrms.artzip.comment.repository.CommentRepository;
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.ErrorCode;
+import com.prgrms.artzip.common.entity.BaseEntity;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
 import com.prgrms.artzip.exhibition.domain.Exhibition;
@@ -30,6 +31,7 @@ import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -44,6 +46,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("CommentService 테스트")
@@ -108,12 +111,27 @@ class CommentServiceTest {
   @DisplayName("댓글 다건 조회 테스트")
   void testGetComments() {
     //given
+    Comment comment = Comment.builder()
+        .user(user)
+        .review(review)
+        .content("안녕")
+        .build();
+    ReflectionTestUtils.setField(
+        comment,
+        BaseEntity.class,
+        "createdAt",
+        LocalDateTime.now(),
+        LocalDateTime.class
+    );
+    ReflectionTestUtils.setField(
+        comment,
+        BaseEntity.class,
+        "updatedAt",
+        LocalDateTime.now(),
+        LocalDateTime.class
+    );
     List<Comment> parents = List.of(
-        Comment.builder()
-            .user(user)
-            .review(review)
-            .content("안녕")
-            .build()
+         comment
     );
     Pageable pageable = PageRequest.of(0, 10);
     doReturn(new PageImpl(parents)).when(commentRepository)
@@ -139,13 +157,42 @@ class CommentServiceTest {
         .review(review)
         .content("안녕")
         .build();
+    ReflectionTestUtils.setField(
+        parent,
+        BaseEntity.class,
+        "createdAt",
+        LocalDateTime.now(),
+        LocalDateTime.class
+    );
+    ReflectionTestUtils.setField(
+        parent,
+        BaseEntity.class,
+        "updatedAt",
+        LocalDateTime.now(),
+        LocalDateTime.class
+    );
     List<Comment> childContent = new ArrayList<>();
     for (int i = 0; i < 9; i++) {
-      childContent.add(Comment.builder()
+      Comment child = Comment.builder()
           .user(user)
           .review(review)
           .content("안녕")
-          .build());
+          .build();
+      ReflectionTestUtils.setField(
+          child,
+          BaseEntity.class,
+          "createdAt",
+          LocalDateTime.now(),
+          LocalDateTime.class
+      );
+      ReflectionTestUtils.setField(
+          child,
+          BaseEntity.class,
+          "updatedAt",
+          LocalDateTime.now(),
+          LocalDateTime.class
+      );
+      childContent.add(child);
     }
     Page<Comment> children = new PageImpl<>(childContent);
     Pageable pageable = PageRequest.of(0, 10);
@@ -170,6 +217,20 @@ class CommentServiceTest {
         .review(review)
         .content("안녕")
         .build();
+    ReflectionTestUtils.setField(
+        comment,
+        BaseEntity.class,
+        "createdAt",
+        LocalDateTime.now(),
+        LocalDateTime.class
+    );
+    ReflectionTestUtils.setField(
+        comment,
+        BaseEntity.class,
+        "updatedAt",
+        LocalDateTime.now(),
+        LocalDateTime.class
+    );
     doReturn(comment).when(commentRepository).save(Mockito.any(Comment.class));
     doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
 
@@ -226,12 +287,40 @@ class CommentServiceTest {
         .review(review)
         .content("안녕")
         .build();
+    ReflectionTestUtils.setField(
+        parent,
+        BaseEntity.class,
+        "createdAt",
+        LocalDateTime.now(),
+        LocalDateTime.class
+    );
+    ReflectionTestUtils.setField(
+        parent,
+        BaseEntity.class,
+        "updatedAt",
+        LocalDateTime.now(),
+        LocalDateTime.class
+    );
     Comment child = Comment.builder()
         .user(user)
         .review(review)
         .content("안녕")
         .parent(parent)
         .build();
+    ReflectionTestUtils.setField(
+        child,
+        BaseEntity.class,
+        "createdAt",
+        LocalDateTime.now(),
+        LocalDateTime.class
+    );
+    ReflectionTestUtils.setField(
+        child,
+        BaseEntity.class,
+        "updatedAt",
+        LocalDateTime.now(),
+        LocalDateTime.class
+    );
     doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
     doReturn(child).when(commentUtilService).getComment(0L);
 
@@ -253,6 +342,20 @@ class CommentServiceTest {
         .review(review)
         .content("안녕")
         .build();
+    ReflectionTestUtils.setField(
+        comment,
+        BaseEntity.class,
+        "createdAt",
+        LocalDateTime.now(),
+        LocalDateTime.class
+    );
+    ReflectionTestUtils.setField(
+        comment,
+        BaseEntity.class,
+        "updatedAt",
+        LocalDateTime.now(),
+        LocalDateTime.class
+    );
     doReturn(comment).when(commentUtilService).getComment(0L);
     doReturn(new ArrayList<>()).when(commentRepository).getCommentsOfParents(List.of(0L));
 
@@ -275,6 +378,20 @@ class CommentServiceTest {
         .review(review)
         .content("안녕")
         .build();
+    ReflectionTestUtils.setField(
+        comment,
+        BaseEntity.class,
+        "createdAt",
+        LocalDateTime.now(),
+        LocalDateTime.class
+    );
+    ReflectionTestUtils.setField(
+        comment,
+        BaseEntity.class,
+        "updatedAt",
+        LocalDateTime.now(),
+        LocalDateTime.class
+    );
     doReturn(comment).when(commentUtilService).getComment(0L);
     doReturn(new ArrayList<>()).when(commentRepository).getCommentsOfParents(List.of(0L));
 
@@ -312,6 +429,20 @@ class CommentServiceTest {
         .review(review)
         .content("안녕")
         .build();
+    ReflectionTestUtils.setField(
+        comment,
+        BaseEntity.class,
+        "createdAt",
+        LocalDateTime.now(),
+        LocalDateTime.class
+    );
+    ReflectionTestUtils.setField(
+        comment,
+        BaseEntity.class,
+        "updatedAt",
+        LocalDateTime.now(),
+        LocalDateTime.class
+    );
     doReturn(comment).when(commentUtilService).getComment(0L);
     doReturn(Optional.empty()).when(commentLikeRepository)
         .getCommentLikeByCommentIdAndUserId(0L, null);
@@ -341,6 +472,20 @@ class CommentServiceTest {
         .review(review)
         .content("안녕")
         .build();
+    ReflectionTestUtils.setField(
+        comment,
+        BaseEntity.class,
+        "createdAt",
+        LocalDateTime.now(),
+        LocalDateTime.class
+    );
+    ReflectionTestUtils.setField(
+        comment,
+        BaseEntity.class,
+        "updatedAt",
+        LocalDateTime.now(),
+        LocalDateTime.class
+    );
     doReturn(comment).when(commentUtilService).getComment(0L);
     doReturn(Optional.of(CommentLike.builder().comment(comment).user(user).build()))
         .when(commentLikeRepository).getCommentLikeByCommentIdAndUserId(0L, null);
