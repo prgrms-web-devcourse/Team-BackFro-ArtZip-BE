@@ -866,7 +866,7 @@ class ReviewServiceTest {
             .willReturn(Optional.of(reviewExhibitionInfo));
         given(commentService.getCommentsByReviewId(
             reflectionReview.getId(),
-            null, PageRequest.of(0, 20)))
+            null, PageRequest.of(0, 20, Sort.by("createdAt").descending())))
             .willReturn(reflectionComments);
 
         // when
@@ -878,7 +878,7 @@ class ReviewServiceTest {
             null, reflectionReview.getExhibition().getId());
         verify(commentService).getCommentsByReviewId(
             reflectionReview.getId(),
-            null, PageRequest.of(0, 20));
+            null, PageRequest.of(0, 20, Sort.by("createdAt").descending()));
       }
 
       @Test
@@ -1046,7 +1046,7 @@ class ReviewServiceTest {
             .willReturn(Optional.of(reviewExhibitionInfo));
         given(commentService.getCommentsByReviewId(
             reflectionReview.getId(),
-            reflectionUser, PageRequest.of(0, 20)))
+            reflectionUser, PageRequest.of(0, 20, Sort.by("createdAt").descending())))
             .willReturn(reflectionComments);
 
         // when
@@ -1059,7 +1059,7 @@ class ReviewServiceTest {
             reflectionUser.getId(), reflectionReview.getExhibition().getId());
         verify(commentService).getCommentsByReviewId(
             reflectionReview.getId(),
-            reflectionUser, PageRequest.of(0, 20));
+            reflectionUser, PageRequest.of(0, 20, Sort.by("createdAt").descending()));
       }
 
     }
