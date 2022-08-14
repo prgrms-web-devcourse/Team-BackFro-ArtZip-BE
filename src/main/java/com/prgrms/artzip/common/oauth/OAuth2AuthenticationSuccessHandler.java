@@ -55,7 +55,7 @@ public class OAuth2AuthenticationSuccessHandler extends
 
   private String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, User user) {
 
-    String targetUri = "http://localhost:3000/oauth/callback";
+    String targetUri = "https://team-back-fro-art-zip-fe.vercel.app/oauth/callback/";
     String accessToken = generateAccessToken(user);
     String refreshToken = generateRefreshToken(user);
 
