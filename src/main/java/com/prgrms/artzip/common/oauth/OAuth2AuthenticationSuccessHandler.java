@@ -59,11 +59,8 @@ public class OAuth2AuthenticationSuccessHandler extends
     String accessToken = generateAccessToken(user);
     String refreshToken = generateRefreshToken(user);
 
-    int cookieMaxAge = jwtService.getRefreshExpiry() / 1000;
-    CookieUtil.deleteCookie(request, response, REFRESH_TOKEN);
-    CookieUtil.addCookie(response, REFRESH_TOKEN, refreshToken, cookieMaxAge);
-
     return UriComponentsBuilder.fromUriString(targetUri)
+        .queryParam("refreshToken", refreshToken)
         .queryParam("accessToken", accessToken)
         .queryParam("userId", user.getId())
         .build().toUriString();
