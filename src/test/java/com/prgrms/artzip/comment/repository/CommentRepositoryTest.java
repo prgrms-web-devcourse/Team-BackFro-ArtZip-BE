@@ -156,14 +156,4 @@ class CommentRepositoryTest {
     assertThat(children.getContent()).hasSize(2);
   }
 
-  @Test
-  @DisplayName("후기에 달린 댓글 개수 조회 테스트")
-  void testCountByReviewId() {
-    // Given
-    // When
-    Long commentCount = commentRepository.countByReviewId(review.getId());
-
-    // Then
-    assertThat(commentCount).isEqualTo(90L);
-  }
 }

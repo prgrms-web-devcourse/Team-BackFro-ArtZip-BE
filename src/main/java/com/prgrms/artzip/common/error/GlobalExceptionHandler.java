@@ -4,14 +4,11 @@ import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.ErrorResponse;
 import com.prgrms.artzip.common.error.exception.AlreadyExistsException;
 import com.prgrms.artzip.common.error.exception.AuthErrorException;
-import com.prgrms.artzip.common.error.exception.CannotSendMessageException;
 import com.prgrms.artzip.common.error.exception.DuplicateRequestException;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
 import com.prgrms.artzip.common.error.exception.PermissionDeniedException;
-import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
@@ -103,7 +100,7 @@ public class GlobalExceptionHandler {
   }
 
   /**
-   * TODO - 400: Custom Index
+   * 400: Custom Index
    */
   @ExceptionHandler(NotFoundException.class)
   public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException e) {
@@ -134,11 +131,6 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(PermissionDeniedException.class)
   public ResponseEntity<ErrorResponse> handlePermissionDeniedException(
       PermissionDeniedException e) {
-    return handleException(e, e.getErrorCode());
-  }
-
-  @ExceptionHandler(CannotSendMessageException.class)
-  public ResponseEntity<ErrorResponse> handleCannotSendMessageException(CannotSendMessageException e) {
     return handleException(e, e.getErrorCode());
   }
 

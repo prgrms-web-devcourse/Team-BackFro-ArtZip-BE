@@ -41,10 +41,10 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
   }
 
   @Override
-  public Optional<ReviewWithLikeData> findByReviewIdAndUserId(Long reviewId, Long userId) {
+  public Optional<ReviewWithLikeAndCommentCount> findByReviewIdAndUserId(Long reviewId, Long userId) {
 
-    ReviewWithLikeData data = queryFactory
-        .select(Projections.fields(ReviewWithLikeData.class,
+    ReviewWithLikeAndCommentCount data = queryFactory
+        .select(Projections.fields(ReviewWithLikeAndCommentCount.class,
             review.id.as("reviewId"),
             review.date,
             review.title,
@@ -56,12 +56,14 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
                 .then(true)
                 .otherwise(false).as("isLiked"),
             review.isPublic,
-            reviewLike.id.count().as("likeCount")
+            reviewLike.id.countDistinct().as("likeCount"),
+            comment.id.countDistinct().as("commentCount")
         ))
         .from(review)
         .leftJoin(reviewLikeToGetIsLiked).on(reviewLikeToGetIsLiked.review.eq(review),
             alwaysFalse().or(reviewLikeUserIdEq(userId)))
         .leftJoin(reviewLike).on(review.id.eq(reviewLike.review.id))
+        .leftJoin(comment).on(review.id.eq(comment.review.id), comment.isDeleted.isFalse())
         .where(review.isDeleted.eq(false),
             review.id.eq(reviewId),
             filterIsNotPublic(userId))

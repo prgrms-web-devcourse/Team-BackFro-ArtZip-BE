@@ -13,7 +13,6 @@ import com.prgrms.artzip.exhibition.domain.enumType.Genre;
 import com.prgrms.artzip.review.domain.Review;
 import com.prgrms.artzip.review.domain.ReviewLike;
 import com.prgrms.artzip.review.dto.projection.ReviewWithLikeAndCommentCount;
-import com.prgrms.artzip.review.dto.projection.ReviewWithLikeData;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
 import java.time.LocalDate;
@@ -256,7 +255,7 @@ public class ReviewRepositoryTest {
     @Test
     @DisplayName("삭제된 리뷰를 조회하는 경우, null을 반환한다.")
     void testDeletedReview() {
-      Optional<ReviewWithLikeData> result = reviewRepository.findByReviewIdAndUserId(
+      Optional<ReviewWithLikeAndCommentCount> result = reviewRepository.findByReviewIdAndUserId(
           deletedReview.getId(), user1.getId());
 
       assertThat(result.isEmpty()).isTrue();
@@ -265,71 +264,79 @@ public class ReviewRepositoryTest {
     @Test
     @DisplayName("삭제되지 않은 리뷰를 조회하는 경우, 리뷰 정보를 반환한다.")
     void testNotDeletedReview() {
-      Optional<ReviewWithLikeData> result = reviewRepository.findByReviewIdAndUserId(
+      Optional<ReviewWithLikeAndCommentCount> result = reviewRepository.findByReviewIdAndUserId(
           publicReview1.getId(), user1.getId());
 
       assertThat(result.isPresent()).isTrue();
-      assertThat(result.get().getReviewId()).isEqualTo(publicReview1.getId());
-      assertThat(result.get().getDate()).isEqualTo(publicReview1.getDate());
-      assertThat(result.get().getTitle()).isEqualTo(publicReview1.getTitle());
-      assertThat(result.get().getContent()).isEqualTo(publicReview1.getContent());
-      assertThat(result.get().getIsLiked()).isEqualTo(true);
-      assertThat(result.get().getIsPublic()).isEqualTo(publicReview1.getIsPublic());
-      assertThat(result.get().getLikeCount()).isEqualTo(2);
+      assertThat(result.get())
+          .hasFieldOrPropertyWithValue("commentCount", 75L)
+          .hasFieldOrPropertyWithValue("isLiked", true)
+          .hasFieldOrPropertyWithValue("likeCount", 2L)
+          .hasFieldOrPropertyWithValue("reviewId", publicReview1.getId())
+          .hasFieldOrPropertyWithValue("date", publicReview1.getDate())
+          .hasFieldOrPropertyWithValue("title", publicReview1.getTitle())
+          .hasFieldOrPropertyWithValue("content", publicReview1.getContent())
+          .hasFieldOrPropertyWithValue("isPublic", true);
     }
 
     @Test
     @DisplayName("후기 작성자가 조회하는 경우, isPublic == true인 리뷰 정보를 반환한다.")
     void testPublicReviewWithWriter() {
-      Optional<ReviewWithLikeData> result = reviewRepository.findByReviewIdAndUserId(
+      Optional<ReviewWithLikeAndCommentCount> result = reviewRepository.findByReviewIdAndUserId(
           publicReview1.getId(), user1.getId());
 
       assertThat(result.isPresent()).isTrue();
-      assertThat(result.get().getReviewId()).isEqualTo(publicReview1.getId());
-      assertThat(result.get().getDate()).isEqualTo(publicReview1.getDate());
-      assertThat(result.get().getTitle()).isEqualTo(publicReview1.getTitle());
-      assertThat(result.get().getContent()).isEqualTo(publicReview1.getContent());
-      assertThat(result.get().getIsLiked()).isEqualTo(true);
-      assertThat(result.get().getIsPublic()).isEqualTo(publicReview1.getIsPublic());
-      assertThat(result.get().getLikeCount()).isEqualTo(2);
+      assertThat(result.get())
+          .hasFieldOrPropertyWithValue("commentCount", 75L)
+          .hasFieldOrPropertyWithValue("isLiked", true)
+          .hasFieldOrPropertyWithValue("likeCount", 2L)
+          .hasFieldOrPropertyWithValue("reviewId", publicReview1.getId())
+          .hasFieldOrPropertyWithValue("date", publicReview1.getDate())
+          .hasFieldOrPropertyWithValue("title", publicReview1.getTitle())
+          .hasFieldOrPropertyWithValue("content", publicReview1.getContent())
+          .hasFieldOrPropertyWithValue("isPublic", true);
     }
 
     @Test
     @DisplayName("후기 작성자가 조회하는 경우, isPublic == false인 리뷰 정보를 반환한다.")
     void testPrivateReviewWhitWriter() {
-      Optional<ReviewWithLikeData> result = reviewRepository.findByReviewIdAndUserId(
+      Optional<ReviewWithLikeAndCommentCount> result = reviewRepository.findByReviewIdAndUserId(
           privateReview.getId(), user1.getId());
 
       assertThat(result.isPresent()).isTrue();
-      assertThat(result.get().getReviewId()).isEqualTo(privateReview.getId());
-      assertThat(result.get().getDate()).isEqualTo(privateReview.getDate());
-      assertThat(result.get().getTitle()).isEqualTo(privateReview.getTitle());
-      assertThat(result.get().getContent()).isEqualTo(privateReview.getContent());
-      assertThat(result.get().getIsLiked()).isEqualTo(false);
-      assertThat(result.get().getIsPublic()).isEqualTo(privateReview.getIsPublic());
-      assertThat(result.get().getLikeCount()).isEqualTo(1);
+      assertThat(result.get())
+          .hasFieldOrPropertyWithValue("commentCount", 0L)
+          .hasFieldOrPropertyWithValue("isLiked", false)
+          .hasFieldOrPropertyWithValue("likeCount", 1L)
+          .hasFieldOrPropertyWithValue("reviewId", privateReview.getId())
+          .hasFieldOrPropertyWithValue("date", privateReview.getDate())
+          .hasFieldOrPropertyWithValue("title", privateReview.getTitle())
+          .hasFieldOrPropertyWithValue("content", privateReview.getContent())
+          .hasFieldOrPropertyWithValue("isPublic", false);
     }
 
     @Test
     @DisplayName("user == null인 경우, isPublic == true인 리뷰 정보를 반환한다.")
     void testNullUser() {
-      Optional<ReviewWithLikeData> result = reviewRepository.findByReviewIdAndUserId(
+      Optional<ReviewWithLikeAndCommentCount> result = reviewRepository.findByReviewIdAndUserId(
           publicReview1.getId(), user1.getId());
 
       assertThat(result.isPresent()).isTrue();
-      assertThat(result.get().getReviewId()).isEqualTo(publicReview1.getId());
-      assertThat(result.get().getDate()).isEqualTo(publicReview1.getDate());
-      assertThat(result.get().getTitle()).isEqualTo(publicReview1.getTitle());
-      assertThat(result.get().getContent()).isEqualTo(publicReview1.getContent());
-      assertThat(result.get().getIsLiked()).isEqualTo(true);
-      assertThat(result.get().getIsPublic()).isEqualTo(publicReview1.getIsPublic());
-      assertThat(result.get().getLikeCount()).isEqualTo(2);
+      assertThat(result.get())
+          .hasFieldOrPropertyWithValue("commentCount", 75L)
+          .hasFieldOrPropertyWithValue("isLiked", true)
+          .hasFieldOrPropertyWithValue("likeCount", 2L)
+          .hasFieldOrPropertyWithValue("reviewId", publicReview1.getId())
+          .hasFieldOrPropertyWithValue("date", publicReview1.getDate())
+          .hasFieldOrPropertyWithValue("title", publicReview1.getTitle())
+          .hasFieldOrPropertyWithValue("content", publicReview1.getContent())
+          .hasFieldOrPropertyWithValue("isPublic", true);
     }
 
     @Test
     @DisplayName("user == null인 경우, isPublic == false인 리뷰 정보는 반환하지 않는다.")
     void testPrivateReview() {
-      Optional<ReviewWithLikeData> result = reviewRepository.findByReviewIdAndUserId(
+      Optional<ReviewWithLikeAndCommentCount> result = reviewRepository.findByReviewIdAndUserId(
           privateReview.getId(), null);
 
       assertThat(result.isEmpty()).isTrue();

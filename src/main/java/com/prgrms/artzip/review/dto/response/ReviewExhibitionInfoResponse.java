@@ -15,10 +15,10 @@ public class ReviewExhibitionInfoResponse extends ReviewExhibitionBasicInfoRespo
 
   public ReviewExhibitionInfoResponse(ReviewExhibitionInfo reviewExhibitionInfo) {
     super(reviewExhibitionInfo.getExhibitionId(), reviewExhibitionInfo.getName(), reviewExhibitionInfo.getThumbnail());
-    this.startDate = getStartDate();
-    this.endDate = getEndDate();
-    this.isLiked = getIsLiked();
-    this.likeCount = getLikeCount();
-    this.reviewCount = getReviewCount();
+    this.startDate = reviewExhibitionInfo.getStartDate();
+    this.endDate = reviewExhibitionInfo.getEndDate();
+    this.isLiked = reviewExhibitionInfo.getIsLiked();
+    this.likeCount = reviewExhibitionInfo.getLikeCount();
+    this.reviewCount = reviewExhibitionInfo.getReviewCount();
   }
 }

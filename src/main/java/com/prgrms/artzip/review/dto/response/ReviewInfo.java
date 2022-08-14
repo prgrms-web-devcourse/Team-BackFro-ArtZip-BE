@@ -2,6 +2,7 @@ package com.prgrms.artzip.review.dto.response;
 
 import com.prgrms.artzip.comment.dto.response.CommentsResponse;
 import com.prgrms.artzip.review.domain.ReviewPhoto;
+import com.prgrms.artzip.review.dto.projection.ReviewWithLikeAndCommentCount;
 import com.prgrms.artzip.review.dto.projection.ReviewWithLikeData;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
