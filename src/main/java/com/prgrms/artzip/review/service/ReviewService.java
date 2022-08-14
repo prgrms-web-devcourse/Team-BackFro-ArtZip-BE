@@ -1,6 +1,6 @@
 package com.prgrms.artzip.review.service;
 
-import com.prgrms.artzip.comment.dto.response.CommentResponse;
+import com.prgrms.artzip.comment.dto.response.CommentsResponse;
 import com.prgrms.artzip.comment.service.CommentService;
 import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.PageResponse;
@@ -144,12 +144,10 @@ public class ReviewService {
     ReviewExhibitionInfo reviewExhibitionInfo = exhibitionRepository.findExhibitionForReview(
             Objects.isNull(user) ? null : user.getId(), review.getExhibition().getId())
         .orElseThrow(() -> new NotFoundException(ErrorCode.EXHB_NOT_FOUND));
-    Page<CommentResponse> comments = commentService.getCommentsByReviewId(
+    CommentsResponse comments = commentService.getCommentsByReviewId(
         reviewId, user, PageRequest.of(0, 20));
-    Long reviewCommentCount = commentService.getCommentCountByReviewId(reviewId);
 
-    return new ReviewResponse(reviewCommentCount,
-        comments,
+    return new ReviewResponse(comments,
         reviewData,
         reviewPhotos,
         reviewUser,

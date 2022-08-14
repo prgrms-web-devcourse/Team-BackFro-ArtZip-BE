@@ -7,9 +7,11 @@ import com.prgrms.artzip.comment.dto.request.CommentUpdateRequest;
 import com.prgrms.artzip.comment.dto.response.CommentInfo;
 import com.prgrms.artzip.comment.dto.response.CommentLikeResponse;
 import com.prgrms.artzip.comment.dto.response.CommentResponse;
+import com.prgrms.artzip.comment.dto.response.CommentsResponse;
 import com.prgrms.artzip.comment.repository.CommentLikeRepository;
 import com.prgrms.artzip.comment.repository.CommentRepository;
 import com.prgrms.artzip.common.ErrorCode;
+import com.prgrms.artzip.common.PageResponse;
 import com.prgrms.artzip.common.error.exception.AuthErrorException;
 import com.prgrms.artzip.common.error.exception.DuplicateRequestException;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,17 +40,18 @@ public class CommentService {
   private final CommentLikeRepository commentLikeRepository;
 
   @Transactional(readOnly = true)
-  public Page<CommentResponse> getCommentsByReviewId(Long reviewId, User user, Pageable pageable) {
+  public CommentsResponse getCommentsByReviewId(Long reviewId, User user, Pageable pageable) {
     Page<Comment> parents = commentRepository.getCommentsByReviewId(reviewId, pageable);
     List<Comment> children = parents.getSize() > 0 ? commentRepository
-        .getCommentsOfParents(parents.map(Comment::getId).toList()) : new ArrayList<>();
-    return parents.map(
+        .getCommentsOfParents(parents.stream().map(Comment::getId).toList()) : new ArrayList<>();
+    Page<CommentResponse> comments = parents.map(
         p -> new CommentResponse(
             p, user, children.stream()
                 .filter(c -> Objects.equals(c.getParent().getId(), p.getId()))
                 .toList()
         )
     );
+    return new CommentsResponse(new PageResponse<>(comments), parents.getContent().size() + children.size());
   }
 
   public CommentResponse createComment(CommentCreateRequest request, Long reviewId, User user) {
