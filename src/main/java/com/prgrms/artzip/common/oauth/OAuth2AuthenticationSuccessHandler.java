@@ -1,6 +1,7 @@
 package com.prgrms.artzip.common.oauth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.prgrms.artzip.common.util.CookieUtil;
 import com.prgrms.artzip.common.util.JwtService;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
@@ -21,6 +22,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RequiredArgsConstructor
 public class OAuth2AuthenticationSuccessHandler extends
@@ -32,32 +34,39 @@ public class OAuth2AuthenticationSuccessHandler extends
   private final UserService userService;
 
   private final ObjectMapper objectMapper;
+  private static final String REFRESH_TOKEN = "refreshToken";
 
   @Override
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
     if (authentication instanceof OAuth2AuthenticationToken oauth2Token) {
       OAuth2User principal = oauth2Token.getPrincipal();
       String registrationId = oauth2Token.getAuthorizedClientRegistrationId();
-
       User user = processUserOAuth2UserJoin(principal, registrationId);
-      String accessToken = generateAccessToken(user);
-      String refreshToken = generateRefreshToken(user);
 
-      LoginResponse loginResponse = LoginResponse.builder()
-          .userId(user.getId())
-          .accessToken(accessToken)
-          .refreshToken(refreshToken)
-          .build();
-
-      response.setStatus(HttpStatus.OK.value());
+      response.setStatus(HttpStatus.MOVED_PERMANENTLY.value());
       response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-      String json = objectMapper.writeValueAsString(loginResponse);
-      PrintWriter writer = response.getWriter();
-      writer.write(json);
-      writer.flush();
+
+      String targetUri = determineTargetUrl(request, response, user);
+      getRedirectStrategy().sendRedirect(request, response, targetUri);
     } else {
       super.onAuthenticationSuccess(request, response, authentication);
     }
+  }
+
+  private String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, User user) {
+
+    String targetUri = "http://localhost:3000/oauth/callback";
+    String accessToken = generateAccessToken(user);
+    String refreshToken = generateRefreshToken(user);
+
+    int cookieMaxAge = jwtService.getRefreshExpiry() / 1000;
+    CookieUtil.deleteCookie(request, response, REFRESH_TOKEN);
+    CookieUtil.addCookie(response, REFRESH_TOKEN, refreshToken, cookieMaxAge);
+
+    return UriComponentsBuilder.fromUriString(targetUri)
+        .queryParam("accessToken", accessToken)
+        .queryParam("userId", user.getId())
+        .build().toUriString();
   }
 
   private User processUserOAuth2UserJoin(OAuth2User oAuth2User, String registrationId) {

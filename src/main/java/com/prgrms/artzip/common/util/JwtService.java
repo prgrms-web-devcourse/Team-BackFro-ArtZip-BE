@@ -41,6 +41,10 @@ public class JwtService {
     this.redisService = redisService;
   }
 
+  public int getRefreshExpiry() {
+    return refreshJwt.getExpirySeconds();
+  }
+
   public String createAccessToken(Long userId, String email, List<GrantedAuthority> authorities) {
     String[] roles = authorities.stream()
         .map(GrantedAuthority::getAuthority)
