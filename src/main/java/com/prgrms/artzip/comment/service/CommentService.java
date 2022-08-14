@@ -52,7 +52,7 @@ public class CommentService {
         )
     );
     return new CommentsResponse(new PageResponse<>(comments),
-        (int) (parents.getTotalElements() + children.size()));
+        commentRepository.getCommentCountByReviewId(reviewId));
   }
 
   public CommentResponse createComment(CommentCreateRequest request, Long reviewId, User user) {
