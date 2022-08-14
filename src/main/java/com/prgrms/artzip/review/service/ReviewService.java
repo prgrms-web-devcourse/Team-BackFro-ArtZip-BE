@@ -97,7 +97,7 @@ public class ReviewService {
     validateFileCount(review, request.getDeletedPhotos(), files);
     validateFileExtensions(files);
 
-    removeReviewPhotosById(request.getDeletedPhotos());
+    removeReviewPhotosByIds(request.getDeletedPhotos());
 
     if (files != null) {
       createReviewPhoto(review, files);
@@ -208,7 +208,7 @@ public class ReviewService {
     return new ReviewsResponse(reviewData, reviewPhotos, reviewUser, exhibition);
   }
 
-  private void removeReviewPhotosById(List<Long> reviewPhotoIds) {
+  private void removeReviewPhotosByIds(List<Long> reviewPhotoIds) {
     reviewPhotoIds.forEach(photoId -> {
       ReviewPhoto reviewPhoto = reviewPhotoRepository.findById(photoId)
           .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_PHOTO_NOT_FOUND));
