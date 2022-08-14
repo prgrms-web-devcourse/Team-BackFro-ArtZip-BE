@@ -2,6 +2,7 @@ package com.prgrms.artzip.review.dto.response;
 
 import com.prgrms.artzip.comment.dto.response.CommentResponse;
 import com.prgrms.artzip.review.domain.ReviewPhoto;
+import com.prgrms.artzip.review.dto.projection.ReviewWithLikeAndCommentCount;
 import com.prgrms.artzip.review.dto.projection.ReviewWithLikeData;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,9 +28,9 @@ public class ReviewInfo extends ReviewCommentInfo {
   private Long likeCount;
   private List<ReviewPhotoInfo> photos;
 
-  public ReviewInfo(Long commentCount, Page<CommentResponse> comments,
-      ReviewWithLikeData reviewData, List<ReviewPhoto> photos) {
-    super(commentCount, comments);
+  public ReviewInfo(Page<CommentResponse> comments,
+      ReviewWithLikeAndCommentCount reviewData, List<ReviewPhoto> photos) {
+    super(reviewData.getCommentCount(), comments);
     this.reviewId = reviewData.getReviewId();
     this.date = reviewData.getDate();
     this.title = reviewData.getTitle();
