@@ -2,6 +2,7 @@ package com.prgrms.artzip.review.controller;
 
 import com.prgrms.artzip.comment.dto.request.CommentCreateRequest;
 import com.prgrms.artzip.comment.dto.response.CommentResponse;
+import com.prgrms.artzip.comment.dto.response.CommentsResponse;
 import com.prgrms.artzip.comment.service.CommentService;
 import com.prgrms.artzip.common.ApiResponse;
 import com.prgrms.artzip.common.PageResponse;
@@ -113,11 +114,9 @@ public class ReviewController {
         .body(apiResponse);
   }
 
-  //TODO 아래 두 API 테스트 작성
-
   @ApiOperation(value = "후기 댓글 다건 조회", notes = "후기의 댓글들을 조회합니다.")
   @GetMapping("/{reviewId}/comments")
-  public ResponseEntity<ApiResponse<PageResponse<CommentResponse>>> getComments(
+  public ResponseEntity<ApiResponse<CommentsResponse>> getComments(
       @ApiParam(value = "조회할 후기의 ID")
       @PathVariable Long reviewId,
       @CurrentUser User user,
@@ -126,9 +125,8 @@ public class ReviewController {
           direction = Sort.Direction.DESC
       ) Pageable pageable
   ) {
-    PageResponse<CommentResponse> comments =
-        new PageResponse<>(commentService.getCommentsByReviewId(reviewId, user, pageable));
-    ApiResponse<PageResponse<CommentResponse>> response
+    CommentsResponse comments = commentService.getCommentsByReviewId(reviewId, user, pageable);
+    ApiResponse<CommentsResponse> response
         = new ApiResponse<>("댓글 다건 조회 성공", HttpStatus.OK.value(), comments);
     return ResponseEntity.ok(response);
   }
@@ -141,7 +139,6 @@ public class ReviewController {
       @RequestBody @Valid CommentCreateRequest request,
       @CurrentUser User user
   ) {
-    //TODO 유저 아이디 수정 -> 추후 아마 유저 객체가 들어올듯
     CommentResponse comment = commentService.createComment(request, reviewId, user);
     ApiResponse<CommentResponse> response
         = new ApiResponse<>("댓글 생성 성공", HttpStatus.OK.value(), comment);

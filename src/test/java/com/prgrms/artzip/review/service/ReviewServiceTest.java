@@ -12,9 +12,11 @@ import static org.mockito.Mockito.verify;
 
 import com.prgrms.artzip.comment.domain.Comment;
 import com.prgrms.artzip.comment.dto.response.CommentResponse;
+import com.prgrms.artzip.comment.dto.response.CommentsResponse;
 import com.prgrms.artzip.comment.service.CommentService;
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.ErrorCode;
+import com.prgrms.artzip.common.PageResponse;
 import com.prgrms.artzip.common.entity.BaseEntity;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
@@ -849,11 +851,10 @@ class ReviewServiceTest {
                         .build()
                 )
             ));
-
-        Page<CommentResponse> reflectionComments = new PageImpl<>(contents,
+        CommentsResponse reflectionComments = new CommentsResponse(new PageResponse<>(new PageImpl<>(contents,
             PageRequest.of(0, 10, Sort.by("createdAt").descending()),
             1L
-        );
+        )), contents.size());
 
         // given
         given(reviewRepository.findById(reflectionReview.getId()))
@@ -1030,10 +1031,10 @@ class ReviewServiceTest {
                 )
             ));
 
-        Page<CommentResponse> reflectionComments = new PageImpl<>(contents,
+        CommentsResponse reflectionComments = new CommentsResponse(new PageResponse<>(new PageImpl<>(contents,
             PageRequest.of(0, 10, Sort.by("createdAt").descending()),
             1L
-        );
+        )), contents.size());
 
         // given
         given(reviewRepository.findById(reflectionReview.getId()))

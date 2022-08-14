@@ -1,6 +1,6 @@
 package com.prgrms.artzip.review.service;
 
-import com.prgrms.artzip.comment.dto.response.CommentResponse;
+import com.prgrms.artzip.comment.dto.response.CommentsResponse;
 import com.prgrms.artzip.comment.service.CommentService;
 import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.PageResponse;
@@ -143,7 +143,7 @@ public class ReviewService {
     ReviewExhibitionInfo reviewExhibitionInfo = exhibitionRepository.findExhibitionForReview(
             Objects.isNull(user) ? null : user.getId(), review.getExhibition().getId())
         .orElseThrow(() -> new NotFoundException(ErrorCode.EXHB_NOT_FOUND));
-    Page<CommentResponse> comments = commentService.getCommentsByReviewId(
+    CommentsResponse comments = commentService.getCommentsByReviewId(
         reviewId, user, PageRequest.of(0, 20, Sort.by("createdAt").descending()));
 
     return new ReviewResponse(
@@ -165,7 +165,8 @@ public class ReviewService {
   }
 
   @Transactional(readOnly = true)
-  public List<ReviewsResponseForExhibitionDetail> getReviewsForExhibition(Long userId, Long exhibitionId) {
+  public List<ReviewsResponseForExhibitionDetail> getReviewsForExhibition(Long userId,
+      Long exhibitionId) {
     List<ReviewWithLikeAndCommentCount> reviews = reviewRepository.findReviewsByExhibitionIdAndUserId(
         exhibitionId, Objects.isNull(userId) ? null : userId,
         PageRequest.of(0, 4, Sort.by("reviewLikeCount").descending())).getContent();
@@ -180,7 +181,8 @@ public class ReviewService {
   }
 
   @Transactional(readOnly = true)
-  public PageResponse<ReviewsResponse> getReviewsForMyLikes(User currentUser, Long targetUserId, Pageable pageable) {
+  public PageResponse<ReviewsResponse> getReviewsForMyLikes(User currentUser, Long targetUserId,
+      Pageable pageable) {
 
     Page<ReviewWithLikeAndCommentCount> reviews = reviewRepository.findMyLikesReviews(
         Objects.isNull(currentUser) ? null : currentUser.getId(), targetUserId, pageable);
@@ -189,7 +191,8 @@ public class ReviewService {
   }
 
   @Transactional(readOnly = true)
-  public PageResponse<ReviewsResponse> getMyReviews(User currentUser, Long targetUserId, Pageable pageable) {
+  public PageResponse<ReviewsResponse> getMyReviews(User currentUser, Long targetUserId,
+      Pageable pageable) {
 
     Page<ReviewWithLikeAndCommentCount> reviews = reviewRepository.findMyReviews(
         Objects.isNull(currentUser) ? null : currentUser.getId(), targetUserId, pageable);
