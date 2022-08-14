@@ -51,7 +51,8 @@ public class CommentService {
                 .toList()
         )
     );
-    return new CommentsResponse(new PageResponse<>(comments), parents.getContent().size() + children.size());
+    return new CommentsResponse(new PageResponse<>(comments),
+        (int) (parents.getTotalElements() + children.size()));
   }
 
   public CommentResponse createComment(CommentCreateRequest request, Long reviewId, User user) {
