@@ -2,6 +2,7 @@
 ## 프로젝트 요약
 - 프로그래머스 데브코스 2기 12팀 **BackFro** 최종 프로젝트 [**ArtZip**](https://artzip.shop/) 의 백엔드 서버 레포지토리입니다.
 - [**ArtZip**](https://artzip.shop/) 은 미술 전시회를 조회하고 후기를 **작성 및 공유**할 수 있는 서비스입니다.
+- [프로젝트 노션 바로가기](https://backend-devcourse.notion.site/BackFro-8db56ad1304e441e8abe0b7045207852)
 
 ## 프로젝트 소개
 👉 [노션으로 프로젝트 소개 보러가기](https://backend-devcourse.notion.site/BackFro-8db56ad1304e441e8abe0b7045207852) 👈
