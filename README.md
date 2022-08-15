@@ -63,7 +63,8 @@
 <img width="1557" alt="Screen Shot 2022-07-08 at 15 27 12" src="https://user-images.githubusercontent.com/62789083/184589924-9947cf7a-61e2-448f-ba70-ef5b8c0e8351.png">
 
 ## Infra Architecture
-![image (25)](https://user-images.githubusercontent.com/53249897/184587114-1fa0ec0b-567d-481f-9a15-e5e4a22db9de.png)
+<img width="1497" alt="image (48)" src="https://user-images.githubusercontent.com/53249897/184590625-87d9b2d9-6e34-4a89-863a-65b3db4e6ab7.png">
+
 
 
 ## API 명세
