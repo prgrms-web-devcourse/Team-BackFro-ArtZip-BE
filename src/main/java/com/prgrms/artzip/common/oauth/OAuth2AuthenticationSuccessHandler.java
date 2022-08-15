@@ -36,7 +36,8 @@ public class OAuth2AuthenticationSuccessHandler extends
   private final ObjectMapper objectMapper;
   private static final String REFRESH_TOKEN = "refreshToken";
 
-  private static final String FRONT_PROD_URL = "https://team-back-fro-art-zip-fe.vercel.app/oauth/callback";
+  private static final String FRONT_PROD_URL = "https://artzip.shop/oauth/callback";
+  private static final String FRONT_TEST_URL = "http://localhost:3000/oauth/callback";
 
   @Override
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
@@ -49,7 +50,7 @@ public class OAuth2AuthenticationSuccessHandler extends
       response.setStatus(HttpStatus.MOVED_PERMANENTLY.value());
       response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
-      String targetUri = determineTargetUrl(request, response, FRONT_PROD_URL, user);
+      String targetUri = determineTargetUrl(request, response, FRONT_TEST_URL, user);
       getRedirectStrategy().sendRedirect(request, response, targetUri);
     } else {
       super.onAuthenticationSuccess(request, response, authentication);
