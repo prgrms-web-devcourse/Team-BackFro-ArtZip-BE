@@ -20,10 +20,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import static org.springframework.util.StringUtils.*;
 
+@Component
 @RequiredArgsConstructor
 public class OAuth2AuthenticationSuccessHandler extends
     SavedRequestAwareAuthenticationSuccessHandler {
@@ -31,9 +33,8 @@ public class OAuth2AuthenticationSuccessHandler extends
 
   private final JwtService jwtService;
 
-  private final UserService userService;
+  //private final UserService userService;
 
-  private final ObjectMapper objectMapper;
   private static final String REFRESH_TOKEN = "refreshToken";
 
   private static final String FRONT_PROD_URL = "https://artzip.shop/oauth/callback";
@@ -70,7 +71,7 @@ public class OAuth2AuthenticationSuccessHandler extends
   }
 
   private User processUserOAuth2UserJoin(OAuth2User oAuth2User, String registrationId) {
-    return userService.oauthSignUp(oAuth2User, registrationId);
+    return null;
   }
 
   private String generateAccessToken(User user) {

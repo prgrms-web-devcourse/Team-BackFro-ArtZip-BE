@@ -9,10 +9,12 @@ import com.prgrms.artzip.common.filter.ExceptionHandlerFilter;
 import com.prgrms.artzip.common.jwt.Jwt;
 import com.prgrms.artzip.common.jwt.JwtAuthenticationFilter;
 import com.prgrms.artzip.common.jwt.JwtAuthenticationProvider;
+import com.prgrms.artzip.common.oauth.OAuth2AuthenticationFailureHandler;
 import com.prgrms.artzip.common.util.JwtService;
 import com.prgrms.artzip.common.oauth.OAuth2AuthenticationSuccessHandler;
 import com.prgrms.artzip.user.service.UserService;
 import com.prgrms.artzip.user.service.UserUtilService;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -37,28 +39,19 @@ import java.io.PrintWriter;
 
 @EnableWebSecurity
 @Configuration
+@RequiredArgsConstructor
 public class WebSecurityConfig {
 
   private final Logger log = LoggerFactory.getLogger(getClass());
   private final JwtConfig jwtConfig;
 
-  @Bean
-  @Qualifier("accessJwt")
-  public Jwt accessJwt() {
-    return new Jwt(
-        jwtConfig.getIssuer(),
-        jwtConfig.getClientSecret(),
-        jwtConfig.getAccessToken().getExpirySeconds());
-  }
+  private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
-  @Bean
-  @Qualifier("refreshJwt")
-  public Jwt refreshJwt() {
-    return new Jwt(
-        jwtConfig.getIssuer(),
-        jwtConfig.getClientSecret(),
-        jwtConfig.getRefreshToken().getExpirySeconds());
-  }
+  private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+
+  private final ExceptionHandlerFilter exceptionHandlerFilter;
+
+  private final ObjectMapper objectMapper;
 
   @Bean
   public PasswordEncoder passwordEncoder() {
@@ -103,19 +96,6 @@ public class WebSecurityConfig {
   }
 
   @Bean
-  public ExceptionHandlerFilter exceptionHandlerFilter(ObjectMapper objectMapper) {
-    return new ExceptionHandlerFilter(objectMapper);
-  }
-
-  @Bean
-  public OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler(JwtService jwtService, UserService userService, ObjectMapper objectMapper) {
-    return new OAuth2AuthenticationSuccessHandler(jwtService, userService, objectMapper);
-  }
-
-  public WebSecurityConfig(JwtConfig jwtConfig) {
-    this.jwtConfig = jwtConfig;
-  }
-
   public JwtAuthenticationFilter jwtAuthenticationFilter(JwtService jwtService,
       UserUtilService userUtilService) {
     return new JwtAuthenticationFilter(jwtConfig.getAccessToken().getHeader(), jwtService,
@@ -123,9 +103,8 @@ public class WebSecurityConfig {
   }
 
   @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http, JwtService jwtService,
-      UserUtilService userUtilService, ObjectMapper objectMapper,
-      ExceptionHandlerFilter exceptionHandlerFilter, OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler) throws Exception {
+  public SecurityFilterChain filterChain(HttpSecurity http,
+      JwtAuthenticationFilter jwtAuthenticationFilter, AccessDeniedHandler accessDeniedHandler, AuthenticationEntryPoint authenticationEntryPoint) throws Exception {
     http
         .cors()
         .and()
@@ -138,7 +117,8 @@ public class WebSecurityConfig {
             "/api/v1/exhibitions/**/likes",
             "api/v1/users/logout").hasAnyAuthority(USER.name(), ADMIN.name())
         .antMatchers(HttpMethod.POST,
-            "/api/v1/reviews", "/api/v1/comments/**", "/api/v1/reviews/**/comments").hasAnyAuthority(USER.name(), ADMIN.name())
+            "/api/v1/reviews", "/api/v1/comments/**", "/api/v1/reviews/**/comments")
+        .hasAnyAuthority(USER.name(), ADMIN.name())
         .antMatchers(HttpMethod.PATCH,
             "/api/v1/reviews/**", "/api/v1/reviews/**/like", "/api/v1/comments/**")
         .hasAnyAuthority(USER.name(), ADMIN.name())
@@ -151,12 +131,13 @@ public class WebSecurityConfig {
         .baseUri("/api/v1/users/oauth/login")
         .and()
         .successHandler(oAuth2AuthenticationSuccessHandler)
+        .failureHandler(oAuth2AuthenticationFailureHandler)
         .and()
         .exceptionHandling()
-        .accessDeniedHandler(accessDeniedHandler(objectMapper))
-        .authenticationEntryPoint(authenticationEntryPoint(objectMapper))
+        .accessDeniedHandler(accessDeniedHandler)
+        .authenticationEntryPoint(authenticationEntryPoint)
         .and()
-        .addFilterBefore(jwtAuthenticationFilter(jwtService, userUtilService),
+        .addFilterBefore(jwtAuthenticationFilter,
             UsernamePasswordAuthenticationFilter.class)
         .addFilterBefore(exceptionHandlerFilter, JwtAuthenticationFilter.class);
     return http.build();
