@@ -50,7 +50,7 @@ public class OAuth2AuthenticationSuccessHandler extends
       response.setStatus(HttpStatus.MOVED_PERMANENTLY.value());
       response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
-      String targetUri = determineTargetUrl(request, response, FRONT_TEST_URL, user);
+      String targetUri = determineTargetUrl(request, response, FRONT_PROD_URL, user);
       getRedirectStrategy().sendRedirect(request, response, targetUri);
     } else {
       super.onAuthenticationSuccess(request, response, authentication);
