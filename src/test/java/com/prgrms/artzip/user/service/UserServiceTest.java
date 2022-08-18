@@ -18,6 +18,7 @@ import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.error.exception.AlreadyExistsException;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
+import com.prgrms.artzip.common.oauth.AuthProvider;
 import com.prgrms.artzip.common.util.AmazonS3Remover;
 import com.prgrms.artzip.common.util.AmazonS3Uploader;
 import com.prgrms.artzip.user.domain.LocalUser;
@@ -396,36 +397,6 @@ class UserServiceTest {
         .isInstanceOf(InvalidRequestException.class)
         .hasMessage(INVALID_INPUT_VALUE.getMessage());
   }
-
-  @Test
-  @DisplayName("소셜로그인 회원가입 테스트")
-  void testOAuthSignUp() {
-    //given
-    Map<String, Object> attributes = new HashMap<>();
-    Map<String, Object> properties = Map.of(
-        "nickname", "김승은",
-        "profile_image", "testUrl"
-    );
-    Map<String, Object> accountInfo = Map.of(
-        "email", "julie0005@ajou.ac.kr"
-    );
-    attributes.put("properties", properties);
-    attributes.put("kakao_account", accountInfo);
-    attributes.put("id", "12345678");
-    String provider = "kakao";
-    OAuth2User oAuth2User = new DefaultOAuth2User(List.of(Role.toGrantedAuthority(new Role(Authority.USER))), attributes, "id");
-    when(userRepository.findByProviderAndProviderId(eq(provider), eq(oAuth2User.getName()))).thenReturn(Optional.empty());
-    when(roleRepository.findByAuthority(Authority.USER)).thenReturn(Optional.of(userRole));
-
-    // when
-    userService.oauthSignUp(oAuth2User, provider);
-
-    // then
-    verify(userRepository).findByProviderAndProviderId(provider, oAuth2User.getName());
-    verify(roleRepository).findByAuthority(Authority.USER);
-    verify(userRepository).save(any());
-  }
-
 
   private static Stream<Arguments> errorLoginParameter() {
     return Stream.of(

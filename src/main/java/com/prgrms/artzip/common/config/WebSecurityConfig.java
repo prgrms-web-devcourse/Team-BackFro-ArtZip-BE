@@ -45,7 +45,6 @@ import java.io.PrintWriter;
 public class WebSecurityConfig {
 
   private final Logger log = LoggerFactory.getLogger(getClass());
-  private final JwtConfig jwtConfig;
 
   private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
