@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.prgrms.artzip.QueryDslTestConfig;
 import com.prgrms.artzip.comment.domain.Comment;
+import com.prgrms.artzip.comment.dto.projection.CommentSimpleProjection;
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.exhibition.domain.Exhibition;
 import com.prgrms.artzip.exhibition.domain.enumType.Area;
@@ -107,8 +108,8 @@ class CommentRepositoryTest {
     Pageable pageable1 = PageRequest.of(1, 20);
 
     //When
-    Page<Comment> comments0 = commentRepository.getCommentsByReviewId(review.getId(), pageable0);
-    Page<Comment> comments1 = commentRepository.getCommentsByReviewId(review.getId(), pageable1);
+    Page<CommentSimpleProjection> comments0 = commentRepository.getCommentsByReviewIdQ(review.getId(), user.getId(), pageable0);
+    Page<CommentSimpleProjection> comments1 = commentRepository.getCommentsByReviewIdQ(review.getId(), user.getId(), pageable1);
 
     //Then
     assertThat(comments0.getContent()).hasSize(20);
@@ -122,8 +123,8 @@ class CommentRepositoryTest {
   void testGetCommentsOfParents() {
     //Given
     Pageable pageable = PageRequest.of(0, 40);
-    Page<Comment> comments = commentRepository.getCommentsByReviewId(review.getId(), pageable);
-    List<Long> parentIds = comments.getContent().stream().map(Comment::getId).toList();
+    Page<CommentSimpleProjection> comments = commentRepository.getCommentsByReviewIdQ(review.getId(), user.getId(), pageable);
+    List<Long> parentIds = comments.getContent().stream().map(CommentSimpleProjection::getCommentId).toList();
 
     //When
     List<Comment> children = commentRepository.getCommentsOfParents(parentIds);
@@ -146,11 +147,11 @@ class CommentRepositoryTest {
     //Given
     Pageable pageable0 = PageRequest.of(0, 40);
     Pageable pageable1 = PageRequest.of(0, 10);
-    Page<Comment> comments = commentRepository.getCommentsByReviewId(review.getId(), pageable0);
+    Page<CommentSimpleProjection> comments = commentRepository.getCommentsByReviewIdQ(review.getId(), user.getId(), pageable0);
 
     //When
     Page<Comment> children = commentRepository
-        .getCommentsOfParent(comments.getContent().get(0).getId(), pageable1);
+        .getCommentsOfParent(comments.getContent().get(0).getCommentId(), pageable1);
 
     //Then
     assertThat(children.getContent()).hasSize(2);
