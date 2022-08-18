@@ -1,6 +1,6 @@
 package com.prgrms.artzip.review.service;
 
-import com.prgrms.artzip.comment.dto.response.CommentResponse;
+import com.prgrms.artzip.comment.dto.response.CommentsResponse;
 import com.prgrms.artzip.comment.service.CommentService;
 import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.PageResponse;
@@ -19,7 +19,6 @@ import com.prgrms.artzip.review.domain.repository.ReviewPhotoRepository;
 import com.prgrms.artzip.review.domain.repository.ReviewRepository;
 import com.prgrms.artzip.review.dto.projection.ReviewExhibitionInfo;
 import com.prgrms.artzip.review.dto.projection.ReviewWithLikeAndCommentCount;
-import com.prgrms.artzip.review.dto.projection.ReviewWithLikeData;
 import com.prgrms.artzip.review.dto.request.ReviewCreateRequest;
 import com.prgrms.artzip.review.dto.request.ReviewUpdateRequest;
 import com.prgrms.artzip.review.dto.response.ReviewExhibitionInfoResponse;
@@ -98,7 +97,7 @@ public class ReviewService {
     validateFileCount(review, request.getDeletedPhotos(), files);
     validateFileExtensions(files);
 
-    removeReviewPhotosById(request.getDeletedPhotos());
+    removeReviewPhotosByIds(request.getDeletedPhotos());
 
     if (files != null) {
       createReviewPhoto(review, files);
@@ -135,7 +134,7 @@ public class ReviewService {
     Review review = reviewRepository.findById(reviewId)
         .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_NOT_FOUND));
 
-    ReviewWithLikeData reviewData = reviewRepository.findByReviewIdAndUserId(reviewId,
+    ReviewWithLikeAndCommentCount reviewData = reviewRepository.findByReviewIdAndUserId(reviewId,
             Objects.isNull(user) ? null : user.getId())
         .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_NOT_FOUND));
 
@@ -144,11 +143,10 @@ public class ReviewService {
     ReviewExhibitionInfo reviewExhibitionInfo = exhibitionRepository.findExhibitionForReview(
             Objects.isNull(user) ? null : user.getId(), review.getExhibition().getId())
         .orElseThrow(() -> new NotFoundException(ErrorCode.EXHB_NOT_FOUND));
-    Page<CommentResponse> comments = commentService.getCommentsByReviewId(
-        reviewId, user, PageRequest.of(0, 20));
-    Long reviewCommentCount = commentService.getCommentCountByReviewId(reviewId);
+    CommentsResponse comments = commentService.getCommentsByReviewId(
+        reviewId, user, PageRequest.of(0, 20, Sort.by("createdAt").descending()));
 
-    return new ReviewResponse(reviewCommentCount,
+    return new ReviewResponse(
         comments,
         reviewData,
         reviewPhotos,
@@ -167,7 +165,8 @@ public class ReviewService {
   }
 
   @Transactional(readOnly = true)
-  public List<ReviewsResponseForExhibitionDetail> getReviewsForExhibition(Long userId, Long exhibitionId) {
+  public List<ReviewsResponseForExhibitionDetail> getReviewsForExhibition(Long userId,
+      Long exhibitionId) {
     List<ReviewWithLikeAndCommentCount> reviews = reviewRepository.findReviewsByExhibitionIdAndUserId(
         exhibitionId, Objects.isNull(userId) ? null : userId,
         PageRequest.of(0, 4, Sort.by("reviewLikeCount").descending())).getContent();
@@ -182,7 +181,8 @@ public class ReviewService {
   }
 
   @Transactional(readOnly = true)
-  public PageResponse<ReviewsResponse> getReviewsForMyLikes(User currentUser, Long targetUserId, Pageable pageable) {
+  public PageResponse<ReviewsResponse> getReviewsForMyLikes(User currentUser, Long targetUserId,
+      Pageable pageable) {
 
     Page<ReviewWithLikeAndCommentCount> reviews = reviewRepository.findMyLikesReviews(
         Objects.isNull(currentUser) ? null : currentUser.getId(), targetUserId, pageable);
@@ -191,7 +191,8 @@ public class ReviewService {
   }
 
   @Transactional(readOnly = true)
-  public PageResponse<ReviewsResponse> getMyReviews(User currentUser, Long targetUserId, Pageable pageable) {
+  public PageResponse<ReviewsResponse> getMyReviews(User currentUser, Long targetUserId,
+      Pageable pageable) {
 
     Page<ReviewWithLikeAndCommentCount> reviews = reviewRepository.findMyReviews(
         Objects.isNull(currentUser) ? null : currentUser.getId(), targetUserId, pageable);
@@ -210,7 +211,7 @@ public class ReviewService {
     return new ReviewsResponse(reviewData, reviewPhotos, reviewUser, exhibition);
   }
 
-  private void removeReviewPhotosById(List<Long> reviewPhotoIds) {
+  private void removeReviewPhotosByIds(List<Long> reviewPhotoIds) {
     reviewPhotoIds.forEach(photoId -> {
       ReviewPhoto reviewPhoto = reviewPhotoRepository.findById(photoId)
           .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_PHOTO_NOT_FOUND));

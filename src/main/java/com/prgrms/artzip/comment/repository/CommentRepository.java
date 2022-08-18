@@ -24,6 +24,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long>, Comment
             countQuery = "select count(c) from Comment c where c.parent.id = :parentId")
     Page<Comment> getCommentsOfParent(Long parentId, Pageable pageable);
 
-    @Query("SELECT COUNT(c) FROM Comment c WHERE c.review.id = :reviewId")
-    Long countByReviewId(@Param("reviewId") Long reviewId);
+    @Query("select count (c) from Comment c where c.review.id = :reviewId and c.isDeleted = false ")
+    Integer getCommentCountByReviewId(Long reviewId);
 }

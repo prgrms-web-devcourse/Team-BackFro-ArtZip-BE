@@ -135,7 +135,7 @@ class CommentServiceTest {
          comment
     );
     Pageable pageable = PageRequest.of(0, 10);
-    doReturn(new PageImpl(parents)).when(commentRepository)
+    doReturn(new PageImpl(parents, pageable, parents.size())).when(commentRepository)
         .getCommentsByReviewId(review.getId(), pageable);
     doReturn(new ArrayList<>()).when(commentRepository).getCommentsOfParents(
         parents.stream().map(Comment::getId).toList()

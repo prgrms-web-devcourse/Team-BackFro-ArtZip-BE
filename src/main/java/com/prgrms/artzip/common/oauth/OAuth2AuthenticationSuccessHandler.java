@@ -1,13 +1,12 @@
 package com.prgrms.artzip.common.oauth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.prgrms.artzip.common.util.CookieUtil;
 import com.prgrms.artzip.common.util.JwtService;
 import com.prgrms.artzip.user.domain.Role;
 import com.prgrms.artzip.user.domain.User;
-import com.prgrms.artzip.user.dto.response.LoginResponse;
 import com.prgrms.artzip.user.service.UserService;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.stream.Collectors;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +20,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import static org.springframework.util.StringUtils.*;
 
 @RequiredArgsConstructor
 public class OAuth2AuthenticationSuccessHandler extends
@@ -32,6 +34,10 @@ public class OAuth2AuthenticationSuccessHandler extends
   private final UserService userService;
 
   private final ObjectMapper objectMapper;
+  private static final String REFRESH_TOKEN = "refreshToken";
+
+  private static final String FRONT_PROD_URL = "https://artzip.shop/oauth/callback";
+  private static final String FRONT_TEST_URL = "http://localhost:3000/oauth/callback";
 
   @Override
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
@@ -40,24 +46,27 @@ public class OAuth2AuthenticationSuccessHandler extends
       String registrationId = oauth2Token.getAuthorizedClientRegistrationId();
 
       User user = processUserOAuth2UserJoin(principal, registrationId);
-      String accessToken = generateAccessToken(user);
-      String refreshToken = generateRefreshToken(user);
 
-      LoginResponse loginResponse = LoginResponse.builder()
-          .userId(user.getId())
-          .accessToken(accessToken)
-          .refreshToken(refreshToken)
-          .build();
-
-      response.setStatus(HttpStatus.OK.value());
+      response.setStatus(HttpStatus.MOVED_PERMANENTLY.value());
       response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-      String json = objectMapper.writeValueAsString(loginResponse);
-      PrintWriter writer = response.getWriter();
-      writer.write(json);
-      writer.flush();
+
+      String targetUri = determineTargetUrl(request, response, FRONT_PROD_URL, user);
+      getRedirectStrategy().sendRedirect(request, response, targetUri);
     } else {
       super.onAuthenticationSuccess(request, response, authentication);
     }
+  }
+
+  private String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, String baseUrl, User user) {
+
+    String accessToken = generateAccessToken(user);
+    String refreshToken = generateRefreshToken(user);
+
+    return UriComponentsBuilder.fromUriString(baseUrl)
+        .queryParam("refreshToken", refreshToken)
+        .queryParam("accessToken", accessToken)
+        .queryParam("userId", user.getId())
+        .build().toUriString();
   }
 
   private User processUserOAuth2UserJoin(OAuth2User oAuth2User, String registrationId) {

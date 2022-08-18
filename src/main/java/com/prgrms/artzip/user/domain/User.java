@@ -15,7 +15,6 @@ import javax.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
