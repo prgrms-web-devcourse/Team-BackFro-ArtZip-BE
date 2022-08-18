@@ -2,6 +2,7 @@ package com.prgrms.artzip.comment.repository;
 
 import static com.prgrms.artzip.comment.domain.QComment.comment;
 import static com.prgrms.artzip.comment.domain.QCommentLike.commentLike;
+import static com.prgrms.artzip.common.util.QueryDslCustomUtils.alwaysFalse;
 import static com.prgrms.artzip.common.util.QueryDslCustomUtils.nullSafeBooleanBuilder;
 import static com.prgrms.artzip.user.domain.QUser.user;
 
@@ -46,7 +47,7 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
                 commentLike.id.countDistinct().as("likeCount"),
                 commentToGetChildren.id.countDistinct().as("childCount"),
                 new CaseBuilder()
-                    .when(commentLikeEqToUserId(userId))
+                    .when(alwaysFalse().or(commentLikeEqToUserId(userId)))
                     .then(true)
                     .otherwise(false)
                     .as("isLiked"))
@@ -57,7 +58,7 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
             .and(commentToGetChildren.isDeleted.isFalse()))
         .leftJoin(commentLikeToGetIsLiked)
         .on(commentLikeToGetIsLiked.comment.id.eq(comment.id),
-            commentLikeEqToUserId(userId))
+            alwaysFalse().or(commentLikeEqToUserId(userId)))
         .where(comment.review.id.eq(reviewId).and(comment.parent.isNull()))
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize())

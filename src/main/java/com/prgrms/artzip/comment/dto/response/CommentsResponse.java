@@ -7,11 +7,11 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 public class CommentsResponse {
-  private final PageResponse<CommentResponse> comments;
+  private final PageResponse<CommentResponseQ> comments;
   private final Integer commentCount;
 
   public CommentsResponse(
-      PageResponse<CommentResponse> comments, Integer commentCount) {
+      PageResponse<CommentResponseQ> comments, Integer commentCount) {
     this.comments = comments;
     this.commentCount = commentCount;
   }

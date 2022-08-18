@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,24 +42,8 @@ public class CommentService {
 
   @Transactional(readOnly = true)
   public CommentsResponse getCommentsByReviewId(Long reviewId, User user, Pageable pageable) {
-    Page<Comment> parents = commentRepository.getCommentsByReviewId(reviewId, pageable);
-    List<Comment> children = parents.getSize() > 0 ? commentRepository
-        .getCommentsOfParents(parents.stream().map(Comment::getId).toList()) : new ArrayList<>();
-    Page<CommentResponse> comments = parents.map(
-        p -> new CommentResponse(
-            p, user, children.stream()
-                .filter(c -> Objects.equals(c.getParent().getId(), p.getId()))
-                .toList()
-        )
-    );
-    return new CommentsResponse(new PageResponse<>(comments),
-        commentRepository.getCommentCountByReviewId(reviewId));
-  }
-
-  @Transactional(readOnly = true)
-  public Page<CommentResponseQ> getCommentsByReviewIdQ(Long reviewId, User user, Pageable pageable) {
     Page<CommentSimpleProjection> comments = commentRepository.getCommentsByReviewIdQ(reviewId, Objects.nonNull(user) ? user.getId() : null, pageable);
-    return comments.map(CommentResponseQ::new);
+    return new CommentsResponse(new PageResponse<>(comments.map(CommentResponseQ::new)), commentRepository.getCommentCountByReviewId(reviewId));
   }
 
   public CommentResponse createComment(CommentCreateRequest request, Long reviewId, User user) {
