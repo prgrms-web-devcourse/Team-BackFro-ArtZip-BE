@@ -84,6 +84,7 @@ public enum ErrorCode {
   COMMENT_USER_IS_REQUIRED(400, "CM004", "댓글 작성 유저는 필수입니다."),
   COMMENT_ALREADY_DELETED(400, "CM005", "댓글이 이미 삭제되었습니다."),
   CHILD_CANT_BE_PARENT(400, "CM006", "자식 댓글은 부모 댓글이 될 수 없습니다."),
+  INVALID_COMMENT_SORT_TYPE(400, "CM007", "잘못된 댓글 정렬 조건입니다."),
   /**
    * Review Domain
    */

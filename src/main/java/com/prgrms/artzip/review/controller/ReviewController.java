@@ -2,6 +2,7 @@ package com.prgrms.artzip.review.controller;
 
 import com.prgrms.artzip.comment.dto.request.CommentCreateRequest;
 import com.prgrms.artzip.comment.dto.response.CommentResponse;
+import com.prgrms.artzip.comment.dto.response.CommentResponseQ;
 import com.prgrms.artzip.comment.dto.response.CommentsResponse;
 import com.prgrms.artzip.comment.service.CommentService;
 import com.prgrms.artzip.common.ApiResponse;

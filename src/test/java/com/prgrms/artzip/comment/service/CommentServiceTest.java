@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import com.prgrms.artzip.comment.domain.Comment;
 import com.prgrms.artzip.comment.domain.CommentLike;
+import com.prgrms.artzip.comment.dto.projection.CommentSimpleProjection;
 import com.prgrms.artzip.comment.dto.request.CommentCreateRequest;
 import com.prgrms.artzip.comment.dto.request.CommentUpdateRequest;
 import com.prgrms.artzip.comment.dto.response.CommentInfo;
@@ -32,6 +33,7 @@ import com.prgrms.artzip.user.domain.User;
 import com.prgrms.artzip.user.domain.repository.UserRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -120,32 +122,40 @@ class CommentServiceTest {
         comment,
         BaseEntity.class,
         "createdAt",
-        LocalDateTime.now(),
+        LocalDateTime.of(2022, Month.AUGUST, 13, 0, 0, 0),
         LocalDateTime.class
     );
     ReflectionTestUtils.setField(
         comment,
         BaseEntity.class,
         "updatedAt",
-        LocalDateTime.now(),
+        LocalDateTime.of(2022, Month.AUGUST, 13, 0, 0, 0),
         LocalDateTime.class
     );
-    List<Comment> parents = List.of(
-         comment
+    List<CommentSimpleProjection> comments = List.of(
+        CommentSimpleProjection.builder()
+            .commentId(0L)
+            .content(comment.getContent())
+            .createdAt(comment.getCreatedAt())
+            .updatedAt(comment.getUpdatedAt())
+            .isDeleted(comment.getIsDeleted())
+            .user(user)
+            .likeCount(0L)
+            .childCount(2L)
+            .isLiked(false)
+            .build()
     );
     Pageable pageable = PageRequest.of(0, 10);
-    doReturn(new PageImpl(parents, pageable, parents.size())).when(commentRepository)
-        .getCommentsByReviewId(review.getId(), pageable);
-    doReturn(new ArrayList<>()).when(commentRepository).getCommentsOfParents(
-        parents.stream().map(Comment::getId).toList()
-    );
+    doReturn(new PageImpl(comments, pageable, comments.size())).when(commentRepository)
+        .getCommentsByReviewIdQ(review.getId(), null, pageable);
+    doReturn(3).when(commentRepository).getCommentCountByReviewId(review.getId());
 
     //when
     commentService.getCommentsByReviewId(review.getId(), user, pageable);
 
     //then
-    verify(commentRepository).getCommentsByReviewId(review.getId(), pageable);
-    verify(commentRepository).getCommentsOfParents(parents.stream().map(Comment::getId).toList());
+    verify(commentRepository).getCommentsByReviewIdQ(review.getId(), null, pageable);
+    verify(commentRepository).getCommentCountByReviewId(review.getId());
   }
 
   @Test
@@ -161,14 +171,14 @@ class CommentServiceTest {
         parent,
         BaseEntity.class,
         "createdAt",
-        LocalDateTime.now(),
+        LocalDateTime.of(2022, Month.AUGUST, 13, 0, 0, 0),
         LocalDateTime.class
     );
     ReflectionTestUtils.setField(
         parent,
         BaseEntity.class,
         "updatedAt",
-        LocalDateTime.now(),
+        LocalDateTime.of(2022, Month.AUGUST, 13, 0, 0, 0),
         LocalDateTime.class
     );
     List<Comment> childContent = new ArrayList<>();
@@ -182,14 +192,14 @@ class CommentServiceTest {
           child,
           BaseEntity.class,
           "createdAt",
-          LocalDateTime.now(),
+          LocalDateTime.of(2022, Month.AUGUST, 13, 0, 0, 0),
           LocalDateTime.class
       );
       ReflectionTestUtils.setField(
           child,
           BaseEntity.class,
           "updatedAt",
-          LocalDateTime.now(),
+          LocalDateTime.of(2022, Month.AUGUST, 13, 0, 0, 0),
           LocalDateTime.class
       );
       childContent.add(child);
@@ -221,14 +231,14 @@ class CommentServiceTest {
         comment,
         BaseEntity.class,
         "createdAt",
-        LocalDateTime.now(),
+        LocalDateTime.of(2022, Month.AUGUST, 13, 0, 0, 0),
         LocalDateTime.class
     );
     ReflectionTestUtils.setField(
         comment,
         BaseEntity.class,
         "updatedAt",
-        LocalDateTime.now(),
+        LocalDateTime.of(2022, Month.AUGUST, 13, 0, 0, 0),
         LocalDateTime.class
     );
     doReturn(comment).when(commentRepository).save(Mockito.any(Comment.class));
@@ -291,14 +301,14 @@ class CommentServiceTest {
         parent,
         BaseEntity.class,
         "createdAt",
-        LocalDateTime.now(),
+        LocalDateTime.of(2022, Month.AUGUST, 13, 0, 0, 0),
         LocalDateTime.class
     );
     ReflectionTestUtils.setField(
         parent,
         BaseEntity.class,
         "updatedAt",
-        LocalDateTime.now(),
+        LocalDateTime.of(2022, Month.AUGUST, 13, 0, 0, 0),
         LocalDateTime.class
     );
     Comment child = Comment.builder()
@@ -311,14 +321,14 @@ class CommentServiceTest {
         child,
         BaseEntity.class,
         "createdAt",
-        LocalDateTime.now(),
+        LocalDateTime.of(2022, Month.AUGUST, 13, 0, 0, 0),
         LocalDateTime.class
     );
     ReflectionTestUtils.setField(
         child,
         BaseEntity.class,
         "updatedAt",
-        LocalDateTime.now(),
+        LocalDateTime.of(2022, Month.AUGUST, 13, 0, 0, 0),
         LocalDateTime.class
     );
     doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
@@ -346,14 +356,14 @@ class CommentServiceTest {
         comment,
         BaseEntity.class,
         "createdAt",
-        LocalDateTime.now(),
+        LocalDateTime.of(2022, Month.AUGUST, 13, 0, 0, 0),
         LocalDateTime.class
     );
     ReflectionTestUtils.setField(
         comment,
         BaseEntity.class,
         "updatedAt",
-        LocalDateTime.now(),
+        LocalDateTime.of(2022, Month.AUGUST, 13, 0, 0, 0),
         LocalDateTime.class
     );
     doReturn(comment).when(commentUtilService).getComment(0L);
@@ -382,14 +392,14 @@ class CommentServiceTest {
         comment,
         BaseEntity.class,
         "createdAt",
-        LocalDateTime.now(),
+        LocalDateTime.of(2022, Month.AUGUST, 13, 0, 0, 0),
         LocalDateTime.class
     );
     ReflectionTestUtils.setField(
         comment,
         BaseEntity.class,
         "updatedAt",
-        LocalDateTime.now(),
+        LocalDateTime.of(2022, Month.AUGUST, 13, 0, 0, 0),
         LocalDateTime.class
     );
     doReturn(comment).when(commentUtilService).getComment(0L);
@@ -433,14 +443,14 @@ class CommentServiceTest {
         comment,
         BaseEntity.class,
         "createdAt",
-        LocalDateTime.now(),
+        LocalDateTime.of(2022, Month.AUGUST, 13, 0, 0, 0),
         LocalDateTime.class
     );
     ReflectionTestUtils.setField(
         comment,
         BaseEntity.class,
         "updatedAt",
-        LocalDateTime.now(),
+        LocalDateTime.of(2022, Month.AUGUST, 13, 0, 0, 0),
         LocalDateTime.class
     );
     doReturn(comment).when(commentUtilService).getComment(0L);
@@ -476,14 +486,14 @@ class CommentServiceTest {
         comment,
         BaseEntity.class,
         "createdAt",
-        LocalDateTime.now(),
+        LocalDateTime.of(2022, Month.AUGUST, 13, 0, 0, 0),
         LocalDateTime.class
     );
     ReflectionTestUtils.setField(
         comment,
         BaseEntity.class,
         "updatedAt",
-        LocalDateTime.now(),
+        LocalDateTime.of(2022, Month.AUGUST, 13, 0, 0, 0),
         LocalDateTime.class
     );
     doReturn(comment).when(commentUtilService).getComment(0L);

@@ -1,7 +1,11 @@
 # Team-BackFro-ArtZip-BE
 ## 프로젝트 요약
-- 프로그래머스 데브코스 2기 12팀 **BackFro** 최종 프로젝트 [**ArtZip**](https://team-back-fro-art-zip-53t46asmb-backfro.vercel.app/) 의 백엔드 서버 레포지토리입니다.
-- [**ArtZip**](https://team-back-fro-art-zip-53t46asmb-backfro.vercel.app/) 은 미술 전시회를 조회하고 후기를 **작성 및 공유**할 수 있는 서비스입니다.
+- 프로그래머스 데브코스 2기 12팀 **BackFro** 최종 프로젝트 [**ArtZip**](https://artzip.shop/) 의 백엔드 서버 레포지토리입니다.
+- [**ArtZip**](https://artzip.shop/) 은 미술 전시회를 조회하고 후기를 **작성 및 공유**할 수 있는 서비스입니다.
+- [프로젝트 노션 바로가기](https://backend-devcourse.notion.site/BackFro-8db56ad1304e441e8abe0b7045207852)
+
+## 프로젝트 소개
+👉 [노션으로 프로젝트 소개 보러가기](https://backend-devcourse.notion.site/BackFro-8db56ad1304e441e8abe0b7045207852) 👈
 
 ## 팀 소개
 ### BE
@@ -57,7 +61,12 @@
 
 ## ERD
 [ERD Cloud](https://www.erdcloud.com/d/resx4g2DuZiuLWsa8)
-<img width="1557" alt="Screen Shot 2022-07-08 at 15 27 12" src="https://user-images.githubusercontent.com/62789083/183323115-de55629f-ecab-4d5f-9fd4-55c29ecdf538.png">
+<img width="1557" alt="Screen Shot 2022-07-08 at 15 27 12" src="https://user-images.githubusercontent.com/62789083/184589924-9947cf7a-61e2-448f-ba70-ef5b8c0e8351.png">
+
+## Infra Architecture
+<img width="1497" alt="image (48)" src="https://user-images.githubusercontent.com/53249897/184590625-87d9b2d9-6e34-4a89-863a-65b3db4e6ab7.png">
+
+
 
 ## API 명세
 [Swagger API 명세](https://server.artzip.shop/swagger-ui/index.html)

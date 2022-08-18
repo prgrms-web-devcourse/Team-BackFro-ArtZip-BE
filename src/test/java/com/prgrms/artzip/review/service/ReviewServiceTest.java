@@ -11,7 +11,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.prgrms.artzip.comment.domain.Comment;
+import com.prgrms.artzip.comment.dto.projection.CommentSimpleProjection;
 import com.prgrms.artzip.comment.dto.response.CommentResponse;
+import com.prgrms.artzip.comment.dto.response.CommentResponseQ;
 import com.prgrms.artzip.comment.dto.response.CommentsResponse;
 import com.prgrms.artzip.comment.service.CommentService;
 import com.prgrms.artzip.common.Authority;
@@ -832,24 +834,19 @@ class ReviewServiceTest {
             LocalDateTime.class
         );
 
-        List<CommentResponse> contents = Arrays.asList(
-            new CommentResponse(
-                comment,
-                reflectionUser,
-                List.of(
-                    Comment.builder()
-                        .review(reflectionReview)
-                        .content("댓글1 내용입니다.")
-                        .user(reflectionUser)
-                        .parent(null)
-                        .build(),
-                    Comment.builder()
-                        .review(reflectionReview)
-                        .content("댓글2 내용입니다.")
-                        .user(reflectionUser)
-                        .parent(null)
-                        .build()
-                )
+        List<CommentResponseQ> contents = List.of(
+            new CommentResponseQ(
+                CommentSimpleProjection.builder()
+                    .commentId(comment.getId())
+                    .content(comment.getContent())
+                    .createdAt(comment.getCreatedAt())
+                    .updatedAt(comment.getUpdatedAt())
+                    .isDeleted(comment.getIsDeleted())
+                    .user(reflectionUser)
+                    .likeCount(0L)
+                    .childCount(2L)
+                    .isLiked(false)
+                    .build()
             ));
         CommentsResponse reflectionComments = new CommentsResponse(new PageResponse<>(new PageImpl<>(contents,
             PageRequest.of(0, 10, Sort.by("createdAt").descending()),
@@ -1011,24 +1008,19 @@ class ReviewServiceTest {
             LocalDateTime.class
         );
 
-        List<CommentResponse> contents = Arrays.asList(
-            new CommentResponse(
-                comment,
-                reflectionUser,
-                List.of(
-                    Comment.builder()
-                        .review(reflectionReview)
-                        .content("댓글1 내용입니다.")
-                        .user(reflectionUser)
-                        .parent(null)
-                        .build(),
-                    Comment.builder()
-                        .review(reflectionReview)
-                        .content("댓글2 내용입니다.")
-                        .user(reflectionUser)
-                        .parent(null)
-                        .build()
-                )
+        List<CommentResponseQ> contents = List.of(
+            new CommentResponseQ(
+                CommentSimpleProjection.builder()
+                    .commentId(comment.getId())
+                    .content(comment.getContent())
+                    .createdAt(comment.getCreatedAt())
+                    .updatedAt(comment.getUpdatedAt())
+                    .isDeleted(comment.getIsDeleted())
+                    .user(reflectionUser)
+                    .likeCount(0L)
+                    .childCount(2L)
+                    .isLiked(false)
+                    .build()
             ));
 
         CommentsResponse reflectionComments = new CommentsResponse(new PageResponse<>(new PageImpl<>(contents,

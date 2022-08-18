@@ -93,6 +93,7 @@ jacocoTestReport {
 							"**/dto/*",
 							"**/domain/*",
 							"**/controller/*",
+							"**/repository/*",
 							"**/util/*",
 							"com/prgrms/artzip/ArtzipApplication.class"
 					] + Qdomains)
