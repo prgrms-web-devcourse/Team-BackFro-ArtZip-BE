@@ -1,6 +1,11 @@
 package com.prgrms.artzip.common.config;
 
 import com.prgrms.artzip.common.jwt.Jwt;
+import com.prgrms.artzip.common.jwt.JwtAuthenticationFilter;
+import com.prgrms.artzip.common.jwt.JwtAuthenticationProvider;
+import com.prgrms.artzip.common.util.JwtService;
+import com.prgrms.artzip.user.service.UserService;
+import com.prgrms.artzip.user.service.UserUtilService;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -47,5 +52,18 @@ public class JwtConfig {
             this.issuer,
             this.clientSecret,
             this.refreshToken.expirySeconds);
+    }
+
+    @Bean
+    public JwtAuthenticationProvider jwtAuthenticationProvider(JwtService jwtService,
+        UserService userService) {
+        return new JwtAuthenticationProvider(jwtService, userService);
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtService jwtService,
+        UserUtilService userUtilService) {
+        return new JwtAuthenticationFilter(this.accessToken.header, jwtService,
+            userUtilService);
     }
 }

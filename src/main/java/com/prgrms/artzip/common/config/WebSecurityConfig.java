@@ -9,6 +9,8 @@ import com.prgrms.artzip.common.filter.ExceptionHandlerFilter;
 import com.prgrms.artzip.common.jwt.Jwt;
 import com.prgrms.artzip.common.jwt.JwtAuthenticationFilter;
 import com.prgrms.artzip.common.jwt.JwtAuthenticationProvider;
+import com.prgrms.artzip.common.oauth.CustomOAuth2UserService;
+import com.prgrms.artzip.common.oauth.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.prgrms.artzip.common.oauth.OAuth2AuthenticationFailureHandler;
 import com.prgrms.artzip.common.util.JwtService;
 import com.prgrms.artzip.common.oauth.OAuth2AuthenticationSuccessHandler;
@@ -51,17 +53,11 @@ public class WebSecurityConfig {
 
   private final ExceptionHandlerFilter exceptionHandlerFilter;
 
-  private final ObjectMapper objectMapper;
+  private final CustomOAuth2UserService customOAuth2UserService;
 
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
-  }
-
-  @Bean
-  public JwtAuthenticationProvider jwtAuthenticationProvider(JwtService jwtService,
-      UserService userService) {
-    return new JwtAuthenticationProvider(jwtService, userService);
   }
 
   @Bean
@@ -96,47 +92,49 @@ public class WebSecurityConfig {
   }
 
   @Bean
-  public JwtAuthenticationFilter jwtAuthenticationFilter(JwtService jwtService,
-      UserUtilService userUtilService) {
-    return new JwtAuthenticationFilter(jwtConfig.getAccessToken().getHeader(), jwtService,
-        userUtilService);
-  }
-
-  @Bean
   public SecurityFilterChain filterChain(HttpSecurity http,
-      JwtAuthenticationFilter jwtAuthenticationFilter, AccessDeniedHandler accessDeniedHandler, AuthenticationEntryPoint authenticationEntryPoint) throws Exception {
+      JwtAuthenticationFilter jwtAuthenticationFilter,
+      AccessDeniedHandler accessDeniedHandler,
+      AuthenticationEntryPoint authenticationEntryPoint,
+      HttpCookieOAuth2AuthorizationRequestRepository cookieOAuth2AuthorizationRequestRepository) throws Exception {
     http
         .cors()
-        .and()
-        .csrf().disable()
-        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        .and()
+          .and()
+        .csrf()
+          .disable()
+          .sessionManagement()
+          .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+          .and()
         .authorizeRequests()
-        .antMatchers(
+          .antMatchers(
             "/api/v1/users/me/**",
-            "/api/v1/exhibitions/**/likes",
-            "api/v1/users/logout").hasAnyAuthority(USER.name(), ADMIN.name())
-        .antMatchers(HttpMethod.POST,
+              "/api/v1/exhibitions/**/likes",
+              "api/v1/users/logout").hasAnyAuthority(USER.name(), ADMIN.name())
+          .antMatchers(HttpMethod.POST,
             "/api/v1/reviews", "/api/v1/comments/**", "/api/v1/reviews/**/comments")
-        .hasAnyAuthority(USER.name(), ADMIN.name())
-        .antMatchers(HttpMethod.PATCH,
+            .hasAnyAuthority(USER.name(), ADMIN.name())
+          .antMatchers(HttpMethod.PATCH,
             "/api/v1/reviews/**", "/api/v1/reviews/**/like", "/api/v1/comments/**")
-        .hasAnyAuthority(USER.name(), ADMIN.name())
-        .antMatchers(HttpMethod.DELETE,
+            .hasAnyAuthority(USER.name(), ADMIN.name())
+          .antMatchers(HttpMethod.DELETE,
             "/api/v1/reviews/**", "/api/v1/comments/**").hasAnyAuthority(USER.name(), ADMIN.name())
-        .anyRequest().permitAll()
-        .and()
+          .anyRequest().permitAll()
+          .and()
         .oauth2Login()
-        .authorizationEndpoint()
-        .baseUri("/api/v1/users/oauth/login")
-        .and()
-        .successHandler(oAuth2AuthenticationSuccessHandler)
-        .failureHandler(oAuth2AuthenticationFailureHandler)
-        .and()
+          .authorizationEndpoint()
+            .baseUri("/api/v1/users/oauth/login")
+            .authorizationRequestRepository(cookieOAuth2AuthorizationRequestRepository)
+            .and()
+          .userInfoEndpoint()
+            .userService(customOAuth2UserService)
+            .and()
+          .successHandler(oAuth2AuthenticationSuccessHandler)
+          .failureHandler(oAuth2AuthenticationFailureHandler)
+          .and()
         .exceptionHandling()
-        .accessDeniedHandler(accessDeniedHandler)
-        .authenticationEntryPoint(authenticationEntryPoint)
-        .and()
+          .accessDeniedHandler(accessDeniedHandler)
+          .authenticationEntryPoint(authenticationEntryPoint)
+          .and()
         .addFilterBefore(jwtAuthenticationFilter,
             UsernamePasswordAuthenticationFilter.class)
         .addFilterBefore(exceptionHandlerFilter, JwtAuthenticationFilter.class);

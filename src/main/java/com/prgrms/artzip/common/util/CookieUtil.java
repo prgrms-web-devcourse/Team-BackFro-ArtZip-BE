@@ -1,9 +1,12 @@
 package com.prgrms.artzip.common.util;
 
+import java.util.Base64;
 import java.util.Optional;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.util.SerializationUtils;
+
 import static java.util.Objects.*;
 
 public class CookieUtil {
@@ -42,6 +45,19 @@ public class CookieUtil {
         }
       }
     }
+  }
+
+  public static String serialize(Object obj) {
+    return Base64.getUrlEncoder()
+        .encodeToString(SerializationUtils.serialize(obj));
+  }
+
+  public static <T> T deserialize(Cookie cookie, Class<T> cls) {
+    return cls.cast(
+        SerializationUtils.deserialize(
+            Base64.getUrlDecoder().decode(cookie.getValue())
+        )
+    );
   }
 
 }

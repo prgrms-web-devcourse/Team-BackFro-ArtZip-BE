@@ -55,7 +55,7 @@ public class JwtService {
   public String createRefreshToken(String email) {
     String refreshToken = refreshJwt.sign(new RefreshClaim(email));
     redisService.setValues(email, refreshToken, Duration.ofSeconds(
-        jwtConfig.getRefreshToken().getExpirySeconds()));
+        refreshJwt.getExpirySeconds()));
     return refreshToken;
   }
 
