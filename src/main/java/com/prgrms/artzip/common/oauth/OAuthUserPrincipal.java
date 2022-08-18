@@ -2,7 +2,6 @@ package com.prgrms.artzip.common.oauth;
 
 import com.prgrms.artzip.user.domain.OAuthUser;
 import com.prgrms.artzip.user.domain.Role;
-import com.prgrms.artzip.user.domain.User;
 import java.util.Collection;
 import java.util.Map;
 import lombok.Getter;

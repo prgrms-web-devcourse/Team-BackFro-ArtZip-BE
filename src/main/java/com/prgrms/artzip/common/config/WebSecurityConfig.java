@@ -1,25 +1,21 @@
 package com.prgrms.artzip.common.config;
 
-import static com.prgrms.artzip.common.Authority.*;
+import static com.prgrms.artzip.common.Authority.ADMIN;
+import static com.prgrms.artzip.common.Authority.USER;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.ErrorResponse;
 import com.prgrms.artzip.common.filter.ExceptionHandlerFilter;
-import com.prgrms.artzip.common.jwt.Jwt;
 import com.prgrms.artzip.common.jwt.JwtAuthenticationFilter;
-import com.prgrms.artzip.common.jwt.JwtAuthenticationProvider;
 import com.prgrms.artzip.common.oauth.CustomOAuth2UserService;
 import com.prgrms.artzip.common.oauth.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.prgrms.artzip.common.oauth.OAuth2AuthenticationFailureHandler;
-import com.prgrms.artzip.common.util.JwtService;
 import com.prgrms.artzip.common.oauth.OAuth2AuthenticationSuccessHandler;
-import com.prgrms.artzip.user.service.UserService;
-import com.prgrms.artzip.user.service.UserUtilService;
+import java.io.PrintWriter;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -36,8 +32,6 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import java.io.PrintWriter;
 
 @EnableWebSecurity
 @Configuration

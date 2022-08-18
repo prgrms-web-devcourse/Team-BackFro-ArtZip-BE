@@ -1,24 +1,13 @@
 package com.prgrms.artzip.user.service;
 
-import static com.prgrms.artzip.common.ErrorCode.INVALID_INPUT_VALUE;
-import static com.prgrms.artzip.common.ErrorCode.LOGIN_PARAM_REQUIRED;
-import static com.prgrms.artzip.common.ErrorCode.NICKNAME_ALREADY_EXISTS;
-import static com.prgrms.artzip.common.ErrorCode.ROLE_NOT_FOUND;
-import static com.prgrms.artzip.common.ErrorCode.USER_ALREADY_EXISTS;
-import static com.prgrms.artzip.common.ErrorCode.USER_NOT_FOUND;
-import static com.prgrms.artzip.common.ErrorCode.USER_PROFILE_NOT_MATCHED;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static com.prgrms.artzip.common.ErrorCode.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.error.exception.AlreadyExistsException;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
-import com.prgrms.artzip.common.oauth.AuthProvider;
 import com.prgrms.artzip.common.util.AmazonS3Remover;
 import com.prgrms.artzip.common.util.AmazonS3Uploader;
 import com.prgrms.artzip.user.domain.LocalUser;
@@ -31,9 +20,7 @@ import com.prgrms.artzip.user.dto.request.UserLocalLoginRequest;
 import com.prgrms.artzip.user.dto.request.UserSignUpRequest;
 import com.prgrms.artzip.user.dto.request.UserUpdateRequest;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
@@ -48,11 +35,8 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
