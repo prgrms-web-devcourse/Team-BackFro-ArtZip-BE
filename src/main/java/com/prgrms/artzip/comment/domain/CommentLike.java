@@ -37,30 +37,6 @@ import org.hibernate.annotations.JoinColumnOrFormula;
 @NoArgsConstructor(access = PROTECTED)
 public class CommentLike {
 
-//  @EmbeddedId
-//  private CommentLikeId commentLikeId;
-//
-//  @MapsId("commentId")
-//  @ManyToOne(fetch = LAZY)
-//  @JoinColumnOrFormula(column =
-//  @JoinColumn(name = "comment_id", referencedColumnName = "comment_Id")
-//  )
-//  private Comment comment;
-//
-//  @MapsId("userId")
-//  @ManyToOne(fetch = LAZY)
-//  @JoinColumnOrFormula(column =
-//  @JoinColumn(name = "user_id", referencedColumnName = "user_Id")
-//  )
-//  private User user;
-//
-//  @Builder
-//  public CommentLike(Comment comment, User user) {
-//    setComment(comment);
-//    setUser(user);
-//    this.commentLikeId = new CommentLikeId(comment.getId(), user.getId());
-//  }
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "comment_like_id")
