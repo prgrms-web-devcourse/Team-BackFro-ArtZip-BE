@@ -42,7 +42,7 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
                 comment.createdAt,
                 comment.updatedAt,
                 comment.isDeleted,
-                user,
+                comment.user,
                 commentLike.id.countDistinct().as("likeCount"),
                 commentToGetChildren.id.countDistinct().as("childCount"),
                 new CaseBuilder()
@@ -51,8 +51,7 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
                     .otherwise(false)
                     .as("isLiked"))
         ).from(comment)
-        .leftJoin(user).on(user.id.eq(comment.user.id))
-        .fetchJoin()
+        .leftJoin(comment.user, user)
         .leftJoin(commentLike).on(commentLike.comment.id.eq(comment.id))
         .leftJoin(commentToGetChildren).on(commentToGetChildren.parent.id.eq(comment.id)
             .and(commentToGetChildren.isDeleted.isFalse()))
