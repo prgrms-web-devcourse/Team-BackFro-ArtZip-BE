@@ -1,18 +1,8 @@
 package com.prgrms.artzip.user.service;
 
-import static com.prgrms.artzip.common.ErrorCode.INVALID_INPUT_VALUE;
-import static com.prgrms.artzip.common.ErrorCode.LOGIN_PARAM_REQUIRED;
-import static com.prgrms.artzip.common.ErrorCode.NICKNAME_ALREADY_EXISTS;
-import static com.prgrms.artzip.common.ErrorCode.ROLE_NOT_FOUND;
-import static com.prgrms.artzip.common.ErrorCode.USER_ALREADY_EXISTS;
-import static com.prgrms.artzip.common.ErrorCode.USER_NOT_FOUND;
-import static com.prgrms.artzip.common.ErrorCode.USER_PROFILE_NOT_MATCHED;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static com.prgrms.artzip.common.ErrorCode.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.error.exception.AlreadyExistsException;
@@ -30,9 +20,7 @@ import com.prgrms.artzip.user.dto.request.UserLocalLoginRequest;
 import com.prgrms.artzip.user.dto.request.UserSignUpRequest;
 import com.prgrms.artzip.user.dto.request.UserUpdateRequest;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
@@ -47,11 +35,8 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
@@ -396,36 +381,6 @@ class UserServiceTest {
         .isInstanceOf(InvalidRequestException.class)
         .hasMessage(INVALID_INPUT_VALUE.getMessage());
   }
-
-  @Test
-  @DisplayName("소셜로그인 회원가입 테스트")
-  void testOAuthSignUp() {
-    //given
-    Map<String, Object> attributes = new HashMap<>();
-    Map<String, Object> properties = Map.of(
-        "nickname", "김승은",
-        "profile_image", "testUrl"
-    );
-    Map<String, Object> accountInfo = Map.of(
-        "email", "julie0005@ajou.ac.kr"
-    );
-    attributes.put("properties", properties);
-    attributes.put("kakao_account", accountInfo);
-    attributes.put("id", "12345678");
-    String provider = "kakao";
-    OAuth2User oAuth2User = new DefaultOAuth2User(List.of(Role.toGrantedAuthority(new Role(Authority.USER))), attributes, "id");
-    when(userRepository.findByProviderAndProviderId(eq(provider), eq(oAuth2User.getName()))).thenReturn(Optional.empty());
-    when(roleRepository.findByAuthority(Authority.USER)).thenReturn(Optional.of(userRole));
-
-    // when
-    userService.oauthSignUp(oAuth2User, provider);
-
-    // then
-    verify(userRepository).findByProviderAndProviderId(provider, oAuth2User.getName());
-    verify(roleRepository).findByAuthority(Authority.USER);
-    verify(userRepository).save(any());
-  }
-
 
   private static Stream<Arguments> errorLoginParameter() {
     return Stream.of(

@@ -4,6 +4,7 @@ import com.prgrms.artzip.QueryDslTestConfig;
 import com.prgrms.artzip.common.Authority;
 import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
+import com.prgrms.artzip.common.oauth.AuthProvider;
 import com.prgrms.artzip.user.domain.LocalUser;
 import com.prgrms.artzip.user.domain.OAuthUser;
 import com.prgrms.artzip.user.domain.Role;
@@ -59,7 +60,7 @@ class UserRepositoryTest {
         .email("test2@gmail.com")
         .nickname("공공2")
         .roles(List.of(userRole, adminRole))
-        .provider("kakao")
+        .provider(AuthProvider.kakao)
         .providerId("kakaoId")
         .build();
 

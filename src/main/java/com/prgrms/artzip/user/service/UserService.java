@@ -9,6 +9,7 @@ import com.prgrms.artzip.common.ErrorCode;
 import com.prgrms.artzip.common.error.exception.AlreadyExistsException;
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.common.error.exception.NotFoundException;
+import com.prgrms.artzip.common.oauth.AuthProvider;
 import com.prgrms.artzip.common.util.AmazonS3Remover;
 import com.prgrms.artzip.common.util.AmazonS3Uploader;
 import com.prgrms.artzip.user.domain.LocalUser;
@@ -83,39 +84,39 @@ public class UserService {
     return userRepository.save(newUser);
   }
 
-  @Transactional
-  public User oauthSignUp(OAuth2User oauth2User, String provider) {
-    if (isNull(oauth2User)) throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
-    if (!hasText(provider)) throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
-
-    String providerId = oauth2User.getName();
-    return userRepository.findByProviderAndProviderId(provider, providerId)
-        .orElseGet(() -> {
-          Map<String, Object> attributes = oauth2User.getAttributes();
-          Map<String, Object> properties = (Map<String, Object>) attributes.get("properties");
-          Map<String, Object> accountInfo = (Map<String, Object>) attributes.get("kakao_account");
-
-          if (isNull(properties)) throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
-          if (isNull(accountInfo)) throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
-
-          // TODO: attributes에서 user에 필요한 정보 뽑아내는 부분 vendor에 따른 추상화 리팩토링 필요
-          String email = (String) accountInfo.get("email");
-          String nickname = (String) properties.get("nickname");
-          String profileImage = (String) properties.get("profile_image");
-          Role userRole = roleRepository.findByAuthority(Authority.USER)
-              .orElseThrow(() -> new NotFoundException(ROLE_NOT_FOUND));
-
-          OAuthUser user = OAuthUser.builder()
-              .email(email)
-              .nickname(nickname)
-              .provider(provider)
-              .providerId(providerId)
-              .roles(List.of(userRole))
-              .build();
-          if (hasText(profileImage)) user.setProfileImage(profileImage);
-          return userRepository.save(user);
-        });
-  }
+//  @Transactional
+//  public User oauthSignUp(OAuth2User oauth2User, String provider) {
+//    if (isNull(oauth2User)) throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
+//    if (!hasText(provider)) throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
+//
+//    String providerId = oauth2User.getName();
+//    return userRepository.findByProviderAndProviderId(provider, providerId)
+//        .orElseGet(() -> {
+//          Map<String, Object> attributes = oauth2User.getAttributes();
+//          Map<String, Object> properties = (Map<String, Object>) attributes.get("properties");
+//          Map<String, Object> accountInfo = (Map<String, Object>) attributes.get("kakao_account");
+//
+//          if (isNull(properties)) throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
+//          if (isNull(accountInfo)) throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
+//
+//          // TODO: attributes에서 user에 필요한 정보 뽑아내는 부분 vendor에 따른 추상화 리팩토링 필요
+//          String email = (String) accountInfo.get("email");
+//          String nickname = (String) properties.get("nickname");
+//          String profileImage = (String) properties.get("profile_image");
+//          Role userRole = roleRepository.findByAuthority(Authority.USER)
+//              .orElseThrow(() -> new NotFoundException(ROLE_NOT_FOUND));
+//
+//          OAuthUser user = OAuthUser.builder()
+//              .email(email)
+//              .nickname(nickname)
+//              .provider(AuthProvider.valueOf(provider.toLowerCase()))
+//              .providerId(providerId)
+//              .roles(List.of(userRole))
+//              .build();
+//          if (hasText(profileImage)) user.setProfileImage(profileImage);
+//          return userRepository.save(user);
+//        });
+//  }
 
   @Transactional
   public UserUpdateResponse updateUserInfo(User user, UserUpdateRequest request, MultipartFile file) {

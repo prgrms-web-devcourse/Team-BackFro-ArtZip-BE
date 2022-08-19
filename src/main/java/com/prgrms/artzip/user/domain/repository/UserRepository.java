@@ -1,5 +1,6 @@
 package com.prgrms.artzip.user.domain.repository;
 
+import com.prgrms.artzip.common.oauth.AuthProvider;
 import com.prgrms.artzip.user.domain.OAuthUser;
 import com.prgrms.artzip.user.domain.User;
 import io.lettuce.core.dynamic.annotation.Param;
@@ -27,5 +28,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByNicknameExceptId(@Param("userId") Long userId, @Param("nickname") String nickname);
 
     @Query("select ou from OAuthUser ou join fetch ou.roles r where ou.provider = :provider and ou.providerId = :providerId")
-    Optional<OAuthUser> findByProviderAndProviderId(@Param("provider") String provider, @Param("providerId") String providerId);
+    Optional<OAuthUser> findByProviderAndProviderId(@Param("provider") AuthProvider provider, @Param("providerId") String providerId);
 }
