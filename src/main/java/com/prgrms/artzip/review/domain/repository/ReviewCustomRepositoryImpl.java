@@ -236,8 +236,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
     }
 
     return pageable.getSort().stream()
-        .filter(order -> ReviewSortType.getReviewSortType(order.getProperty()).isPresent())
-        .map(order -> ReviewSortType.getReviewSortType(order.getProperty()).get()
+        .map(order -> ReviewSortType.getReviewSortType(order.getProperty())
             .getOrderSpecifier(order.getDirection().isAscending() ? Order.ASC : Order.DESC))
         .collect(Collectors.toList());
   }
