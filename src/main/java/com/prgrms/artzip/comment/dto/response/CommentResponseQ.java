@@ -30,7 +30,7 @@ public class CommentResponseQ {
     this.content = projection.getContent();
     this.createdAt = projection.getCreatedAt();
     this.updatedAt = projection.getUpdatedAt();
-    this.isEdited = projection.getCreatedAt().isEqual(projection.getUpdatedAt());
+    this.isEdited = !projection.getCreatedAt().isEqual(projection.getUpdatedAt());
     this.isDeleted = projection.getIsDeleted();
     this.user = new CommentUser(projection.getUser());
     this.likeCount = projection.getLikeCount();
