@@ -8,7 +8,6 @@ import static com.prgrms.artzip.review.domain.QReviewLike.reviewLike;
 
 import com.prgrms.artzip.review.domain.QReviewLike;
 import com.prgrms.artzip.review.dto.projection.ReviewWithLikeAndCommentCount;
-import com.prgrms.artzip.review.dto.projection.ReviewWithLikeData;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -41,34 +40,16 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
   }
 
   @Override
-  public Optional<ReviewWithLikeAndCommentCount> findByReviewIdAndUserId(Long reviewId, Long userId) {
+  public Optional<ReviewWithLikeAndCommentCount> findByReviewIdAndUserId(
+      Long reviewId, Long userId) {
 
-    ReviewWithLikeAndCommentCount data = queryFactory
-        .select(Projections.fields(ReviewWithLikeAndCommentCount.class,
-            review.id.as("reviewId"),
-            review.date,
-            review.title,
-            review.content,
-            review.createdAt,
-            review.updatedAt,
-            new CaseBuilder()
-                .when(alwaysFalse().or(reviewLikeUserIdEq(userId)))
-                .then(true)
-                .otherwise(false).as("isLiked"),
-            review.isPublic,
-            reviewLike.id.countDistinct().as("likeCount"),
-            comment.id.countDistinct().as("commentCount")
-        ))
-        .from(review)
-        .leftJoin(reviewLikeToGetIsLiked).on(reviewLikeToGetIsLiked.review.eq(review),
-            alwaysFalse().or(reviewLikeUserIdEq(userId)))
-        .leftJoin(reviewLike).on(review.id.eq(reviewLike.review.id))
-        .leftJoin(comment).on(review.id.eq(comment.review.id), comment.isDeleted.isFalse())
-        .where(review.isDeleted.eq(false),
-            review.id.eq(reviewId),
-            filterIsNotPublic(userId))
-        .groupBy(review.id)
-        .fetchOne();
+    ReviewWithLikeAndCommentCount data =
+        selectReviewWithLikeAndCommentCount(userId)
+            .where(review.isDeleted.eq(false),
+                review.id.eq(reviewId),
+                filterIsNotPublic(userId))
+            .groupBy(review.id)
+            .fetchOne();
 
     return Optional.ofNullable(data);
   }
@@ -77,7 +58,81 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
   public Page<ReviewWithLikeAndCommentCount> findReviewsByExhibitionIdAndUserId(
       Long exhibitionId, Long userId, Pageable pageable) {
 
-    List<ReviewWithLikeAndCommentCount> content = queryFactory.select(
+    List<ReviewWithLikeAndCommentCount> content =
+        selectReviewWithLikeAndCommentCount(userId)
+            .where(review.isDeleted.eq(false),
+                review.isPublic.eq(true),
+                reviewExhibitionIdEq(exhibitionId))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .groupBy(review.id, review.createdAt)
+            .orderBy(getAllOrderSpecifiers(pageable).toArray(OrderSpecifier[]::new))
+            .fetch();
+
+    JPAQuery<Long> countQuery = queryFactory
+        .select(review.count())
+        .from(review)
+        .where(review.isDeleted.eq(false),
+            review.isPublic.eq(true),
+            reviewExhibitionIdEq(exhibitionId));
+
+    return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+  }
+
+  @Override
+  public Page<ReviewWithLikeAndCommentCount> findMyLikesReviews(
+      Long currentUserId, Long targetUserId, Pageable pageable) {
+
+    List<ReviewWithLikeAndCommentCount> content =
+        selectReviewWithLikeAndCommentCount(currentUserId)
+            .leftJoin(reviewLikeToFilterTargetUser)
+            .on(review.id.eq(reviewLikeToFilterTargetUser.review.id))
+            .where(review.isDeleted.eq(false),
+                review.isPublic.eq(true),
+                reviewLikeTargetUserIdEq(targetUserId))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .groupBy(review.id, review.createdAt)
+            .orderBy(getAllOrderSpecifiers(pageable).toArray(OrderSpecifier[]::new))
+            .fetch();
+
+    JPAQuery<Long> countQuery = queryFactory
+        .select(review.count())
+        .from(review)
+        .where(review.isDeleted.eq(false),
+            review.isPublic.eq(true),
+            reviewLikeTargetUserIdEq(targetUserId));
+
+    return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+  }
+
+  @Override
+  public Page<ReviewWithLikeAndCommentCount> findMyReviews(
+      Long currentUserId, Long targetUserId, Pageable pageable) {
+
+    List<ReviewWithLikeAndCommentCount> content =
+        selectReviewWithLikeAndCommentCount(currentUserId)
+        .where(review.isDeleted.isFalse(),
+            reviewTargetUserIdEq(targetUserId),
+            filterIsNotPublic(currentUserId))
+        .offset(pageable.getOffset())
+        .limit(pageable.getPageSize())
+        .groupBy(review.id, review.createdAt)
+        .orderBy(getAllOrderSpecifiers(pageable).toArray(OrderSpecifier[]::new))
+        .fetch();
+
+    JPAQuery<Long> countQuery = queryFactory
+        .select(review.count())
+        .from(review)
+        .where(review.isDeleted.isFalse(),
+            reviewTargetUserIdEq(targetUserId),
+            filterIsNotPublic(currentUserId));
+
+    return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+  }
+
+  private JPAQuery<ReviewWithLikeAndCommentCount> selectReviewWithLikeAndCommentCount(Long userId) {
+    return queryFactory.select(
             Projections.fields(ReviewWithLikeAndCommentCount.class,
                 review.id.as("reviewId"),
                 review.date,
@@ -97,113 +152,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
         .leftJoin(reviewLikeToGetIsLiked).on(reviewLikeToGetIsLiked.review.eq(review),
             alwaysFalse().or(reviewLikeUserIdEq(userId)))
         .leftJoin(reviewLike).on(review.id.eq(reviewLike.review.id))
-        .leftJoin(comment).on(review.id.eq(comment.review.id), comment.isDeleted.isFalse())
-        .where(review.isDeleted.eq(false),
-            review.isPublic.eq(true),
-            reviewExhibitionIdEq(exhibitionId))
-        .offset(pageable.getOffset())
-        .limit(pageable.getPageSize())
-        .groupBy(review.id, review.createdAt)
-        .orderBy(getAllOrderSpecifiers(pageable).toArray(OrderSpecifier[]::new))
-        .fetch();
-
-    JPAQuery<Long> countQuery = queryFactory
-        .select(review.count())
-        .from(review)
-        .where(review.isDeleted.eq(false),
-            review.isPublic.eq(true),
-            reviewExhibitionIdEq(exhibitionId));
-
-    return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
-  }
-
-  @Override
-  public Page<ReviewWithLikeAndCommentCount> findMyLikesReviews(
-      Long currentUserId, Long targetUserId, Pageable pageable) {
-
-    List<ReviewWithLikeAndCommentCount> content = queryFactory.select(
-            Projections.fields(ReviewWithLikeAndCommentCount.class,
-                review.id.as("reviewId"),
-                review.date,
-                review.title,
-                review.content,
-                review.createdAt,
-                review.updatedAt,
-                new CaseBuilder()
-                    .when(alwaysFalse().or(reviewLikeUserIdEq(currentUserId)))
-                    .then(true)
-                    .otherwise(false).as("isLiked"),
-                review.isPublic,
-                reviewLike.id.countDistinct().as("likeCount"),
-                comment.id.countDistinct().as("commentCount")
-            ))
-        .from(review)
-        .leftJoin(reviewLikeToGetIsLiked).on(reviewLikeToGetIsLiked.review.eq(review),
-            alwaysFalse().or(reviewLikeUserIdEq(currentUserId)))
-        .leftJoin(reviewLike).on(review.id.eq(reviewLike.review.id))
-        .leftJoin(reviewLikeToFilterTargetUser).on(review.id.eq(reviewLikeToFilterTargetUser.review.id))
-        .leftJoin(comment).on(review.id.eq(comment.review.id), comment.isDeleted.isFalse())
-        .where(review.isDeleted.eq(false),
-            review.isPublic.eq(true),
-            reviewLikeTargetUserIdEq(targetUserId))
-        .offset(pageable.getOffset())
-        .limit(pageable.getPageSize())
-        .groupBy(review.id, review.createdAt)
-        .orderBy(getAllOrderSpecifiers(pageable).toArray(OrderSpecifier[]::new))
-        .fetch();
-
-    JPAQuery<Long> countQuery = queryFactory
-        .select(review.count())
-        .from(review)
-        .where(review.isDeleted.eq(false),
-            review.isPublic.eq(true),
-            reviewLikeTargetUserIdEq(targetUserId));
-
-    return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
-  }
-
-  @Override
-  public Page<ReviewWithLikeAndCommentCount> findMyReviews(Long currentUserId, Long targetUserId,
-      Pageable pageable) {
-
-    List<ReviewWithLikeAndCommentCount> content = queryFactory.select(
-            Projections.fields(ReviewWithLikeAndCommentCount.class,
-                review.id.as("reviewId"),
-                review.date,
-                review.title,
-                review.content,
-                review.createdAt,
-                review.updatedAt,
-                new CaseBuilder()
-                    .when(alwaysFalse().or(reviewLikeUserIdEq(currentUserId)))
-                    .then(true)
-                    .otherwise(false).as("isLiked"),
-                review.isPublic,
-                reviewLike.id.countDistinct().as("likeCount"),
-                comment.id.countDistinct().as("commentCount")
-            ))
-        .from(review)
-        .leftJoin(reviewLikeToGetIsLiked).on(reviewLikeToGetIsLiked.review.eq(review),
-            alwaysFalse().or(reviewLikeUserIdEq(currentUserId)))
-        .leftJoin(reviewLike).on(review.id.eq(reviewLike.review.id))
-        .leftJoin(comment).on(review.id.eq(comment.review.id), comment.isDeleted.isFalse())
-        .where(review.isDeleted.isFalse(),
-            reviewTargetUserIdEq(targetUserId),
-            filterIsNotPublic(currentUserId))
-        .offset(pageable.getOffset())
-        .limit(pageable.getPageSize())
-        .groupBy(review.id, review.createdAt)
-        .orderBy(getAllOrderSpecifiers(pageable).toArray(OrderSpecifier[]::new))
-        .fetch();
-
-    JPAQuery<Long> countQuery = queryFactory
-        .select(review.count())
-        .from(review)
-        .where(review.isDeleted.isFalse(),
-            reviewTargetUserIdEq(targetUserId),
-            filterIsNotPublic(currentUserId));
-
-    return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+        .leftJoin(comment).on(review.id.eq(comment.review.id), comment.isDeleted.isFalse());
   }
 
   private BooleanBuilder reviewTargetUserIdEq(Long targetUserId) {
