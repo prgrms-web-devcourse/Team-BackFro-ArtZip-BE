@@ -158,7 +158,7 @@ public class ReviewService {
   public PageResponse<ReviewsResponse> getReviews(
       final User user, final Long exhibitionId, final Pageable pageable) {
 
-    Page<ReviewWithLikeAndCommentCount> reviews = reviewRepository.findReviewsByExhibitionIdAndUserId(
+    Page<ReviewWithLikeAndCommentCount> reviews = reviewRepository.findReviews(
         exhibitionId, Objects.isNull(user) ? null : user.getId(), pageable);
 
     return new PageResponse<>(reviews.map(this::getReviewsResponse));
@@ -167,7 +167,7 @@ public class ReviewService {
   @Transactional(readOnly = true)
   public List<ReviewsResponseForExhibitionDetail> getReviewsForExhibition(Long userId,
       Long exhibitionId) {
-    List<ReviewWithLikeAndCommentCount> reviews = reviewRepository.findReviewsByExhibitionIdAndUserId(
+    List<ReviewWithLikeAndCommentCount> reviews = reviewRepository.findReviews(
         exhibitionId, Objects.isNull(userId) ? null : userId,
         PageRequest.of(0, 4, Sort.by("reviewLikeCount").descending())).getContent();
 

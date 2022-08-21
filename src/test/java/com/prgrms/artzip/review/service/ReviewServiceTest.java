@@ -1238,7 +1238,7 @@ class ReviewServiceTest {
             1L
         );
 
-        given(reviewRepository.findReviewsByExhibitionIdAndUserId(
+        given(reviewRepository.findReviews(
             reflectionExhibition.getId(), null, pageable))
             .willReturn(reflectionReviews);
         given(reviewRepository.findById(reflectionReviews.getContent().get(0).getReviewId()))
@@ -1248,7 +1248,7 @@ class ReviewServiceTest {
 
         reviewService.getReviews(null, reflectionExhibition.getId(), pageable);
 
-        verify(reviewRepository).findReviewsByExhibitionIdAndUserId(reflectionExhibition.getId(),
+        verify(reviewRepository).findReviews(reflectionExhibition.getId(),
             null, pageable);
         verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(
             reflectionReview.getId());
@@ -1360,7 +1360,7 @@ class ReviewServiceTest {
             1L
         );
 
-        given(reviewRepository.findReviewsByExhibitionIdAndUserId(
+        given(reviewRepository.findReviews(
             reflectionExhibition.getId(), reflectionUser.getId(), pageable))
             .willReturn(reflectionReviews);
         given(reviewRepository.findById(reflectionReviews.getContent().get(0).getReviewId()))
@@ -1370,7 +1370,7 @@ class ReviewServiceTest {
 
         reviewService.getReviews(reflectionUser, reflectionExhibition.getId(), pageable);
 
-        verify(reviewRepository).findReviewsByExhibitionIdAndUserId(reflectionExhibition.getId(),
+        verify(reviewRepository).findReviews(reflectionExhibition.getId(),
             reflectionUser.getId(), pageable);
         verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(
             reflectionReview.getId());
@@ -1404,7 +1404,7 @@ class ReviewServiceTest {
       void testReviewNotFoundException() {
         // given
         doReturn(reviews)
-            .when(reviewRepository).findReviewsByExhibitionIdAndUserId(
+            .when(reviewRepository).findReviews(
                 exhibition.getId(), null, pageable);
         doThrow(new NotFoundException(ErrorCode.REVIEW_NOT_FOUND))
             .when(reviewRepository).findById(any());
@@ -1535,7 +1535,7 @@ class ReviewServiceTest {
             1L
         );
 
-        given(reviewRepository.findReviewsByExhibitionIdAndUserId(
+        given(reviewRepository.findReviews(
             reflectionExhibition.getId(), null, pageable))
             .willReturn(reflectionReviews);
         given(reviewRepository.findById(reflectionReviews.getContent().get(0).getReviewId()))
@@ -1543,7 +1543,7 @@ class ReviewServiceTest {
 
         reviewService.getReviewsForExhibition(null, reflectionExhibition.getId());
 
-        verify(reviewRepository).findReviewsByExhibitionIdAndUserId(reflectionExhibition.getId(),
+        verify(reviewRepository).findReviews(reflectionExhibition.getId(),
             null, pageable);
         verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(
             reflectionReview.getId());
@@ -1653,7 +1653,7 @@ class ReviewServiceTest {
             1L
         );
 
-        given(reviewRepository.findReviewsByExhibitionIdAndUserId(
+        given(reviewRepository.findReviews(
             reflectionExhibition.getId(), reflectionUser.getId(), pageable))
             .willReturn(reflectionReviews);
         given(reviewRepository.findById(reflectionReviews.getContent().get(0).getReviewId()))
@@ -1661,7 +1661,7 @@ class ReviewServiceTest {
 
         reviewService.getReviewsForExhibition(reflectionUser.getId(), reflectionExhibition.getId());
 
-        verify(reviewRepository).findReviewsByExhibitionIdAndUserId(reflectionExhibition.getId(),
+        verify(reviewRepository).findReviews(reflectionExhibition.getId(),
             reflectionUser.getId(), pageable);
         verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(
             reflectionReview.getId());
@@ -1700,7 +1700,7 @@ class ReviewServiceTest {
       void testReviewNotFoundException() {
         // given
         doReturn(reviews)
-            .when(reviewRepository).findReviewsByExhibitionIdAndUserId(
+            .when(reviewRepository).findReviews(
                 exhibition.getId(), null, pageable);
         doThrow(new NotFoundException(ErrorCode.REVIEW_NOT_FOUND))
             .when(reviewRepository).findById(any());

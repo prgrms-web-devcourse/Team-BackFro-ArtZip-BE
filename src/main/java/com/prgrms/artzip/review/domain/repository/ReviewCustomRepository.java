@@ -9,7 +9,7 @@ public interface ReviewCustomRepository {
 
   Optional<ReviewWithLikeAndCommentCount> findReviewByReviewId(Long reviewId, Long userId);
 
-  Page<ReviewWithLikeAndCommentCount> findReviewsByExhibitionIdAndUserId(
+  Page<ReviewWithLikeAndCommentCount> findReviews(
       Long exhibitionId, Long userId, Pageable pageable);
 
   Page<ReviewWithLikeAndCommentCount> findMyLikesReviews(

@@ -55,7 +55,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
   }
 
   @Override
-  public Page<ReviewWithLikeAndCommentCount> findReviewsByExhibitionIdAndUserId(
+  public Page<ReviewWithLikeAndCommentCount> findReviews(
       Long exhibitionId, Long userId, Pageable pageable) {
 
     List<ReviewWithLikeAndCommentCount> content =
