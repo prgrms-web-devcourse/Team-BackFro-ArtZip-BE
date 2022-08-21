@@ -25,8 +25,13 @@ import javax.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
+import org.springframework.util.Assert;
 
 public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
+
+  private static final String REVIEW_ID_MUST_NOT_BE_NULL = "The given review id must not be null!";
+  private static final String USER_ID_MUST_NOT_BE_NULL = "The given user id must not be null!";
+  private static final String PAGEABLE_MUST_NOT_BE_NULL = "The given pageable must not be null!";
 
   private final JPAQueryFactory queryFactory;
 
@@ -43,6 +48,8 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
   public Optional<ReviewWithLikeAndCommentCount> findReviewByReviewId(
       Long reviewId, Long userId) {
 
+    Assert.notNull(reviewId, REVIEW_ID_MUST_NOT_BE_NULL);
+
     ReviewWithLikeAndCommentCount data =
         selectReviewWithLikeAndCommentCount(userId)
             .where(review.isDeleted.isFalse(),
@@ -57,6 +64,8 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
   @Override
   public Page<ReviewWithLikeAndCommentCount> findReviews(
       Long exhibitionId, Long userId, Pageable pageable) {
+
+    Assert.notNull(pageable, PAGEABLE_MUST_NOT_BE_NULL);
 
     List<ReviewWithLikeAndCommentCount> content =
         selectReviewWithLikeAndCommentCount(userId)
@@ -82,6 +91,9 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
   @Override
   public Page<ReviewWithLikeAndCommentCount> findMyLikesReviews(
       Long currentUserId, Long targetUserId, Pageable pageable) {
+
+    Assert.notNull(targetUserId, USER_ID_MUST_NOT_BE_NULL);
+    Assert.notNull(pageable, PAGEABLE_MUST_NOT_BE_NULL);
 
     List<ReviewWithLikeAndCommentCount> content =
         selectReviewWithLikeAndCommentCount(currentUserId)
@@ -109,6 +121,9 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
   @Override
   public Page<ReviewWithLikeAndCommentCount> findMyReviews(
       Long currentUserId, Long targetUserId, Pageable pageable) {
+
+    Assert.notNull(targetUserId, USER_ID_MUST_NOT_BE_NULL);
+    Assert.notNull(pageable, PAGEABLE_MUST_NOT_BE_NULL);
 
     List<ReviewWithLikeAndCommentCount> content =
         selectReviewWithLikeAndCommentCount(currentUserId)
