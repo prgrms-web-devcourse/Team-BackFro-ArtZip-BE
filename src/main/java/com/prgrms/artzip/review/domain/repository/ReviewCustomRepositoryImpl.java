@@ -40,7 +40,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
   }
 
   @Override
-  public Optional<ReviewWithLikeAndCommentCount> findReviewByReviewIdAndUserId(
+  public Optional<ReviewWithLikeAndCommentCount> findReviewByReviewId(
       Long reviewId, Long userId) {
 
     ReviewWithLikeAndCommentCount data =

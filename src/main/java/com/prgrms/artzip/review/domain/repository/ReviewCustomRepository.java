@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface ReviewCustomRepository {
 
-  Optional<ReviewWithLikeAndCommentCount> findReviewByReviewIdAndUserId(Long reviewId, Long userId);
+  Optional<ReviewWithLikeAndCommentCount> findReviewByReviewId(Long reviewId, Long userId);
 
   Page<ReviewWithLikeAndCommentCount> findReviewsByExhibitionIdAndUserId(
       Long exhibitionId, Long userId, Pageable pageable);

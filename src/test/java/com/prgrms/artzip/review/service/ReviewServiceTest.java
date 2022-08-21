@@ -855,7 +855,7 @@ class ReviewServiceTest {
         // given
         given(reviewRepository.findById(reflectionReview.getId()))
             .willReturn(Optional.of(reflectionReview));
-        given(reviewRepository.findReviewByReviewIdAndUserId(
+        given(reviewRepository.findReviewByReviewId(
             reflectionReview.getId(), null))
             .willReturn(Optional.of(reviewData));
         given(exhibitionRepository.findExhibitionForReview(
@@ -870,7 +870,7 @@ class ReviewServiceTest {
         reviewService.getReview(null, reflectionReview.getId());
 
         // then
-        verify(reviewRepository).findReviewByReviewIdAndUserId(reflectionReview.getId(), null);
+        verify(reviewRepository).findReviewByReviewId(reflectionReview.getId(), null);
         verify(exhibitionRepository).findExhibitionForReview(
             null, reflectionReview.getExhibition().getId());
         verify(commentService).getCommentsByReviewId(
@@ -1030,7 +1030,7 @@ class ReviewServiceTest {
         // given
         given(reviewRepository.findById(reflectionReview.getId()))
             .willReturn(Optional.of(reflectionReview));
-        given(reviewRepository.findReviewByReviewIdAndUserId(
+        given(reviewRepository.findReviewByReviewId(
             reflectionReview.getId(), reflectionUser.getId()))
             .willReturn(Optional.of(reviewData));
         given(exhibitionRepository.findExhibitionForReview(
@@ -1045,7 +1045,7 @@ class ReviewServiceTest {
         reviewService.getReview(reflectionUser, reflectionReview.getId());
 
         // then
-        verify(reviewRepository).findReviewByReviewIdAndUserId(reflectionReview.getId(),
+        verify(reviewRepository).findReviewByReviewId(reflectionReview.getId(),
             reflectionUser.getId());
         verify(exhibitionRepository).findExhibitionForReview(
             reflectionUser.getId(), reflectionReview.getExhibition().getId());
@@ -1092,7 +1092,7 @@ class ReviewServiceTest {
 
         doReturn(Optional.of(privateReview)).when(reviewRepository).findById(privateReview.getId());
         doThrow(new NotFoundException(ErrorCode.REVIEW_NOT_FOUND))
-            .when(reviewRepository).findReviewByReviewIdAndUserId(privateReview.getId(), null);
+            .when(reviewRepository).findReviewByReviewId(privateReview.getId(), null);
 
         // when
         // then
@@ -1108,7 +1108,7 @@ class ReviewServiceTest {
         // given
         doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
         doReturn(Optional.of(reviewData))
-            .when(reviewRepository).findReviewByReviewIdAndUserId(review.getId(), null);
+            .when(reviewRepository).findReviewByReviewId(review.getId(), null);
         doThrow(new NotFoundException(ErrorCode.EXHB_NOT_FOUND))
             .when(exhibitionRepository).findExhibitionForReview(any(), any());
 

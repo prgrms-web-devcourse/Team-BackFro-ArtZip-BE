@@ -134,7 +134,7 @@ public class ReviewService {
     Review review = reviewRepository.findById(reviewId)
         .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_NOT_FOUND));
 
-    ReviewWithLikeAndCommentCount reviewData = reviewRepository.findReviewByReviewIdAndUserId(reviewId,
+    ReviewWithLikeAndCommentCount reviewData = reviewRepository.findReviewByReviewId(reviewId,
             Objects.isNull(user) ? null : user.getId())
         .orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_NOT_FOUND));
 
