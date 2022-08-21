@@ -45,7 +45,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
 
     ReviewWithLikeAndCommentCount data =
         selectReviewWithLikeAndCommentCount(userId)
-            .where(review.isDeleted.eq(false),
+            .where(review.isDeleted.isFalse(),
                 review.id.eq(reviewId),
                 filterIsNotPublic(userId))
             .groupBy(review.id)
@@ -60,8 +60,8 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
 
     List<ReviewWithLikeAndCommentCount> content =
         selectReviewWithLikeAndCommentCount(userId)
-            .where(review.isDeleted.eq(false),
-                review.isPublic.eq(true),
+            .where(review.isDeleted.isFalse(),
+                review.isPublic.isTrue(),
                 reviewExhibitionIdEq(exhibitionId))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
@@ -72,8 +72,8 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
     JPAQuery<Long> countQuery = queryFactory
         .select(review.count())
         .from(review)
-        .where(review.isDeleted.eq(false),
-            review.isPublic.eq(true),
+        .where(review.isDeleted.isFalse(),
+            review.isPublic.isTrue(),
             reviewExhibitionIdEq(exhibitionId));
 
     return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
@@ -87,8 +87,8 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
         selectReviewWithLikeAndCommentCount(currentUserId)
             .leftJoin(reviewLikeToFilterTargetUser)
             .on(review.id.eq(reviewLikeToFilterTargetUser.review.id))
-            .where(review.isDeleted.eq(false),
-                review.isPublic.eq(true),
+            .where(review.isDeleted.isFalse(),
+                review.isPublic.isTrue(),
                 reviewLikeTargetUserIdEq(targetUserId))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
@@ -99,8 +99,8 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
     JPAQuery<Long> countQuery = queryFactory
         .select(review.count())
         .from(review)
-        .where(review.isDeleted.eq(false),
-            review.isPublic.eq(true),
+        .where(review.isDeleted.isFalse(),
+            review.isPublic.isTrue(),
             reviewLikeTargetUserIdEq(targetUserId));
 
     return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
@@ -173,9 +173,9 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
 
   private BooleanExpression filterIsNotPublic(Long userId) {
     if (Objects.isNull(userId)) {
-      return review.isPublic.eq(true);
+      return review.isPublic.isTrue();
     } else {
-      return review.user.id.eq(userId).or(review.user.id.ne(userId).and(review.isPublic.eq(true)));
+      return review.user.id.eq(userId).or(review.user.id.ne(userId).and(review.isPublic.isTrue()));
     }
   }
 
