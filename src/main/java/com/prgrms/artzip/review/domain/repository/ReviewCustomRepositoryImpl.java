@@ -1,8 +1,8 @@
 package com.prgrms.artzip.review.domain.repository;
 
 import static com.prgrms.artzip.comment.domain.QComment.comment;
-import static com.prgrms.artzip.common.util.QueryDslCustomUtils.alwaysFalse;
 import static com.prgrms.artzip.common.util.QueryDslCustomUtils.nullSafeBooleanBuilder;
+import static com.prgrms.artzip.common.util.QueryDslCustomUtils.nullSafeConditions;
 import static com.prgrms.artzip.review.domain.QReview.review;
 import static com.prgrms.artzip.review.domain.QReviewLike.reviewLike;
 
@@ -141,7 +141,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
                 review.createdAt,
                 review.updatedAt,
                 new CaseBuilder()
-                    .when(alwaysFalse().or(reviewLikeUserIdEq(userId)))
+                    .when(nullSafeConditions(reviewLikeUserIdEq(userId)))
                     .then(true)
                     .otherwise(false).as("isLiked"),
                 review.isPublic,
@@ -150,7 +150,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
             ))
         .from(review)
         .leftJoin(reviewLikeToGetIsLiked).on(reviewLikeToGetIsLiked.review.eq(review),
-            alwaysFalse().or(reviewLikeUserIdEq(userId)))
+            nullSafeConditions(reviewLikeUserIdEq(userId)))
         .leftJoin(reviewLike).on(review.id.eq(reviewLike.review.id))
         .leftJoin(comment).on(review.id.eq(comment.review.id), comment.isDeleted.isFalse());
   }
