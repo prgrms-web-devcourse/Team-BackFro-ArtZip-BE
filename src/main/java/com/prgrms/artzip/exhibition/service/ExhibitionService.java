@@ -55,8 +55,7 @@ public class ExhibitionService {
         validateCoordinate(latitude, longitude);
         validateDistance(distance);
 
-        List<ExhibitionWithLocationForSimpleQuery> exhibitions = exhibitionRepository.findExhibitionsAroundMe(
-                userId, latitude, longitude, distance);
+        List<ExhibitionWithLocationForSimpleQuery> exhibitions = exhibitionRepository.findExhibitionsAroundMe(userId, latitude, longitude, distance);
 
         return exhibitions.stream()
                 .map(ExhibitionAroundMeInfoResponse::new)
