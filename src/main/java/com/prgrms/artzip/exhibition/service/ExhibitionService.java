@@ -23,9 +23,7 @@ import static com.prgrms.artzip.common.ErrorCode.*;
 @Service
 @RequiredArgsConstructor
 public class ExhibitionService {
-
     private final ExhibitionRepository exhibitionRepository;
-
     private final ReviewService reviewService;
 
     public Page<ExhibitionInfoResponse> getUpcomingExhibitions(Long userId, Pageable pageable) {
