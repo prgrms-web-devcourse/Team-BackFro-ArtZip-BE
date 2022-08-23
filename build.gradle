@@ -1,15 +1,15 @@
 buildscript {
-	ext {
-		queryDslVersion = "5.0.0"
-	}
+    ext {
+        queryDslVersion = "5.0.0"
+    }
 }
 
 plugins {
-	id 'org.springframework.boot' version '2.7.2'
-	id 'io.spring.dependency-management' version '1.0.12.RELEASE'
-	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
-	id 'java'
-	id 'jacoco'
+    id 'org.springframework.boot' version '2.7.2'
+    id 'io.spring.dependency-management' version '1.0.12.RELEASE'
+    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+    id 'java'
+    id 'jacoco'
 }
 
 group = 'com.prgrms'
@@ -17,175 +17,176 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 jacoco {
-	toolVersion = '0.8.7'
+    toolVersion = '0.8.7'
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'mysql:mysql-connector-java'
-	implementation ('it.ozimov:embedded-redis:0.7.3') {
-		exclude group: 'org.slf4j', module: 'slf4j-simple'
-	}
-	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
-	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
-	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'com.h2database:h2'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'mysql:mysql-connector-java'
+    implementation('it.ozimov:embedded-redis:0.7.3') {
+        exclude group: 'org.slf4j', module: 'slf4j-simple'
+    }
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+    implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'com.h2database:h2'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
 
-	//swagger setting
-	implementation "io.springfox:springfox-boot-starter:3.0.0"
+    //swagger setting
+    implementation "io.springfox:springfox-boot-starter:3.0.0"
 
-	//aws
-	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-aws', version: '2.2.6.RELEASE'
+    //aws
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-aws', version: '2.2.6.RELEASE'
 
-	//jwt setting
-	implementation 'com.auth0:java-jwt:3.19.2'
+    //jwt setting
+    implementation 'com.auth0:java-jwt:3.19.2'
 
-	//s3 mock
-	testImplementation 'io.findify:s3mock_2.12:0.2.4'
+    //s3 mock
+    testImplementation 'io.findify:s3mock_2.12:0.2.4'
 
-	//mysql
-	implementation 'mysql:mysql-connector-java'
+    //mysql
+    implementation 'mysql:mysql-connector-java'
 
-	//oauth
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    //oauth
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
-	finalizedBy 'jacocoTestReport'
+    useJUnitPlatform()
+    finalizedBy 'jacocoTestReport'
 }
 
 jacocoTestReport {
-	reports {
-		html.destination file("${buildDir}/jacocoHtml")
-		xml.enabled false
-		csv.enabled false
-	}
+    reports {
+        html.destination file("${buildDir}/jacocoHtml")
+        xml.enabled false
+        csv.enabled false
+    }
 
-	def Qdomains = []
+    def Qdomains = []
 
-	for (qPattern in '**/QA'..'**/QZ') {
-		Qdomains.add(qPattern + '*')
-	}
+    for (qPattern in '**/QA'..'**/QZ') {
+        Qdomains.add(qPattern + '*')
+    }
 
-	afterEvaluate {
-		classDirectories.setFrom(
-				files(classDirectories.files.collect {
-					fileTree(dir: it, excludes: [
-							"com/prgrms/artzip/common/*",
-							"**/dto/*",
-							"**/domain/*",
-							"**/controller/*",
-							"**/repository/*",
-							"**/util/*",
-							"com/prgrms/artzip/ArtzipApplication.class"
-					] + Qdomains)
-				})
-		)
-	}
+    afterEvaluate {
+        classDirectories.setFrom(
+                files(classDirectories.files.collect {
+                    fileTree(dir: it, excludes: [
+                            "com/prgrms/artzip/common/*",
+                            "**/dto/*",
+                            "**/domain/*",
+                            "**/controller/*",
+                            "**/repository/*",
+                            "**/util/*",
+                            "com/prgrms/artzip/ArtzipApplication.class"
+                    ] + Qdomains)
+                })
+        )
+    }
 
-	finalizedBy 'jacocoTestCoverageVerification'
+    finalizedBy 'jacocoTestCoverageVerification'
 }
 
 jacocoTestCoverageVerification {
-	def Qdomains = []
+    def Qdomains = []
 
-	for (qPattern in '*.QA'..'*.QZ') {
-		Qdomains.add(qPattern + '*')
-	}
+    for (qPattern in '*.QA'..'*.QZ') {
+        Qdomains.add(qPattern + '*')
+    }
 
-	violationRules {
-		rule {
-			element = 'CLASS'
+    violationRules {
+        rule {
+            element = 'CLASS'
 
-			limit {
-				counter = 'LINE'
-				value = 'COVEREDRATIO'
-				minimum = 0.70
-			}
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.70
+            }
 
-			limit {
-				counter = 'BRANCH'
-				value = 'COVEREDRATIO'
-				minimum = 0.70
-			}
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.70
+            }
 
-			excludes = [
-					"com.prgrms.artzip.common.*",
-					"*.dto.*",
-					"*.controller.*",
-					"*.domain.*",
-					"*.util.*",
-					"com.prgrms.artzip.ArtzipApplication"
-			] + Qdomains
-		}
-	}
+            excludes = [
+                    "com.prgrms.artzip.common.*",
+                    "*.dto.*",
+                    "*.controller.*",
+                    "*.domain.*",
+                    "*.repository.*",
+                    "*.util.*",
+                    "com.prgrms.artzip.ArtzipApplication"
+            ] + Qdomains
+        }
+    }
 }
 
 def querydslDir = "$buildDir/generated/querydsl" as Object
 
 querydsl {
-	jpa = true
-	querydslSourcesDir = querydslDir
+    jpa = true
+    querydslSourcesDir = querydslDir
 }
 sourceSets {
-	main.java.srcDir querydslDir
+    main.java.srcDir querydslDir
 }
 compileQuerydsl {
-	options.annotationProcessorPath = configurations.querydsl
+    options.annotationProcessorPath = configurations.querydsl
 }
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-	querydsl.extendsFrom compileClasspath
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    querydsl.extendsFrom compileClasspath
 }
 
 task copyPrivate(type: Copy) {
-	copy {
-		from './BackFro-BE-submodule'
-		include "application-aws.yml"
-		into 'src/main/resources'
-	}
+    copy {
+        from './BackFro-BE-submodule'
+        include "application-aws.yml"
+        into 'src/main/resources'
+    }
 
-	copy {
-		from './BackFro-BE-submodule'
-		include "application-dev.yml"
-		into 'src/main/resources'
-	}
+    copy {
+        from './BackFro-BE-submodule'
+        include "application-dev.yml"
+        into 'src/main/resources'
+    }
 
-	copy {
-		from './BackFro-BE-submodule'
-		include "application-oauth.yml"
-		into 'src/main/resources'
-	}
+    copy {
+        from './BackFro-BE-submodule'
+        include "application-oauth.yml"
+        into 'src/main/resources'
+    }
 
-	copy {
-		from './BackFro-BE-submodule'
-		include "application-aws.yml"
-		into 'src/test/resources'
-	}
+    copy {
+        from './BackFro-BE-submodule'
+        include "application-aws.yml"
+        into 'src/test/resources'
+    }
 
-	copy {
-		from './BackFro-BE-submodule'
-		include "application-oauth.yml"
-		into 'src/test/resources'
-	}
+    copy {
+        from './BackFro-BE-submodule'
+        include "application-oauth.yml"
+        into 'src/test/resources'
+    }
 }
