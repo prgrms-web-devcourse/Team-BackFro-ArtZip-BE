@@ -28,7 +28,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import({QueryDslTestConfig.class})
 @DisplayName("ExhibitionLikeRepository 테스트")
 class ExhibitionLikeRepositoryTest {
-
     @PersistenceContext
     private EntityManager em;
 
@@ -80,12 +79,10 @@ class ExhibitionLikeRepositoryTest {
         em.flush();
         em.clear();
     }
-
-
+    
     @Nested
     @DisplayName("countByExhibitionId() 테스트")
     class CountByExhibitionIdTest {
-
         @Test
         @DisplayName("전시회에 좋아요가 없는 경우 테스트")
         void testExhibitionWithoutLike() {
@@ -104,20 +101,17 @@ class ExhibitionLikeRepositoryTest {
     @Nested
     @DisplayName("findByExhibitionIdAndUserId() 테스트")
     class FindByExhibitionIdAndUserIdTest {
-
         @Test
         @DisplayName("좋아요가 존재하지 않는 경우 테스트")
         void testLikeNotExist() {
-            Optional<ExhibitionLike> exhibitionLike = exhibitionLikeRepository
-                    .findByUserIdAndExhibitionId(123L, 123L);
+            Optional<ExhibitionLike> exhibitionLike = exhibitionLikeRepository.findByUserIdAndExhibitionId(123L, 123L);
             assertThat(exhibitionLike).isEmpty();
         }
 
         @Test
         @DisplayName("좋아요가 존재하는 경우 테스트")
         void testLikeExist() {
-            Optional<ExhibitionLike> exhibitionLike = exhibitionLikeRepository
-                    .findByUserIdAndExhibitionId(user1.getId(), exhibition.getId());
+            Optional<ExhibitionLike> exhibitionLike = exhibitionLikeRepository.findByUserIdAndExhibitionId(user1.getId(), exhibition.getId());
             assertThat(exhibitionLike).isNotEmpty();
         }
     }

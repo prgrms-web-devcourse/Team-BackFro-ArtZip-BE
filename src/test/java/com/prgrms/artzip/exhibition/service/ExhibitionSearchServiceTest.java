@@ -54,22 +54,18 @@ class ExhibitionSearchServiceTest {
         @MethodSource("queryParameter")
         @DisplayName("검색어가 blank인 경우 테스트")
         void testBlankQuery(String query) {
-            assertThatThrownBy(
-                    () -> exhibitionSearchService.getExhibitionsByQuery(null, query, true,
-                            PageRequest.of(0, 10)))
+            assertThatThrownBy(() -> exhibitionSearchService.getExhibitionsByQuery(null, query, true, PageRequest.of(0, 10)))
                     .isInstanceOf(InvalidRequestException.class)
                     .hasMessage(INVALID_EXHB_QUERY.getMessage());
 
-            verify(exhibitionRepository, never()).findExhibitionsByQuery(null, query, true,
-                    PageRequest.of(0, 10));
+            verify(exhibitionRepository, never()).findExhibitionsByQuery(null, query, true, PageRequest.of(0, 10));
         }
 
         @Test
         @DisplayName("성공적으로 검색한 경우 테스트")
         void testNormalQuery() {
             PageRequest pageRequest = PageRequest.of(0, 10);
-            List<ExhibitionForSimpleQuery> exhibitions = new ArrayList<>();
-            exhibitions.add(ExhibitionForSimpleQuery.builder()
+            Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = new PageImpl(List.of(ExhibitionForSimpleQuery.builder()
                     .id(11L)
                     .name("고흐 전시")
                     .thumbnail("http://www.culture.go.kr/upload/rdf/22/07/show_2022071411402126915.png")
@@ -77,11 +73,9 @@ class ExhibitionSearchServiceTest {
                     .period(new Period(LocalDate.now().plusDays(1), LocalDate.now().plusDays(10)))
                     .likeCount(30)
                     .reviewCount(15)
-                    .build());
-            Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = new PageImpl(exhibitions);
+                    .build()));
 
-            when(exhibitionRepository.findExhibitionsByQuery(null, "고흐", true, pageRequest))
-                    .thenReturn(exhibitionsPagingResult);
+            when(exhibitionRepository.findExhibitionsByQuery(null, "고흐", true, pageRequest)).thenReturn(exhibitionsPagingResult);
 
             exhibitionSearchService.getExhibitionsByQuery(null, "고흐", true, pageRequest);
 
@@ -106,8 +100,7 @@ class ExhibitionSearchServiceTest {
         @MethodSource("queryParameter")
         @DisplayName("검색어가 blank인 경우 테스트")
         void testBlankQuery(String query) {
-            assertThatThrownBy(
-                    () -> exhibitionSearchService.getExhibitionsForReview(query))
+            assertThatThrownBy(() -> exhibitionSearchService.getExhibitionsForReview(query))
                     .isInstanceOf(InvalidRequestException.class)
                     .hasMessage(INVALID_EXHB_QUERY_FOR_REVIEW.getMessage());
 
@@ -117,8 +110,7 @@ class ExhibitionSearchServiceTest {
         @Test
         @DisplayName("성공적으로 검색한 경우 테스트")
         void testNormalQuery() {
-            List<ExhibitionBasicForSimpleQuery> exhibitions = new ArrayList<>();
-            exhibitions.add(ExhibitionBasicForSimpleQuery.builder()
+            List<ExhibitionBasicForSimpleQuery> exhibitions = List.of(ExhibitionBasicForSimpleQuery.builder()
                     .id(11L)
                     .name("고흐 전시")
                     .thumbnail("http://www.culture.go.kr/upload/rdf/22/07/show_2022071411402126915.png")
@@ -132,34 +124,28 @@ class ExhibitionSearchServiceTest {
         }
 
         private static Stream<Arguments> queryParameter() {
-            return Stream.of(
-                    null,
-                    Arguments.of(""),
-                    Arguments.of("    ")
-            );
+            return Stream.of(null, Arguments.of(""), Arguments.of("    "));
         }
     }
 
     @Nested
     @DisplayName("getExhibitionsByCustomCondition() 테스트")
     class GetExhibitionsByCustomConditionTest {
-
         private Long userId = null;
+
         private boolean includeEnd = true;
+
         private Pageable pageable = PageRequest.of(0, 8);
 
-        private List<ExhibitionForSimpleQuery> exhibitions = Arrays.asList(
-                ExhibitionForSimpleQuery.builder()
-                        .id(11L)
-                        .name("고흐 전시")
-                        .thumbnail("http://www.culture.go.kr/upload/rdf/22/07/show_2022071411402126915.png")
-                        .isLiked(false)
-                        .period(new Period(LocalDate.of(LocalDate.now().getYear(), 6, 5),
-                                LocalDate.of(LocalDate.now().getYear(), 8, 10)))
-                        .likeCount(30)
-                        .reviewCount(15)
-                        .build());
-        private Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = new PageImpl(exhibitions);
+        private Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = new PageImpl(List.of(ExhibitionForSimpleQuery.builder()
+                .id(11L)
+                .name("고흐 전시")
+                .thumbnail("http://www.culture.go.kr/upload/rdf/22/07/show_2022071411402126915.png")
+                .isLiked(false)
+                .period(new Period(LocalDate.of(LocalDate.now().getYear(), 6, 5), LocalDate.of(LocalDate.now().getYear(), 8, 10)))
+                .likeCount(30)
+                .reviewCount(15)
+                .build()));
 
         @Test
         @DisplayName("ExhibitionCustomConditionRequest의 areas가 비어있는 경우 테스트")
@@ -170,13 +156,11 @@ class ExhibitionSearchServiceTest {
                     .genres(List.of(Genre.INSTALLATION))
                     .build();
 
-            assertThatThrownBy(() -> exhibitionSearchService.getExhibitionsByCustomCondition(userId,
-                    exhibitionCustomConditionRequest, includeEnd, pageable))
+            assertThatThrownBy(() -> exhibitionSearchService.getExhibitionsByCustomCondition(userId, exhibitionCustomConditionRequest, includeEnd, pageable))
                     .isInstanceOf(InvalidRequestException.class)
                     .hasMessage(INVALID_INPUT_VALUE.getMessage());
 
-            verify(exhibitionRepository, never()).findExhibitionsByCustomCondition(eq(userId),
-                    any(ExhibitionCustomCondition.class), eq(pageable));
+            verify(exhibitionRepository, never()).findExhibitionsByCustomCondition(eq(userId), any(ExhibitionCustomCondition.class), eq(pageable));
         }
 
         @Test
@@ -188,13 +172,11 @@ class ExhibitionSearchServiceTest {
                     .genres(List.of(Genre.INSTALLATION))
                     .build();
 
-            assertThatThrownBy(() -> exhibitionSearchService.getExhibitionsByCustomCondition(userId,
-                    exhibitionCustomConditionRequest, includeEnd, pageable))
+            assertThatThrownBy(() -> exhibitionSearchService.getExhibitionsByCustomCondition(userId, exhibitionCustomConditionRequest, includeEnd, pageable))
                     .isInstanceOf(InvalidRequestException.class)
                     .hasMessage(INVALID_INPUT_VALUE.getMessage());
 
-            verify(exhibitionRepository, never()).findExhibitionsByCustomCondition(eq(userId),
-                    any(ExhibitionCustomCondition.class), eq(pageable));
+            verify(exhibitionRepository, never()).findExhibitionsByCustomCondition(eq(userId), any(ExhibitionCustomCondition.class), eq(pageable));
         }
 
         @Test
@@ -206,13 +188,11 @@ class ExhibitionSearchServiceTest {
                     .genres(new ArrayList<>())
                     .build();
 
-            assertThatThrownBy(() -> exhibitionSearchService.getExhibitionsByCustomCondition(userId,
-                    exhibitionCustomConditionRequest, includeEnd, pageable))
+            assertThatThrownBy(() -> exhibitionSearchService.getExhibitionsByCustomCondition(userId, exhibitionCustomConditionRequest, includeEnd, pageable))
                     .isInstanceOf(InvalidRequestException.class)
                     .hasMessage(INVALID_INPUT_VALUE.getMessage());
 
-            verify(exhibitionRepository, never()).findExhibitionsByCustomCondition(eq(userId),
-                    any(ExhibitionCustomCondition.class), eq(pageable));
+            verify(exhibitionRepository, never()).findExhibitionsByCustomCondition(eq(userId), any(ExhibitionCustomCondition.class), eq(pageable));
         }
 
         @Test
@@ -220,17 +200,15 @@ class ExhibitionSearchServiceTest {
         void testAreasIncludeNull() {
             ExhibitionCustomConditionRequest exhibitionCustomConditionRequest = ExhibitionCustomConditionRequest.builder()
                     .areas(Arrays.asList(Area.SEOUL, null))
-                    .months(Arrays.asList(Month.JUN))
-                    .genres(Arrays.asList(Genre.INSTALLATION))
+                    .months(List.of(Month.JUN))
+                    .genres(List.of(Genre.INSTALLATION))
                     .build();
 
-            assertThatThrownBy(() -> exhibitionSearchService.getExhibitionsByCustomCondition(userId,
-                    exhibitionCustomConditionRequest, includeEnd, pageable))
+            assertThatThrownBy(() -> exhibitionSearchService.getExhibitionsByCustomCondition(userId, exhibitionCustomConditionRequest, includeEnd, pageable))
                     .isInstanceOf(InvalidRequestException.class)
                     .hasMessage(INVALID_CUSTOM_EXHB_CONDITION.getMessage());
 
-            verify(exhibitionRepository, never()).findExhibitionsByCustomCondition(eq(userId),
-                    any(ExhibitionCustomCondition.class), eq(pageable));
+            verify(exhibitionRepository, never()).findExhibitionsByCustomCondition(eq(userId), any(ExhibitionCustomCondition.class), eq(pageable));
         }
 
         @Test
@@ -242,13 +220,11 @@ class ExhibitionSearchServiceTest {
                     .genres(Arrays.asList(Genre.INSTALLATION))
                     .build();
 
-            assertThatThrownBy(() -> exhibitionSearchService.getExhibitionsByCustomCondition(userId,
-                    exhibitionCustomConditionRequest, includeEnd, pageable))
+            assertThatThrownBy(() -> exhibitionSearchService.getExhibitionsByCustomCondition(userId, exhibitionCustomConditionRequest, includeEnd, pageable))
                     .isInstanceOf(InvalidRequestException.class)
                     .hasMessage(INVALID_CUSTOM_EXHB_CONDITION.getMessage());
 
-            verify(exhibitionRepository, never()).findExhibitionsByCustomCondition(eq(userId),
-                    any(ExhibitionCustomCondition.class), eq(pageable));
+            verify(exhibitionRepository, never()).findExhibitionsByCustomCondition(eq(userId), any(ExhibitionCustomCondition.class), eq(pageable));
         }
 
         @Test
@@ -260,13 +236,11 @@ class ExhibitionSearchServiceTest {
                     .genres(Arrays.asList(Genre.INSTALLATION, null))
                     .build();
 
-            assertThatThrownBy(() -> exhibitionSearchService.getExhibitionsByCustomCondition(userId,
-                    exhibitionCustomConditionRequest, includeEnd, pageable))
+            assertThatThrownBy(() -> exhibitionSearchService.getExhibitionsByCustomCondition(userId, exhibitionCustomConditionRequest, includeEnd, pageable))
                     .isInstanceOf(InvalidRequestException.class)
                     .hasMessage(INVALID_CUSTOM_EXHB_CONDITION.getMessage());
 
-            verify(exhibitionRepository, never()).findExhibitionsByCustomCondition(eq(userId),
-                    any(ExhibitionCustomCondition.class), eq(pageable));
+            verify(exhibitionRepository, never()).findExhibitionsByCustomCondition(eq(userId), any(ExhibitionCustomCondition.class), eq(pageable));
         }
 
         @Test
@@ -278,14 +252,11 @@ class ExhibitionSearchServiceTest {
                     .genres(Arrays.asList(Genre.INSTALLATION))
                     .build();
 
-            when(exhibitionRepository.findExhibitionsByCustomCondition(eq(userId),
-                    any(ExhibitionCustomCondition.class), eq(pageable))).thenReturn(exhibitionsPagingResult);
+            when(exhibitionRepository.findExhibitionsByCustomCondition(eq(userId), any(ExhibitionCustomCondition.class), eq(pageable))).thenReturn(exhibitionsPagingResult);
 
-            exhibitionSearchService.getExhibitionsByCustomCondition(userId,
-                    exhibitionCustomConditionRequest, includeEnd, pageable);
+            exhibitionSearchService.getExhibitionsByCustomCondition(userId, exhibitionCustomConditionRequest, includeEnd, pageable);
 
-            verify(exhibitionRepository).findExhibitionsByCustomCondition(eq(userId),
-                    any(ExhibitionCustomCondition.class), eq(pageable));
+            verify(exhibitionRepository).findExhibitionsByCustomCondition(eq(userId), any(ExhibitionCustomCondition.class), eq(pageable));
         }
 
         @Test
@@ -297,14 +268,11 @@ class ExhibitionSearchServiceTest {
                     .genres(Arrays.asList(Genre.INSTALLATION))
                     .build();
 
-            when(exhibitionRepository.findExhibitionsByCustomCondition(eq(userId),
-                    any(ExhibitionCustomCondition.class), eq(pageable))).thenReturn(exhibitionsPagingResult);
+            when(exhibitionRepository.findExhibitionsByCustomCondition(eq(userId), any(ExhibitionCustomCondition.class), eq(pageable))).thenReturn(exhibitionsPagingResult);
 
-            exhibitionSearchService.getExhibitionsByCustomCondition(userId,
-                    exhibitionCustomConditionRequest, includeEnd, pageable);
+            exhibitionSearchService.getExhibitionsByCustomCondition(userId, exhibitionCustomConditionRequest, includeEnd, pageable);
 
-            verify(exhibitionRepository).findExhibitionsByCustomCondition(eq(userId),
-                    any(ExhibitionCustomCondition.class), eq(pageable));
+            verify(exhibitionRepository).findExhibitionsByCustomCondition(eq(userId), any(ExhibitionCustomCondition.class), eq(pageable));
         }
 
         @Test
@@ -316,15 +284,11 @@ class ExhibitionSearchServiceTest {
                     .genres(Arrays.asList(Genre.ALL))
                     .build();
 
-            when(exhibitionRepository.findExhibitionsByCustomCondition(eq(userId),
-                    any(ExhibitionCustomCondition.class), eq(pageable))).thenReturn(exhibitionsPagingResult);
+            when(exhibitionRepository.findExhibitionsByCustomCondition(eq(userId), any(ExhibitionCustomCondition.class), eq(pageable))).thenReturn(exhibitionsPagingResult);
 
-            exhibitionSearchService.getExhibitionsByCustomCondition(userId,
-                    exhibitionCustomConditionRequest, includeEnd, pageable);
+            exhibitionSearchService.getExhibitionsByCustomCondition(userId, exhibitionCustomConditionRequest, includeEnd, pageable);
 
-            verify(exhibitionRepository).findExhibitionsByCustomCondition(eq(userId),
-                    any(ExhibitionCustomCondition.class), eq(pageable));
+            verify(exhibitionRepository).findExhibitionsByCustomCondition(eq(userId), any(ExhibitionCustomCondition.class), eq(pageable));
         }
-
     }
 }

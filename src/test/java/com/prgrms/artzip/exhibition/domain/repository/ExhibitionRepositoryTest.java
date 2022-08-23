@@ -58,7 +58,6 @@ class ExhibitionRepositoryTest {
     @Nested
     @DisplayName("findUpcomingExhibitions() 테스트")
     class FindUpcomingExhibitionsTest {
-
         private User user1;
 
         @BeforeEach
@@ -164,8 +163,7 @@ class ExhibitionRepositoryTest {
         @Test
         @DisplayName("로그인하지 않은 상태에서 실제로 시작일이 빠른 전시회가 먼저 오는지 확인하는 테스트")
         void testFindUpcomingExhibitionWithoutAuthorization() {
-            Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-                    .findUpcomingExhibitions(null, pageable);
+            Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findUpcomingExhibitions(null, pageable);
             ExhibitionForSimpleQuery exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);
 
             assertThat(exhibitionsPagingResult.getContent()).hasSize(2);
@@ -179,8 +177,7 @@ class ExhibitionRepositoryTest {
         @Test
         @DisplayName("로그인한 상태에서 실제로 시작일이 빠른 전시회가 먼저 오는지 확인하는 테스트")
         void testFindUpcomingExhibitionWithAuthorization() {
-            Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-                    .findUpcomingExhibitions(user1.getId(), pageable);
+            Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findUpcomingExhibitions(user1.getId(), pageable);
             ExhibitionForSimpleQuery exhibitionAtSeoul = exhibitionsPagingResult.getContent().get(0);
 
             assertThat(exhibitionsPagingResult.getContent()).hasSize(2);
@@ -195,7 +192,6 @@ class ExhibitionRepositoryTest {
     @Nested
     @DisplayName("findMostLikeExhibitions() 테스트")
     class FindMostLikeExhibitionsTest {
-
         private User user1;
 
         @BeforeEach
@@ -280,8 +276,7 @@ class ExhibitionRepositoryTest {
         @Test
         @DisplayName("로그인하지 않고 종료된 전시회 포함하여 인기 많은 전시회 조회 테스트")
         void testFindMostLikeExhibitionIncludeEndWithoutAuthorization() {
-            Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-                    .findMostLikeExhibitions(null, true, pageable);
+            Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findMostLikeExhibitions(null, true, pageable);
 
             assertThat(exhibitionsPagingResult.getContent()).hasSize(2);
 
@@ -296,8 +291,7 @@ class ExhibitionRepositoryTest {
         @Test
         @DisplayName("로그인 하고 종료된 전시회 제외하고 인기 많은 전시회 조회 테스트")
         void testFindMostLikeExhibitionExcludeEndWithAuthorization() {
-            Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-                    .findMostLikeExhibitions(user1.getId(), false, pageable);
+            Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findMostLikeExhibitions(user1.getId(), false, pageable);
 
             ExhibitionForSimpleQuery exhibitionAtBusan = exhibitionsPagingResult.getContent().get(0);
 
@@ -312,7 +306,6 @@ class ExhibitionRepositoryTest {
     @Nested
     @DisplayName("findExhibition() 테스트")
     class FindExhibitionTest {
-
         private User user2;
         private Exhibition exhibitionAlreadyEnd;
 
@@ -358,16 +351,14 @@ class ExhibitionRepositoryTest {
         @Test
         @DisplayName("존재하지 않는 전시회 조회 테스트")
         void testFindEmptyExhibition() {
-            Optional<ExhibitionDetailForSimpleQuery> exhibition = exhibitionRepository
-                    .findExhibition(null, 123431L);
+            Optional<ExhibitionDetailForSimpleQuery> exhibition = exhibitionRepository.findExhibition(null, 123431L);
             assertThat(exhibition).isEmpty();
         }
 
         @Test
         @DisplayName("전시회 조회 테스트")
         void testFindExhibition() {
-            Optional<ExhibitionDetailForSimpleQuery> exhibitionAtGyeonggi = exhibitionRepository
-                    .findExhibition(user2.getId(), exhibitionAlreadyEnd.getId());
+            Optional<ExhibitionDetailForSimpleQuery> exhibitionAtGyeonggi = exhibitionRepository.findExhibition(user2.getId(), exhibitionAlreadyEnd.getId());
 
             assertThat(exhibitionAtGyeonggi).isNotEmpty();
             assertThat(exhibitionAtGyeonggi.get())
@@ -384,7 +375,6 @@ class ExhibitionRepositoryTest {
     @Nested
     @DisplayName("findExhibitionsByQuery() 테스트")
     class FindExhibitionsByQueryTest {
-
         private User user2;
 
         @BeforeEach
@@ -449,8 +439,7 @@ class ExhibitionRepositoryTest {
         @Test
         @DisplayName("로그인 하지 않고 끝난 전시회 제외 하지 않고 검색 경우 태스트")
         void testWithEndExhibition() {
-            Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-                    .findExhibitionsByQuery(null, "부산", true, pageable);
+            Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findExhibitionsByQuery(null, "부산", true, pageable);
 
             assertThat(exhibitionsPagingResult.getContent()).hasSize(1);
         }
@@ -458,8 +447,7 @@ class ExhibitionRepositoryTest {
         @Test
         @DisplayName("로그인 하고 끝난 전시회 제외하고 검색 경우 태스트")
         void testWithOutEndExhibition() {
-            Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-                    .findExhibitionsByQuery(user2.getId(), "전시회", false, pageable);
+            Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findExhibitionsByQuery(user2.getId(), "전시회", false, pageable);
 
             assertThat(exhibitionsPagingResult.getContent()).hasSize(1);
             assertThat(exhibitionsPagingResult.getContent().get(0))
@@ -517,25 +505,21 @@ class ExhibitionRepositoryTest {
             em.clear();
         }
 
-
         @Test
         @DisplayName("검색어에 맞는 결과가 반환되는지 테스트")
         void testFindExhibitionsForReview() {
-            List<ExhibitionBasicForSimpleQuery> exhibitions = exhibitionRepository.findExhibitionsForReview(
-                    "전시");
+            List<ExhibitionBasicForSimpleQuery> exhibitions = exhibitionRepository.findExhibitionsForReview("전시");
 
             assertThat(exhibitions).hasSize(1);
             assertThat(exhibitions.get(0))
                     .hasFieldOrPropertyWithValue("name", "전시회 at 부산")
-                    .hasFieldOrPropertyWithValue("thumbnail",
-                            "http://www.culture.go.kr/upload/rdf/22/07/show_2022072010193392447.jpg");
+                    .hasFieldOrPropertyWithValue("thumbnail", "http://www.culture.go.kr/upload/rdf/22/07/show_2022072010193392447.jpg");
         }
     }
 
     @Nested
     @DisplayName("findUserLikeExhibitions() 테스트")
     class FindUserLikeExhibitionsTest {
-
         private User user1;
         private User user2;
 
@@ -603,8 +587,7 @@ class ExhibitionRepositoryTest {
         void testDifferentUser() {
             // user2 : 로그인 유저
             // user1 : 조회 대상
-            Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-                    .findUserLikeExhibitions(user2.getId(), user1.getId(), pageable);
+            Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findUserLikeExhibitions(user2.getId(), user1.getId(), pageable);
 
             List<ExhibitionForSimpleQuery> contents = exhibitionsPagingResult.getContent();
             assertThat(contents).hasSize(2);
@@ -622,8 +605,7 @@ class ExhibitionRepositoryTest {
         @DisplayName("로그인 유저와 조회 대상인 유저가 일치하는 경우")
         void testSameUser() {
             // user1 : 로그인 유저, 조회 대상
-            Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-                    .findUserLikeExhibitions(user1.getId(), user1.getId(), pageable);
+            Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findUserLikeExhibitions(user1.getId(), user1.getId(), pageable);
 
             List<ExhibitionForSimpleQuery> contents = exhibitionsPagingResult.getContent();
             assertThat(contents).hasSize(2);
@@ -637,7 +619,6 @@ class ExhibitionRepositoryTest {
     @Nested
     @DisplayName("findExhibitionsByCustomCondition() 테스트")
     class FindExhibitionsByCustomConditionTest {
-
         private User user1;
 
         @BeforeEach
@@ -746,17 +727,14 @@ class ExhibitionRepositoryTest {
                     .includeEnd(includeEnd)
                     .build();
 
-            Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-                    .findExhibitionsByCustomCondition(null, exhibitionCustomCondition, pageable);
+            Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findExhibitionsByCustomCondition(null, exhibitionCustomCondition, pageable);
 
             List<ExhibitionForSimpleQuery> contents = exhibitionsPagingResult.getContent();
             assertThat(contents).hasSize(2);
 
-            assertThat(contents.get(0))
-                    .hasFieldOrPropertyWithValue("name", "전시회 at 부산");
+            assertThat(contents.get(0)).hasFieldOrPropertyWithValue("name", "전시회 at 부산");
 
-            assertThat(contents.get(1))
-                    .hasFieldOrPropertyWithValue("name", "전시회 at 경기");
+            assertThat(contents.get(1)).hasFieldOrPropertyWithValue("name", "전시회 at 경기");
         }
 
         @Test
@@ -775,17 +753,14 @@ class ExhibitionRepositoryTest {
                     .includeEnd(includeEnd)
                     .build();
 
-            Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-                    .findExhibitionsByCustomCondition(null, exhibitionCustomCondition, pageable);
+            Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findExhibitionsByCustomCondition(null, exhibitionCustomCondition, pageable);
 
             List<ExhibitionForSimpleQuery> contents = exhibitionsPagingResult.getContent();
             assertThat(contents).hasSize(2);
 
-            assertThat(contents.get(0))
-                    .hasFieldOrPropertyWithValue("name", "전시회 at 부산");
+            assertThat(contents.get(0)).hasFieldOrPropertyWithValue("name", "전시회 at 부산");
 
-            assertThat(contents.get(1))
-                    .hasFieldOrPropertyWithValue("name", "전시회 at 경기");
+            assertThat(contents.get(1)).hasFieldOrPropertyWithValue("name", "전시회 at 경기");
         }
 
         @Test
@@ -803,14 +778,12 @@ class ExhibitionRepositoryTest {
                     .includeEnd(includeEnd)
                     .build();
 
-            Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findExhibitionsByCustomCondition(
-                    null, exhibitionCustomCondition, pageable);
+            Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findExhibitionsByCustomCondition(null, exhibitionCustomCondition, pageable);
 
             List<ExhibitionForSimpleQuery> contents = exhibitionsPagingResult.getContent();
             assertThat(contents).hasSize(1);
 
-            assertThat(contents.get(0))
-                    .hasFieldOrPropertyWithValue("name", "전시회 at 서울");
+            assertThat(contents.get(0)).hasFieldOrPropertyWithValue("name", "전시회 at 서울");
         }
 
         @Test
@@ -834,9 +807,7 @@ class ExhibitionRepositoryTest {
                     .includeEnd(includeEnd)
                     .build();
 
-            Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository
-                    .findExhibitionsByCustomCondition(user1.getId(), exhibitionCustomCondition,
-                            pageable);
+            Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findExhibitionsByCustomCondition(user1.getId(), exhibitionCustomCondition, pageable);
 
             List<ExhibitionForSimpleQuery> contents = exhibitionsPagingResult.getContent();
             assertThat(contents).hasSize(1);
@@ -920,10 +891,10 @@ class ExhibitionRepositoryTest {
         @Test
         @DisplayName("내 주변 전시회 3KM 조건 테스트")
         void testAroundMe3KM() {
-            List<ExhibitionWithLocationForSimpleQuery> exhibitions = exhibitionRepository
-                    .findExhibitionsAroundMe(null, 37.492001, 127.029704, 3);
+            List<ExhibitionWithLocationForSimpleQuery> exhibitions = exhibitionRepository.findExhibitionsAroundMe(null, 37.492001, 127.029704, 3);
 
             assertThat(exhibitions).hasSize(1);
+
             assertThat(exhibitions.get(0))
                     .hasFieldOrPropertyWithValue("name", "전시회 at 부산")
                     .hasFieldOrPropertyWithValue("location.latitude", 37.501086)
@@ -934,7 +905,6 @@ class ExhibitionRepositoryTest {
     @Nested
     @DisplayName("findExhibitionForReview() 테스트")
     class FindExhibitionForReviewTest {
-
         private User user1;
         private User user2;
 
@@ -1044,78 +1014,65 @@ class ExhibitionRepositoryTest {
         @Test
         @DisplayName("userId == null인 경우 전시회 정보, 전시회 좋아요 여부, 전시회 좋아요 개수, 전시회 후기 개수 조회 테스트")
         void testFindExhibitionForReviewWhenUserIdNull() {
-            Optional<ReviewExhibitionInfo> maybeBusanExhibition = exhibitionRepository.findExhibitionForReview(
-                    null, exhibitionAtBusan.getId());
-            Optional<ReviewExhibitionInfo> maybeSeoulExhibition = exhibitionRepository.findExhibitionForReview(
-                    null, exhibitionAtSeoul.getId());
+            Optional<ReviewExhibitionInfo> maybeBusanExhibition = exhibitionRepository.findExhibitionForReview(null, exhibitionAtBusan.getId());
+            Optional<ReviewExhibitionInfo> maybeSeoulExhibition = exhibitionRepository.findExhibitionForReview(null, exhibitionAtSeoul.getId());
 
             assertThat(maybeBusanExhibition.isPresent()).isTrue();
-            assertThat(maybeBusanExhibition.get().getExhibitionId()).isEqualTo(exhibitionAtBusan.getId());
-            assertThat(maybeBusanExhibition.get().getName()).isEqualTo(exhibitionAtBusan.getName());
-            assertThat(maybeBusanExhibition.get().getThumbnail()).isEqualTo(
-                    exhibitionAtBusan.getThumbnail());
-            assertThat(maybeBusanExhibition.get().getStartDate()).isEqualTo(
-                    exhibitionAtBusan.getPeriod().getStartDate());
-            assertThat(maybeBusanExhibition.get().getEndDate()).isEqualTo(
-                    exhibitionAtBusan.getPeriod().getEndDate());
-            assertThat(maybeBusanExhibition.get().getIsLiked()).isFalse();
-            assertThat(maybeBusanExhibition.get().getLikeCount()).isEqualTo(2);
-            assertThat(maybeBusanExhibition.get().getReviewCount()).isEqualTo(2);
+            assertThat(maybeBusanExhibition.get())
+                    .hasFieldOrPropertyWithValue("exhibitionId", exhibitionAtBusan.getId())
+                    .hasFieldOrPropertyWithValue("name", exhibitionAtBusan.getName())
+                    .hasFieldOrPropertyWithValue("thumbnail", exhibitionAtBusan.getThumbnail())
+                    .hasFieldOrPropertyWithValue("startDate", exhibitionAtBusan.getPeriod().getStartDate())
+                    .hasFieldOrPropertyWithValue("endDate", exhibitionAtBusan.getPeriod().getEndDate())
+                    .hasFieldOrPropertyWithValue("isLiked", false)
+                    .hasFieldOrPropertyWithValue("likeCount", 2L)
+                    .hasFieldOrPropertyWithValue("reviewCount", 2L);
 
             assertThat(maybeSeoulExhibition.isPresent()).isTrue();
-            assertThat(maybeSeoulExhibition.get().getExhibitionId()).isEqualTo(exhibitionAtSeoul.getId());
-            assertThat(maybeSeoulExhibition.get().getName()).isEqualTo(exhibitionAtSeoul.getName());
-            assertThat(maybeSeoulExhibition.get().getThumbnail()).isEqualTo(
-                    exhibitionAtSeoul.getThumbnail());
-            assertThat(maybeSeoulExhibition.get().getStartDate()).isEqualTo(
-                    exhibitionAtSeoul.getPeriod().getStartDate());
-            assertThat(maybeSeoulExhibition.get().getEndDate()).isEqualTo(
-                    exhibitionAtSeoul.getPeriod().getEndDate());
-            assertThat(maybeSeoulExhibition.get().getIsLiked()).isFalse();
-            assertThat(maybeSeoulExhibition.get().getLikeCount()).isEqualTo(1);
-            assertThat(maybeSeoulExhibition.get().getReviewCount()).isEqualTo(0);
+            assertThat(maybeSeoulExhibition.get())
+                    .hasFieldOrPropertyWithValue("exhibitionId", exhibitionAtSeoul.getId())
+                    .hasFieldOrPropertyWithValue("name", exhibitionAtSeoul.getName())
+                    .hasFieldOrPropertyWithValue("thumbnail", exhibitionAtSeoul.getThumbnail())
+                    .hasFieldOrPropertyWithValue("startDate", exhibitionAtSeoul.getPeriod().getStartDate())
+                    .hasFieldOrPropertyWithValue("endDate", exhibitionAtSeoul.getPeriod().getEndDate())
+                    .hasFieldOrPropertyWithValue("isLiked", false)
+                    .hasFieldOrPropertyWithValue("likeCount", 1L)
+                    .hasFieldOrPropertyWithValue("reviewCount", 0L);
         }
 
         @Test
         @DisplayName("userId != null인 경우 전시회 정보, 전시회 좋아요 여부, 전시회 좋아요 개수, 전시회 후기 개수 조회 테스트")
         void testFindExhibitionForReviewWhenUserIdNotNull() {
-            Optional<ReviewExhibitionInfo> maybeBusanExhibition = exhibitionRepository.findExhibitionForReview(
-                    user1.getId(), exhibitionAtBusan.getId());
-            Optional<ReviewExhibitionInfo> maybeSeoulExhibition = exhibitionRepository.findExhibitionForReview(
-                    user2.getId(), exhibitionAtSeoul.getId());
+            Optional<ReviewExhibitionInfo> maybeBusanExhibition = exhibitionRepository.findExhibitionForReview(user1.getId(), exhibitionAtBusan.getId());
+            Optional<ReviewExhibitionInfo> maybeSeoulExhibition = exhibitionRepository.findExhibitionForReview(user2.getId(), exhibitionAtSeoul.getId());
 
             assertThat(maybeBusanExhibition.isPresent()).isTrue();
-            assertThat(maybeBusanExhibition.get().getExhibitionId()).isEqualTo(exhibitionAtBusan.getId());
-            assertThat(maybeBusanExhibition.get().getName()).isEqualTo(exhibitionAtBusan.getName());
-            assertThat(maybeBusanExhibition.get().getThumbnail()).isEqualTo(
-                    exhibitionAtBusan.getThumbnail());
-            assertThat(maybeBusanExhibition.get().getStartDate()).isEqualTo(
-                    exhibitionAtBusan.getPeriod().getStartDate());
-            assertThat(maybeBusanExhibition.get().getEndDate()).isEqualTo(
-                    exhibitionAtBusan.getPeriod().getEndDate());
-            assertThat(maybeBusanExhibition.get().getIsLiked()).isTrue();
-            assertThat(maybeBusanExhibition.get().getLikeCount()).isEqualTo(2);
-            assertThat(maybeBusanExhibition.get().getReviewCount()).isEqualTo(2);
+            assertThat(maybeBusanExhibition.get())
+                    .hasFieldOrPropertyWithValue("exhibitionId", exhibitionAtBusan.getId())
+                    .hasFieldOrPropertyWithValue("name", exhibitionAtBusan.getName())
+                    .hasFieldOrPropertyWithValue("thumbnail", exhibitionAtBusan.getThumbnail())
+                    .hasFieldOrPropertyWithValue("startDate", exhibitionAtBusan.getPeriod().getStartDate())
+                    .hasFieldOrPropertyWithValue("endDate", exhibitionAtBusan.getPeriod().getEndDate())
+                    .hasFieldOrPropertyWithValue("isLiked", true)
+                    .hasFieldOrPropertyWithValue("likeCount", 2L)
+                    .hasFieldOrPropertyWithValue("reviewCount", 2L);
 
             assertThat(maybeSeoulExhibition.isPresent()).isTrue();
-            assertThat(maybeSeoulExhibition.get().getExhibitionId()).isEqualTo(exhibitionAtSeoul.getId());
-            assertThat(maybeSeoulExhibition.get().getName()).isEqualTo(exhibitionAtSeoul.getName());
-            assertThat(maybeSeoulExhibition.get().getThumbnail()).isEqualTo(
-                    exhibitionAtSeoul.getThumbnail());
-            assertThat(maybeSeoulExhibition.get().getStartDate()).isEqualTo(
-                    exhibitionAtSeoul.getPeriod().getStartDate());
-            assertThat(maybeSeoulExhibition.get().getEndDate()).isEqualTo(
-                    exhibitionAtSeoul.getPeriod().getEndDate());
-            assertThat(maybeSeoulExhibition.get().getIsLiked()).isFalse();
-            assertThat(maybeSeoulExhibition.get().getLikeCount()).isEqualTo(1);
-            assertThat(maybeSeoulExhibition.get().getReviewCount()).isEqualTo(0);
+            assertThat(maybeSeoulExhibition.get())
+                    .hasFieldOrPropertyWithValue("exhibitionId", exhibitionAtSeoul.getId())
+                    .hasFieldOrPropertyWithValue("name", exhibitionAtSeoul.getName())
+                    .hasFieldOrPropertyWithValue("thumbnail", exhibitionAtSeoul.getThumbnail())
+                    .hasFieldOrPropertyWithValue("startDate", exhibitionAtSeoul.getPeriod().getStartDate())
+                    .hasFieldOrPropertyWithValue("endDate", exhibitionAtSeoul.getPeriod().getEndDate())
+                    .hasFieldOrPropertyWithValue("isLiked", false)
+                    .hasFieldOrPropertyWithValue("likeCount", 1L)
+                    .hasFieldOrPropertyWithValue("reviewCount", 0L);
         }
     }
 
     @Nested
     @DisplayName("관리자 전시회 조회 테스트들")
     class FindExhibitionsByAdmin {
-
         private User user1;
         private User user2;
 
@@ -1257,20 +1214,19 @@ class ExhibitionRepositoryTest {
         @DisplayName("[관리자] - 전시회 다건 조회 테스트 (생성일자 순 정렬)")
         void testFindExhibitionsByAdminOrderByCreatedAt() {
             // given
-            Pageable pageable = PageRequest.of(
-                    0, 10, Sort.by(Direction.DESC, "createdAt")
-            );
+            Pageable pageable = PageRequest.of(0, 10, Sort.by(Direction.DESC, "createdAt"));
 
             //when
-            Page<ExhibitionForSimpleQuery> response = exhibitionRepository.findExhibitionsByAdmin(
-                    pageable);
+            Page<ExhibitionForSimpleQuery> response = exhibitionRepository.findExhibitionsByAdmin(pageable);
 
             //then
             assertThat(response.getContent()).hasSize(3);
+
             assertThat(response.getContent().get(0))
                     .hasFieldOrPropertyWithValue("id", exhibitionAtGyeonggi.getId())
                     .hasFieldOrPropertyWithValue("name", exhibitionAtGyeonggi.getName())
                     .hasFieldOrPropertyWithValue("thumbnail", exhibitionAtGyeonggi.getThumbnail());
+
             assertThat(response.getContent().get(0).getPeriod())
                     .hasFieldOrPropertyWithValue("startDate", exhibitionAtGyeonggi.getPeriod().getStartDate())
                     .hasFieldOrPropertyWithValue("endDate", exhibitionAtGyeonggi.getPeriod().getEndDate());
@@ -1280,20 +1236,19 @@ class ExhibitionRepositoryTest {
         @DisplayName("[관리자] - 전시회 다건 조회 테스트 (좋아요 수 순 정렬)")
         void testFindExhibitionsByAdminOrderByLikeCount() {
             // given
-            Pageable pageable = PageRequest.of(
-                    0, 10, Sort.by(Direction.DESC, "likeCount")
-            );
+            Pageable pageable = PageRequest.of(0, 10, Sort.by(Direction.DESC, "likeCount"));
 
             //when
-            Page<ExhibitionForSimpleQuery> response = exhibitionRepository.findExhibitionsByAdmin(
-                    pageable);
+            Page<ExhibitionForSimpleQuery> response = exhibitionRepository.findExhibitionsByAdmin(pageable);
 
             //then
             assertThat(response.getContent()).hasSize(3);
+
             assertThat(response.getContent().get(0))
                     .hasFieldOrPropertyWithValue("id", exhibitionAtBusan.getId())
                     .hasFieldOrPropertyWithValue("name", exhibitionAtBusan.getName())
                     .hasFieldOrPropertyWithValue("thumbnail", exhibitionAtBusan.getThumbnail());
+
             assertThat(response.getContent().get(0).getPeriod())
                     .hasFieldOrPropertyWithValue("startDate", exhibitionAtBusan.getPeriod().getStartDate())
                     .hasFieldOrPropertyWithValue("endDate", exhibitionAtBusan.getPeriod().getEndDate());
@@ -1303,14 +1258,11 @@ class ExhibitionRepositoryTest {
         @DisplayName("[관리자] - 전시회 다건 조회 테스트 (잘못된 정렬 기준)")
         void testFindExhibitionsByAdminOrderByInvalidSort() {
             // given
-            Pageable pageable = PageRequest.of(
-                    0, 10, Sort.by(Direction.DESC, "something wrong")
-            );
+            Pageable pageable = PageRequest.of(0, 10, Sort.by(Direction.DESC, "something wrong"));
 
             //when //then
-            assertThatThrownBy(() -> {
-                exhibitionRepository.findExhibitionsByAdmin(pageable);
-            }).isInstanceOf(NotFoundException.class)
+            assertThatThrownBy(() -> exhibitionRepository.findExhibitionsByAdmin(pageable))
+                    .isInstanceOf(NotFoundException.class)
                     .hasMessage(ErrorCode.INVALID_EXHB_SORT_TYPE.getMessage());
         }
     }

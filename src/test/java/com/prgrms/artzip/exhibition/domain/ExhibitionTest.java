@@ -50,8 +50,7 @@ class ExhibitionTest {
         void testNameTooLong() {
             assertThatThrownBy(() -> Exhibition.builder()
                     .seq(12345)
-                    .name(
-                            "이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름")
+                    .name("이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름")
                     .startDate(LocalDate.now())
                     .endDate(LocalDate.now())
                     .latitude(123.321)
@@ -380,10 +379,8 @@ class ExhibitionTest {
                 Arguments.of("http://www.culture.go.kr/upload/rdf/21/11/show_20211181717993881.jpg"),
                 Arguments.of("http://www.culture.go.kr/upload/rdf/22/01/show_2022011310122915168.png"),
                 Arguments.of("http://soma.kspo.or.kr"),
-                Arguments.of(
-                        "https://www.hangeul.go.kr/traceHangeul/traceHangeul1List.do?curr_menu_cd=0103010100"),
-                Arguments.of(
-                        "https://www.hangeul.go.kr/traceHangeul/traceHangeul1List.do?curr_menu_cd=0103010100"),
+                Arguments.of("https://www.hangeul.go.kr/traceHangeul/traceHangeul1List.do?curr_menu_cd=0103010100"),
+                Arguments.of("https://www.hangeul.go.kr/traceHangeul/traceHangeul1List.do?curr_menu_cd=0103010100"),
                 Arguments.of("http://galleryraon.com/?page_id=2472#upcoming")
         );
     }

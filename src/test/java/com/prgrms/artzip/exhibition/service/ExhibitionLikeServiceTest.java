@@ -41,10 +41,10 @@ class ExhibitionLikeServiceTest {
     @InjectMocks
     private ExhibitionLikeService exhibitionLikeService;
 
-    private Long userId = 2L;
     private User user = new User("test@example.com", "Emily", List.of(new Role(Authority.USER)));
 
     private Long exhibitionId = 1L;
+
     private Exhibition exhibition = Exhibition.builder()
             .seq(32)
             .name("전시회 제목")
@@ -67,8 +67,7 @@ class ExhibitionLikeServiceTest {
     @Test
     @DisplayName("좋아요 추가시 전시회가 없는 경우 테스트")
     void testAddLikeExhibitionNotFound() {
-        when(exhibitionLikeRepository.findByUserIdAndExhibitionId(user.getId(), exhibitionId))
-                .thenReturn(Optional.empty());
+        when(exhibitionLikeRepository.findByUserIdAndExhibitionId(user.getId(), exhibitionId)).thenReturn(Optional.empty());
         when(exhibitionRepository.findById(exhibitionId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> exhibitionLikeService.updateExhibitionLike(user, exhibitionId))
@@ -106,8 +105,7 @@ class ExhibitionLikeServiceTest {
                 .build();
         deletedExhibition.deleteExhibition();
 
-        when(exhibitionLikeRepository.findByUserIdAndExhibitionId(user.getId(), exhibitionId))
-                .thenReturn(Optional.empty());
+        when(exhibitionLikeRepository.findByUserIdAndExhibitionId(user.getId(), exhibitionId)).thenReturn(Optional.empty());
         when(exhibitionRepository.findById(exhibitionId)).thenReturn(Optional.of(deletedExhibition));
 
         assertThatThrownBy(() -> exhibitionLikeService.updateExhibitionLike(user, exhibitionId))
@@ -125,15 +123,11 @@ class ExhibitionLikeServiceTest {
     @Test
     @DisplayName("좋아요 추가 테스트")
     void testAddLike() {
-        when(exhibitionLikeRepository.findByUserIdAndExhibitionId(user.getId(), exhibitionId))
-                .thenReturn(Optional.empty());
-        when(exhibitionRepository.findById(exhibitionId))
-                .thenReturn(Optional.of(exhibition));
-        when(exhibitionLikeRepository.countByExhibitionId(exhibitionId))
-                .thenReturn(100L);
+        when(exhibitionLikeRepository.findByUserIdAndExhibitionId(user.getId(), exhibitionId)).thenReturn(Optional.empty());
+        when(exhibitionRepository.findById(exhibitionId)).thenReturn(Optional.of(exhibition));
+        when(exhibitionLikeRepository.countByExhibitionId(exhibitionId)).thenReturn(100L);
 
-        ExhibitionLikeResponse exhibitionLikeResponse = exhibitionLikeService
-                .updateExhibitionLike(user, exhibitionId);
+        ExhibitionLikeResponse exhibitionLikeResponse = exhibitionLikeService.updateExhibitionLike(user, exhibitionId);
 
         assertThat(exhibitionLikeResponse.getIsLiked()).isTrue();
 
@@ -150,13 +144,10 @@ class ExhibitionLikeServiceTest {
     void testRemoveLike() {
         ExhibitionLike exhibitionLike = new ExhibitionLike(user, exhibition);
 
-        when(exhibitionLikeRepository.findByUserIdAndExhibitionId(user.getId(), exhibitionId))
-                .thenReturn(Optional.of(exhibitionLike));
-        when(exhibitionLikeRepository.countByExhibitionId(exhibitionId))
-                .thenReturn(100L);
+        when(exhibitionLikeRepository.findByUserIdAndExhibitionId(user.getId(), exhibitionId)).thenReturn(Optional.of(exhibitionLike));
+        when(exhibitionLikeRepository.countByExhibitionId(exhibitionId)).thenReturn(100L);
 
-        ExhibitionLikeResponse exhibitionLikeResponse = exhibitionLikeService
-                .updateExhibitionLike(user, exhibitionId);
+        ExhibitionLikeResponse exhibitionLikeResponse = exhibitionLikeService.updateExhibitionLike(user, exhibitionId);
 
         verify(exhibitionLikeRepository).findByUserIdAndExhibitionId(user.getId(), exhibitionId);
         verify(exhibitionLikeRepository).delete(exhibitionLike);
@@ -173,8 +164,10 @@ class ExhibitionLikeServiceTest {
     void testGetExhibitionLikeCountByUserId() {
         // given
         when(exhibitionLikeRepository.countByUserId(1L)).thenReturn(3L);
+
         // when
         Long exhibitionLikeCount = exhibitionLikeService.getExhibitionLikeCountByUserId(1L);
+
         // then
         assertThat(exhibitionLikeCount).isEqualTo(3L);
         verify(exhibitionLikeRepository).countByUserId(1L);
