@@ -255,7 +255,7 @@ public class ReviewRepositoryTest {
     @Test
     @DisplayName("삭제된 리뷰를 조회하는 경우, null을 반환한다.")
     void testDeletedReview() {
-      Optional<ReviewWithLikeAndCommentCount> result = reviewRepository.findByReviewIdAndUserId(
+      Optional<ReviewWithLikeAndCommentCount> result = reviewRepository.findReviewByReviewId(
           deletedReview.getId(), user1.getId());
 
       assertThat(result.isEmpty()).isTrue();
@@ -264,7 +264,7 @@ public class ReviewRepositoryTest {
     @Test
     @DisplayName("삭제되지 않은 리뷰를 조회하는 경우, 리뷰 정보를 반환한다.")
     void testNotDeletedReview() {
-      Optional<ReviewWithLikeAndCommentCount> result = reviewRepository.findByReviewIdAndUserId(
+      Optional<ReviewWithLikeAndCommentCount> result = reviewRepository.findReviewByReviewId(
           publicReview1.getId(), user1.getId());
 
       assertThat(result.isPresent()).isTrue();
@@ -282,7 +282,7 @@ public class ReviewRepositoryTest {
     @Test
     @DisplayName("후기 작성자가 조회하는 경우, isPublic == true인 리뷰 정보를 반환한다.")
     void testPublicReviewWithWriter() {
-      Optional<ReviewWithLikeAndCommentCount> result = reviewRepository.findByReviewIdAndUserId(
+      Optional<ReviewWithLikeAndCommentCount> result = reviewRepository.findReviewByReviewId(
           publicReview1.getId(), user1.getId());
 
       assertThat(result.isPresent()).isTrue();
@@ -300,7 +300,7 @@ public class ReviewRepositoryTest {
     @Test
     @DisplayName("후기 작성자가 조회하는 경우, isPublic == false인 리뷰 정보를 반환한다.")
     void testPrivateReviewWhitWriter() {
-      Optional<ReviewWithLikeAndCommentCount> result = reviewRepository.findByReviewIdAndUserId(
+      Optional<ReviewWithLikeAndCommentCount> result = reviewRepository.findReviewByReviewId(
           privateReview.getId(), user1.getId());
 
       assertThat(result.isPresent()).isTrue();
@@ -318,7 +318,7 @@ public class ReviewRepositoryTest {
     @Test
     @DisplayName("user == null인 경우, isPublic == true인 리뷰 정보를 반환한다.")
     void testNullUser() {
-      Optional<ReviewWithLikeAndCommentCount> result = reviewRepository.findByReviewIdAndUserId(
+      Optional<ReviewWithLikeAndCommentCount> result = reviewRepository.findReviewByReviewId(
           publicReview1.getId(), user1.getId());
 
       assertThat(result.isPresent()).isTrue();
@@ -336,7 +336,7 @@ public class ReviewRepositoryTest {
     @Test
     @DisplayName("user == null인 경우, isPublic == false인 리뷰 정보는 반환하지 않는다.")
     void testPrivateReview() {
-      Optional<ReviewWithLikeAndCommentCount> result = reviewRepository.findByReviewIdAndUserId(
+      Optional<ReviewWithLikeAndCommentCount> result = reviewRepository.findReviewByReviewId(
           privateReview.getId(), null);
 
       assertThat(result.isEmpty()).isTrue();
@@ -358,7 +358,7 @@ public class ReviewRepositoryTest {
       @DisplayName("userId == null인 경우, isLiked(좋아요 여부)는 조회되지 않는다.")
       void testUserIdIsNull() {
 
-        Page<ReviewWithLikeAndCommentCount> result = reviewRepository.findReviewsByExhibitionIdAndUserId(
+        Page<ReviewWithLikeAndCommentCount> result = reviewRepository.findReviews(
             null, null, pageable);
 
         assertThat(result.getTotalPages()).isEqualTo(1);
@@ -396,7 +396,7 @@ public class ReviewRepositoryTest {
       @Test
       @DisplayName("userId != null인 경우, isLiked(좋아요 여부)도 함께 조회된다.")
       void testUserIdInNotNull() {
-        Page<ReviewWithLikeAndCommentCount> result = reviewRepository.findReviewsByExhibitionIdAndUserId(
+        Page<ReviewWithLikeAndCommentCount> result = reviewRepository.findReviews(
             null, user1.getId(), pageable);
 
         assertThat(result.getTotalPages()).isEqualTo(1);
@@ -441,7 +441,7 @@ public class ReviewRepositoryTest {
       @DisplayName("userId == null인 경우, isLiked(좋아요 여부)는 조회되지 않는다.")
       void testUserIdIsNull() {
 
-        Page<ReviewWithLikeAndCommentCount> result = reviewRepository.findReviewsByExhibitionIdAndUserId(
+        Page<ReviewWithLikeAndCommentCount> result = reviewRepository.findReviews(
             exhibitionAtBusan.getId(), null, pageable);
 
         assertThat(result.getTotalPages()).isEqualTo(1);
@@ -470,7 +470,7 @@ public class ReviewRepositoryTest {
       @Test
       @DisplayName("userId != null인 경우, isLiked(좋아요 여부)도 함께 조회된다.")
       void testUserIdInNotNull() {
-        Page<ReviewWithLikeAndCommentCount> result = reviewRepository.findReviewsByExhibitionIdAndUserId(
+        Page<ReviewWithLikeAndCommentCount> result = reviewRepository.findReviews(
             exhibitionAtBusan.getId(), user1.getId(), pageable);
 
         assertThat(result.getTotalPages()).isEqualTo(1);

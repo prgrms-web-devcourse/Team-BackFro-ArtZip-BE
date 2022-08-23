@@ -12,7 +12,6 @@ import static org.mockito.Mockito.verify;
 
 import com.prgrms.artzip.comment.domain.Comment;
 import com.prgrms.artzip.comment.dto.projection.CommentSimpleProjection;
-import com.prgrms.artzip.comment.dto.response.CommentResponse;
 import com.prgrms.artzip.comment.dto.response.CommentResponseQ;
 import com.prgrms.artzip.comment.dto.response.CommentsResponse;
 import com.prgrms.artzip.comment.service.CommentService;
@@ -856,7 +855,7 @@ class ReviewServiceTest {
         // given
         given(reviewRepository.findById(reflectionReview.getId()))
             .willReturn(Optional.of(reflectionReview));
-        given(reviewRepository.findByReviewIdAndUserId(
+        given(reviewRepository.findReviewByReviewId(
             reflectionReview.getId(), null))
             .willReturn(Optional.of(reviewData));
         given(exhibitionRepository.findExhibitionForReview(
@@ -871,7 +870,7 @@ class ReviewServiceTest {
         reviewService.getReview(null, reflectionReview.getId());
 
         // then
-        verify(reviewRepository).findByReviewIdAndUserId(reflectionReview.getId(), null);
+        verify(reviewRepository).findReviewByReviewId(reflectionReview.getId(), null);
         verify(exhibitionRepository).findExhibitionForReview(
             null, reflectionReview.getExhibition().getId());
         verify(commentService).getCommentsByReviewId(
@@ -1031,7 +1030,7 @@ class ReviewServiceTest {
         // given
         given(reviewRepository.findById(reflectionReview.getId()))
             .willReturn(Optional.of(reflectionReview));
-        given(reviewRepository.findByReviewIdAndUserId(
+        given(reviewRepository.findReviewByReviewId(
             reflectionReview.getId(), reflectionUser.getId()))
             .willReturn(Optional.of(reviewData));
         given(exhibitionRepository.findExhibitionForReview(
@@ -1046,7 +1045,7 @@ class ReviewServiceTest {
         reviewService.getReview(reflectionUser, reflectionReview.getId());
 
         // then
-        verify(reviewRepository).findByReviewIdAndUserId(reflectionReview.getId(),
+        verify(reviewRepository).findReviewByReviewId(reflectionReview.getId(),
             reflectionUser.getId());
         verify(exhibitionRepository).findExhibitionForReview(
             reflectionUser.getId(), reflectionReview.getExhibition().getId());
@@ -1093,7 +1092,7 @@ class ReviewServiceTest {
 
         doReturn(Optional.of(privateReview)).when(reviewRepository).findById(privateReview.getId());
         doThrow(new NotFoundException(ErrorCode.REVIEW_NOT_FOUND))
-            .when(reviewRepository).findByReviewIdAndUserId(privateReview.getId(), null);
+            .when(reviewRepository).findReviewByReviewId(privateReview.getId(), null);
 
         // when
         // then
@@ -1109,7 +1108,7 @@ class ReviewServiceTest {
         // given
         doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
         doReturn(Optional.of(reviewData))
-            .when(reviewRepository).findByReviewIdAndUserId(review.getId(), null);
+            .when(reviewRepository).findReviewByReviewId(review.getId(), null);
         doThrow(new NotFoundException(ErrorCode.EXHB_NOT_FOUND))
             .when(exhibitionRepository).findExhibitionForReview(any(), any());
 
@@ -1239,7 +1238,7 @@ class ReviewServiceTest {
             1L
         );
 
-        given(reviewRepository.findReviewsByExhibitionIdAndUserId(
+        given(reviewRepository.findReviews(
             reflectionExhibition.getId(), null, pageable))
             .willReturn(reflectionReviews);
         given(reviewRepository.findById(reflectionReviews.getContent().get(0).getReviewId()))
@@ -1249,7 +1248,7 @@ class ReviewServiceTest {
 
         reviewService.getReviews(null, reflectionExhibition.getId(), pageable);
 
-        verify(reviewRepository).findReviewsByExhibitionIdAndUserId(reflectionExhibition.getId(),
+        verify(reviewRepository).findReviews(reflectionExhibition.getId(),
             null, pageable);
         verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(
             reflectionReview.getId());
@@ -1361,7 +1360,7 @@ class ReviewServiceTest {
             1L
         );
 
-        given(reviewRepository.findReviewsByExhibitionIdAndUserId(
+        given(reviewRepository.findReviews(
             reflectionExhibition.getId(), reflectionUser.getId(), pageable))
             .willReturn(reflectionReviews);
         given(reviewRepository.findById(reflectionReviews.getContent().get(0).getReviewId()))
@@ -1371,7 +1370,7 @@ class ReviewServiceTest {
 
         reviewService.getReviews(reflectionUser, reflectionExhibition.getId(), pageable);
 
-        verify(reviewRepository).findReviewsByExhibitionIdAndUserId(reflectionExhibition.getId(),
+        verify(reviewRepository).findReviews(reflectionExhibition.getId(),
             reflectionUser.getId(), pageable);
         verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(
             reflectionReview.getId());
@@ -1405,7 +1404,7 @@ class ReviewServiceTest {
       void testReviewNotFoundException() {
         // given
         doReturn(reviews)
-            .when(reviewRepository).findReviewsByExhibitionIdAndUserId(
+            .when(reviewRepository).findReviews(
                 exhibition.getId(), null, pageable);
         doThrow(new NotFoundException(ErrorCode.REVIEW_NOT_FOUND))
             .when(reviewRepository).findById(any());
@@ -1536,7 +1535,7 @@ class ReviewServiceTest {
             1L
         );
 
-        given(reviewRepository.findReviewsByExhibitionIdAndUserId(
+        given(reviewRepository.findReviews(
             reflectionExhibition.getId(), null, pageable))
             .willReturn(reflectionReviews);
         given(reviewRepository.findById(reflectionReviews.getContent().get(0).getReviewId()))
@@ -1544,7 +1543,7 @@ class ReviewServiceTest {
 
         reviewService.getReviewsForExhibition(null, reflectionExhibition.getId());
 
-        verify(reviewRepository).findReviewsByExhibitionIdAndUserId(reflectionExhibition.getId(),
+        verify(reviewRepository).findReviews(reflectionExhibition.getId(),
             null, pageable);
         verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(
             reflectionReview.getId());
@@ -1654,7 +1653,7 @@ class ReviewServiceTest {
             1L
         );
 
-        given(reviewRepository.findReviewsByExhibitionIdAndUserId(
+        given(reviewRepository.findReviews(
             reflectionExhibition.getId(), reflectionUser.getId(), pageable))
             .willReturn(reflectionReviews);
         given(reviewRepository.findById(reflectionReviews.getContent().get(0).getReviewId()))
@@ -1662,7 +1661,7 @@ class ReviewServiceTest {
 
         reviewService.getReviewsForExhibition(reflectionUser.getId(), reflectionExhibition.getId());
 
-        verify(reviewRepository).findReviewsByExhibitionIdAndUserId(reflectionExhibition.getId(),
+        verify(reviewRepository).findReviews(reflectionExhibition.getId(),
             reflectionUser.getId(), pageable);
         verify(reviewRepository, times(reflectionReviews.getContent().size())).findById(
             reflectionReview.getId());
@@ -1701,7 +1700,7 @@ class ReviewServiceTest {
       void testReviewNotFoundException() {
         // given
         doReturn(reviews)
-            .when(reviewRepository).findReviewsByExhibitionIdAndUserId(
+            .when(reviewRepository).findReviews(
                 exhibition.getId(), null, pageable);
         doThrow(new NotFoundException(ErrorCode.REVIEW_NOT_FOUND))
             .when(reviewRepository).findById(any());

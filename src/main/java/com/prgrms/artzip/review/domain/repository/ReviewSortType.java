@@ -4,11 +4,12 @@ import static com.prgrms.artzip.comment.domain.QComment.comment;
 import static com.prgrms.artzip.review.domain.QReview.review;
 import static com.prgrms.artzip.review.domain.QReviewLike.reviewLike;
 
+import com.prgrms.artzip.common.ErrorCode;
+import com.prgrms.artzip.common.error.exception.NotFoundException;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import java.util.Arrays;
-import java.util.Optional;
 
 public enum ReviewSortType {
 
@@ -28,10 +29,13 @@ public enum ReviewSortType {
     return new OrderSpecifier(direction, this.target);
   }
 
-  public static Optional<ReviewSortType> getReviewSortType(String property) {
+  public static ReviewSortType getReviewSortType(String property) {
     return Arrays.stream(ReviewSortType.values())
         .filter(reviewSortType -> reviewSortType.property.equals(property))
-        .findAny();
+        .findAny()
+        .orElseThrow(() -> {
+          throw new NotFoundException(ErrorCode.INVALID_REVIEW_SORT_TYPE);
+        });
   }
 
 }
