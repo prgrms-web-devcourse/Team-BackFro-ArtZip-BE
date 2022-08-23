@@ -1,13 +1,13 @@
 package com.prgrms.artzip.exhibition.service;
 
 import com.prgrms.artzip.common.error.exception.InvalidRequestException;
-import com.prgrms.artzip.exhibition.domain.repository.ExhibitionRepository;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionWithLocationForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.response.ExhibitionAroundMeInfoResponse;
 import com.prgrms.artzip.exhibition.dto.response.ExhibitionDetailInfoResponse;
 import com.prgrms.artzip.exhibition.dto.response.ExhibitionInfoResponse;
+import com.prgrms.artzip.exhibition.repository.ExhibitionRepository;
 import com.prgrms.artzip.review.dto.response.ReviewsResponseForExhibitionDetail;
 import com.prgrms.artzip.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;

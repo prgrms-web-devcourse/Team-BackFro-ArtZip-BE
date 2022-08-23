@@ -17,7 +17,7 @@ import com.prgrms.artzip.common.util.AmazonS3Uploader;
 import com.prgrms.artzip.exhibition.domain.Exhibition;
 import com.prgrms.artzip.exhibition.domain.enumType.Area;
 import com.prgrms.artzip.exhibition.domain.enumType.Genre;
-import com.prgrms.artzip.exhibition.domain.repository.ExhibitionRepository;
+import com.prgrms.artzip.exhibition.repository.ExhibitionRepository;
 import com.prgrms.artzip.review.domain.Review;
 import com.prgrms.artzip.review.domain.ReviewLike;
 import com.prgrms.artzip.review.domain.ReviewPhoto;

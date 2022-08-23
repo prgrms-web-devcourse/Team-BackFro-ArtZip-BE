@@ -5,12 +5,12 @@ import com.prgrms.artzip.common.error.exception.InvalidRequestException;
 import com.prgrms.artzip.exhibition.domain.Exhibition;
 import com.prgrms.artzip.exhibition.domain.enumType.Area;
 import com.prgrms.artzip.exhibition.domain.enumType.Genre;
-import com.prgrms.artzip.exhibition.domain.repository.ExhibitionRepository;
 import com.prgrms.artzip.exhibition.domain.vo.Location;
 import com.prgrms.artzip.exhibition.domain.vo.Period;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionDetailForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionForSimpleQuery;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionWithLocationForSimpleQuery;
+import com.prgrms.artzip.exhibition.repository.ExhibitionRepository;
 import com.prgrms.artzip.review.domain.Review;
 import com.prgrms.artzip.review.domain.ReviewPhoto;
 import com.prgrms.artzip.review.dto.response.ReviewPhotoInfo;
@@ -237,7 +237,7 @@ class ExhibitionServiceTest {
         Long exhibitionLikeUserId = 2L;
 
         pageRequest = PageRequest.of(0, 1);
-        
+
         Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = new PageImpl(List.of(ExhibitionForSimpleQuery.builder()
                 .id(11L)
                 .name("요리조리 MOKA Garden")
