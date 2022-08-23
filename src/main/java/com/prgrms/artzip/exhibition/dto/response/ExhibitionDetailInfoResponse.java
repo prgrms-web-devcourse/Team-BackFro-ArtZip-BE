@@ -11,7 +11,6 @@ import java.util.List;
 
 @Getter
 public class ExhibitionDetailInfoResponse extends ExhibitionBasicInfoResponse {
-
     private LocalDate startDate;
     private LocalDate endDate;
     private Area area;

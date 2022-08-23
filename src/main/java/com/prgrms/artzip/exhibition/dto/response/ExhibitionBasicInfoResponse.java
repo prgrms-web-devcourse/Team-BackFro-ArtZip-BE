@@ -6,14 +6,13 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Getter
 public class ExhibitionBasicInfoResponse {
+    private Long exhibitionId;
+    private String name;
+    private String thumbnail;
 
-  private Long exhibitionId;
-  private String name;
-  private String thumbnail;
-
-  public ExhibitionBasicInfoResponse(Long exhibitionId, String name, String thumbnail) {
-    this.exhibitionId = exhibitionId;
-    this.name = name;
-    this.thumbnail = thumbnail;
-  }
+    public ExhibitionBasicInfoResponse(Long exhibitionId, String name, String thumbnail) {
+        this.exhibitionId = exhibitionId;
+        this.name = name;
+        this.thumbnail = thumbnail;
+    }
 }

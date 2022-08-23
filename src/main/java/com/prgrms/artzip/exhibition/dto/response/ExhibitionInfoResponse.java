@@ -7,7 +7,6 @@ import java.time.LocalDate;
 
 @Getter
 public class ExhibitionInfoResponse extends ExhibitionBasicInfoResponse {
-
     private LocalDate startDate;
     private LocalDate endDate;
     private Boolean isLiked;

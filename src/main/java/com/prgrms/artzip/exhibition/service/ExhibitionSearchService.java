@@ -52,7 +52,6 @@ public class ExhibitionSearchService {
 
     public Page<ExhibitionInfoResponse> getExhibitionsByCustomCondition(Long userId, ExhibitionCustomConditionRequest exhibitionCustomConditionRequest, boolean includeEnd, Pageable pageable) {
         ExhibitionCustomCondition exhibitionCustomCondition = validateCondition(exhibitionCustomConditionRequest, includeEnd);
-
         Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findExhibitionsByCustomCondition(userId, exhibitionCustomCondition, pageable);
 
         return exhibitionsPagingResult.map(ExhibitionInfoResponse::new);

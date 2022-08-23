@@ -28,18 +28,18 @@ public class ExhibitionService {
 
     public Page<ExhibitionInfoResponse> getUpcomingExhibitions(Long userId, Pageable pageable) {
         Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findUpcomingExhibitions(userId, pageable);
+
         return exhibitionsPagingResult.map(ExhibitionInfoResponse::new);
     }
 
     public Page<ExhibitionInfoResponse> getMostLikeExhibitions(Long userId, boolean includeEnd, Pageable pageable) {
         Page<ExhibitionForSimpleQuery> exhibitionsPagingResult = exhibitionRepository.findMostLikeExhibitions(userId, includeEnd, pageable);
+
         return exhibitionsPagingResult.map(ExhibitionInfoResponse::new);
     }
 
     public ExhibitionDetailInfoResponse getExhibition(Long userId, Long exhibitionId) {
-        ExhibitionDetailForSimpleQuery exhibition = exhibitionRepository.findExhibition(userId, exhibitionId)
-                .orElseThrow(() -> new InvalidRequestException(EXHB_NOT_FOUND));
-
+        ExhibitionDetailForSimpleQuery exhibition = exhibitionRepository.findExhibition(userId, exhibitionId).orElseThrow(() -> new InvalidRequestException(EXHB_NOT_FOUND));
         List<ReviewsResponseForExhibitionDetail> reviews = reviewService.getReviewsForExhibition(userId, exhibitionId);
 
         return new ExhibitionDetailInfoResponse(exhibition, reviews);

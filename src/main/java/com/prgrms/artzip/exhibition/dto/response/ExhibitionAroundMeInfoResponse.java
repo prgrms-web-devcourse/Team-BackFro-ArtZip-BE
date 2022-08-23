@@ -6,7 +6,6 @@ import lombok.Getter;
 
 @Getter
 public class ExhibitionAroundMeInfoResponse extends ExhibitionInfoResponse {
-
     private String placeAddr;
     private Double lat;
     private Double lng;
