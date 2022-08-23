@@ -111,6 +111,8 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
     JPAQuery<Long> countQuery = queryFactory
         .select(review.count())
         .from(review)
+        .leftJoin(reviewLikeToFilterTargetUser)
+        .on(review.id.eq(reviewLikeToFilterTargetUser.review.id))
         .where(review.isDeleted.isFalse(),
             review.isPublic.isTrue(),
             reviewLikeTargetUserIdEq(targetUserId));
