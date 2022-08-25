@@ -1,15 +1,14 @@
 package com.prgrms.artzip.exhibition.dto.response;
 
-import java.util.List;
 import lombok.Getter;
+
+import java.util.List;
 
 @Getter
 public class ExhibitionsAroundMeResponse {
+    private List<ExhibitionAroundMeInfoResponse> exhibitions;
 
-  private List<ExhibitionAroundMeInfoResponse> exhibitions;
-
-  public ExhibitionsAroundMeResponse(
-      List<ExhibitionAroundMeInfoResponse> exhibitions) {
-    this.exhibitions = exhibitions;
-  }
+    public ExhibitionsAroundMeResponse(List<ExhibitionAroundMeInfoResponse> exhibitions) {
+        this.exhibitions = exhibitions;
+    }
 }

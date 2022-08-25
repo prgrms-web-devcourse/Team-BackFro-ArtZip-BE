@@ -5,15 +5,14 @@ import lombok.Getter;
 
 @Getter
 public class ExhibitionLikeResponse {
+    private Long exhibitionId;
+    private long likeCount;
+    private Boolean isLiked;
 
-  private Long exhibitionId;
-  private long likeCount;
-  private Boolean isLiked;
-
-  @Builder
-  public ExhibitionLikeResponse(Long exhibitionId, long likeCount, Boolean isLiked) {
-    this.exhibitionId = exhibitionId;
-    this.likeCount = likeCount;
-    this.isLiked = isLiked;
-  }
+    @Builder
+    public ExhibitionLikeResponse(Long exhibitionId, long likeCount, Boolean isLiked) {
+        this.exhibitionId = exhibitionId;
+        this.likeCount = likeCount;
+        this.isLiked = isLiked;
+    }
 }

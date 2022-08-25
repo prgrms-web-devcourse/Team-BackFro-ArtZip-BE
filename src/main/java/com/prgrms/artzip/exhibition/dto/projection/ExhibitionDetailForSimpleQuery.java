@@ -12,16 +12,16 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class ExhibitionDetailForSimpleQuery extends ExhibitionBasicForSimpleQuery {
 
-  private Integer seq;
-  private Period period;
-  private Genre genre;
-  private String description;
-  private Location location;
-  private String inquiry;
-  private String fee;
-  private String url;
-  private String placeUrl;
-  private Boolean isLiked;
-  private long likeCount;
-  private long reviewCount;
+    private Integer seq;
+    private Period period;
+    private Genre genre;
+    private String description;
+    private Location location;
+    private String inquiry;
+    private String fee;
+    private String url;
+    private String placeUrl;
+    private Boolean isLiked;
+    private long likeCount;
+    private long reviewCount;
 }

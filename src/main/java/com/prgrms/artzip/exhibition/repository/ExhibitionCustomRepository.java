@@ -1,4 +1,4 @@
-package com.prgrms.artzip.exhibition.domain.repository;
+package com.prgrms.artzip.exhibition.repository;
 
 import com.prgrms.artzip.exhibition.dto.ExhibitionCustomCondition;
 import com.prgrms.artzip.exhibition.dto.projection.ExhibitionBasicForSimpleQuery;

@@ -10,7 +10,7 @@ import com.prgrms.artzip.common.error.exception.PermissionDeniedException;
 import com.prgrms.artzip.common.util.AmazonS3Remover;
 import com.prgrms.artzip.common.util.AmazonS3Uploader;
 import com.prgrms.artzip.exhibition.domain.Exhibition;
-import com.prgrms.artzip.exhibition.domain.repository.ExhibitionRepository;
+import com.prgrms.artzip.exhibition.repository.ExhibitionRepository;
 import com.prgrms.artzip.review.domain.Review;
 import com.prgrms.artzip.review.domain.ReviewLike;
 import com.prgrms.artzip.review.domain.ReviewPhoto;
