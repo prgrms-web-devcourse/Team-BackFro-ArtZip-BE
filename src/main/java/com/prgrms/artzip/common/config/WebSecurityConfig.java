@@ -99,6 +99,8 @@ public class WebSecurityConfig {
           .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
           .and()
         .authorizeRequests()
+          .antMatchers("/api/v1/admin/**")
+            .hasAuthority(ADMIN.name())
           .antMatchers(
             "/api/v1/users/me/**",
               "/api/v1/exhibitions/**/likes",
