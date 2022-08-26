@@ -60,7 +60,7 @@ class ExhibitionAdminControllerTest {
 
     @BeforeEach
     void setUp() {
-        Role role = new Role(Authority.USER);
+        Role role = new Role(Authority.ADMIN);
         em.persist(role);
         user = LocalUser.builder()
                 .email("test@test.com")
@@ -127,7 +127,8 @@ class ExhibitionAdminControllerTest {
     @DisplayName("관리자 전시회 다건 조회 테스트 - 생성 일자 순 정렬")
     void testGetExhibitionsOrderByCreatedAt() throws Exception {
         //given //when //then
-        mockMvc.perform(get("/api/v1/admin/exhibitions"))
+        mockMvc.perform(get("/api/v1/admin/exhibitions")
+                .header("accessToken", accessToken))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -137,6 +138,7 @@ class ExhibitionAdminControllerTest {
     void testGetExhibitionsOrderByLikeCount() throws Exception {
         //given // when //then
         mockMvc.perform(get("/api/v1/admin/exhibitions")
+                        .header("accessToken", accessToken)
                         .param("sort", "likeCount,DESC"))
                 .andExpect(status().isOk())
                 .andDo(print());
@@ -147,6 +149,7 @@ class ExhibitionAdminControllerTest {
     void testGetExhibitionsOrderByInvalidSort() throws Exception {
         //given // when //then
         mockMvc.perform(get("/api/v1/admin/exhibitions")
+                        .header("accessToken", accessToken)
                         .param("sort", "something wrong"))
                 .andExpect(status().isBadRequest())
                 .andDo(print());
@@ -156,7 +159,8 @@ class ExhibitionAdminControllerTest {
     @DisplayName("관리자 전시회 단건 조회 테스트")
     void testGetExhibition() throws Exception {
         //given // when //then
-        mockMvc.perform(get("/api/v1/admin/exhibitions/{exhibitionId}", exhibition.getId()))
+        mockMvc.perform(get("/api/v1/admin/exhibitions/{exhibitionId}", exhibition.getId())
+                .header("accessToken", accessToken))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -187,6 +191,7 @@ class ExhibitionAdminControllerTest {
         // when //then
         mockMvc.perform(multipart("/api/v1/admin/exhibitions/")
                         .file("thumbnail", file.getBytes())
+                        .header("accessToken", accessToken)
                         .param("name", request.getName())
                         .param("startDate", request.getStartDate().toString())
                         .param("endDate", request.getEndDate().toString())
@@ -228,6 +233,7 @@ class ExhibitionAdminControllerTest {
 
         // when //then
         mockMvc.perform(multipart("/api/v1/admin/exhibitions")
+                        .header("accessToken", accessToken)
                         .param("name", request.getName())
                         .param("startDate", request.getStartDate().toString())
                         .param("endDate", request.getEndDate().toString())
@@ -332,6 +338,7 @@ class ExhibitionAdminControllerTest {
 
         // when //then
         mockMvc.perform(builder
+                        .header("accessToken", accessToken)
                         .param("name", request.getName())
                         .param("startDate", request.getStartDate().toString())
                         .param("endDate", request.getEndDate().toString())
@@ -382,6 +389,7 @@ class ExhibitionAdminControllerTest {
 
         // when //then
         mockMvc.perform(builder
+                        .header("accessToken", accessToken)
                         .param("name", request.getName())
                         .param("startDate", request.getStartDate().toString())
                         .param("endDate", request.getEndDate().toString())
@@ -411,6 +419,7 @@ class ExhibitionAdminControllerTest {
 
         // when //then
         mockMvc.perform(patch("/api/v1/admin/exhibitions/{exhibitionId}/semi", exhibition.getId())
+                        .header("accessToken", accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isSeeOther())
@@ -426,6 +435,7 @@ class ExhibitionAdminControllerTest {
 
         // when //then
         mockMvc.perform(patch("/api/v1/admin/exhibitions/{exhibitionId}/semi", exhibition.getId())
+                        .header("accessToken", accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isSeeOther())
@@ -436,10 +446,12 @@ class ExhibitionAdminControllerTest {
     @DisplayName("관리자 전시회 삭제 테스트")
     void testDeleteExhibition() throws Exception {
         // given // when //then
-        mockMvc.perform(delete("/api/v1/admin/exhibitions/{exhibitionId}", exhibition.getId()))
+        mockMvc.perform(delete("/api/v1/admin/exhibitions/{exhibitionId}", exhibition.getId())
+                .header("accessToken", accessToken))
                 .andExpect(status().isSeeOther())
                 .andDo(print());
-        mockMvc.perform(delete("/api/v1/admin/exhibitions/{exhibitionId}", exhibition.getId()))
+        mockMvc.perform(delete("/api/v1/admin/exhibitions/{exhibitionId}", exhibition.getId())
+                .header("accessToken", accessToken))
                 .andExpect(status().isBadRequest())
                 .andDo(print());
     }
