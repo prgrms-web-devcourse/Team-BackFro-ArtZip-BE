@@ -15,25 +15,25 @@ import javax.annotation.PostConstruct;
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
-  private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
-  @PostConstruct
-  public void initObjectMapper() {
-    objectMapper.getFactory().configure(JsonWriteFeature.ESCAPE_NON_ASCII.mappedFeature(), true);
-    objectMapper.registerModule(new JavaTimeModule());
-  }
+    @PostConstruct
+    public void initObjectMapper() {
+        objectMapper.getFactory().configure(JsonWriteFeature.ESCAPE_NON_ASCII.mappedFeature(), true);
+        objectMapper.registerModule(new JavaTimeModule());
+    }
 
-  @Override
-  public void addCorsMappings(CorsRegistry registry) {
-    registry.addMapping("/api/v1/**")
-        .allowedOrigins("http://localhost:3000", "https://artzip.shop", "https://team-back-fro-art-zip-fe.vercel.app")
-        .allowedMethods(
-            HttpMethod.GET.name(),
-            HttpMethod.HEAD.name(),
-            HttpMethod.POST.name(),
-            HttpMethod.PUT.name(),
-            HttpMethod.DELETE.name(),
-            HttpMethod.PATCH.name())
-        .allowCredentials(true);
-  }
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/api/v1/**")
+                .allowedOrigins("http://localhost:3000", "https://server.artzip.shop", "https://artzip.shop", "https://team-back-fro-art-zip-fe.vercel.app")
+                .allowedMethods(
+                        HttpMethod.GET.name(),
+                        HttpMethod.HEAD.name(),
+                        HttpMethod.POST.name(),
+                        HttpMethod.PUT.name(),
+                        HttpMethod.DELETE.name(),
+                        HttpMethod.PATCH.name())
+                .allowCredentials(true);
+    }
 }
