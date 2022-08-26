@@ -100,8 +100,8 @@ public class WebSecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-//                .antMatchers("/api/v1/admin/**")
-//                .hasAuthority(ADMIN.name())
+                .antMatchers("/api/v1/admin/**")
+                .hasAuthority(ADMIN.name())
                 .antMatchers("/api/v1/users/me/**", "/api/v1/exhibitions/**/likes", "api/v1/users/logout")
                 .hasAnyAuthority(USER.name(), ADMIN.name())
                 .antMatchers(HttpMethod.POST, "/api/v1/reviews", "/api/v1/comments/**", "/api/v1/reviews/**/comments")
@@ -129,7 +129,7 @@ public class WebSecurityConfig {
                 .and()
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(exceptionHandlerFilter, JwtAuthenticationFilter.class);
-        
+
         return http.build();
     }
 }
