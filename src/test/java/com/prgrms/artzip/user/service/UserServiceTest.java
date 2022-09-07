@@ -82,7 +82,7 @@ class UserServiceTest {
 
   private static final String PROFILE_DIRECTORY_NAME = "profileImage";
 
-  private static final String defaultImageLink = "default";
+  private static final String defaultImageLink = "";
 
   @Test
   @DisplayName("정상 회원가입 테스트")

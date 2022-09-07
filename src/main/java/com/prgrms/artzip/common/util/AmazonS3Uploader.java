@@ -30,8 +30,7 @@ public class AmazonS3Uploader {
   @Value("${cloud.aws.s3.bucket}")
   private String bucket;
 
-  @Value("${cloud.aws.s3.default-profile-image}")
-  private String defaultProfileImage;
+  private String defaultProfileImage = "";
 
   public String upload(MultipartFile multipartFile, String dirName) throws IOException {
     File uploadFile = convert(multipartFile).orElseThrow(
