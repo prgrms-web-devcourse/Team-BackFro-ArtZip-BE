@@ -42,7 +42,7 @@ public class User extends BaseEntity {
   private String email;
 
   @Column(name = "profile_image", length = 300)
-  private String profileImage = "https://devcourse-backfro-s3.s3.ap-northeast-2.amazonaws.com/profileImage/default/anonymous-user.jpg";
+  private String profileImage = "";
 
   @Column(name = "nickname", nullable = false, length = MAX_NICKNAME_LENGTH)
   private String nickname;
@@ -94,9 +94,8 @@ public class User extends BaseEntity {
 
   public void setProfileImage(String profileImage) {
     if (!hasText(profileImage)) {
-      throw new InvalidRequestException(MISSING_REQUEST_PARAMETER);
+      validateProfileImage(profileImage);
     }
-    validateProfileImage(profileImage);
     this.profileImage = profileImage;
   }
 

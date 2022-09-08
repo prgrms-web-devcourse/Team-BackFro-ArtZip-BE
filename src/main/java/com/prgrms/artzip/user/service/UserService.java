@@ -135,7 +135,7 @@ public class UserService {
       } else {
         // 수정하지 않은 경우
         if (hasText(request.getProfileImage())) {
-          if (request.getProfileImage().equals(amazonS3Uploader.getDefaultProfileImage()) || user.getProfileImage().equals(request.getProfileImage()))
+          if (user.getProfileImage().equals(request.getProfileImage()))
             updatedProfile = request.getProfileImage();
           else
             throw new InvalidRequestException(USER_PROFILE_NOT_MATCHED);
