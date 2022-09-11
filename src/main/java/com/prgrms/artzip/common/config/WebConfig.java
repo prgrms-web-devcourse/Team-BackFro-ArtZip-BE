@@ -26,7 +26,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/v1/**")
-                .allowedOrigins("http://localhost:3000", "https://server.artzip.shop", "https://artzip.shop")
+                .allowedOrigins("http://localhost:3000", "https://server.artzip.shop", "https://artzip.shop", "https://artzip-backfro.vercel.app")
                 .allowedOriginPatterns("https://artzip-git*.vercel.app")
                 .allowedMethods(
                         HttpMethod.GET.name(),
