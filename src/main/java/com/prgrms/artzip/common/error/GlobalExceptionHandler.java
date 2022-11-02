@@ -63,9 +63,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(AccessDeniedException.class)
   public ResponseEntity<ErrorResponse> handleAccessDeniedException(
           AccessDeniedException e) {
-    log.warn(e.getMessage(), e);
-    ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.ACCESS_DENIED);
-    return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
+    return handleException(e, ErrorCode.ACCESS_DENIED);
   }
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
